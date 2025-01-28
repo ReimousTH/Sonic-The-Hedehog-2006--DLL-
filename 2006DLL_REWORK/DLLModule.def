@@ -1,0 +1,3 @@
+LIBRARY      DLLModule
+EXPORTS
+    szModuleName   @1 DATA

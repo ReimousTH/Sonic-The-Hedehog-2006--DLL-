@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject ProjectType="Visual C++" Version="9.00" Name="DLLModule" Keyword="XenonProj" ProjectGUID="{652C7D60-BC02-4E09-96DD-930012345678}" TargetFrameworkVersion="131072" xmlns:atg="http://atg.xbox.com">
+<Platforms>
+<Platform Name="Xbox 360" />
+</Platforms>
+<ToolFiles />
+<Configurations>
+<Configuration Name="Debug|Xbox 360" OutputDirectory="Debug" IntermediateDirectory="Debug" CharacterSet="2" ConfigurationType="2" UseOfMFC="-1" UseOfATL="0">
+<Tool Name="VCCLX360CompilerTool" Optimization="0" EnableIntrinsicFunctions="true" AdditionalIncludeDirectories="..\..\Common;..\..\..\Modules" PreprocessorDefinitions="_DEBUG;_XBOX;XBOX;XBOX_SAMPLE;_XBOX_CRT_DEPRECATE_INSECURE;" ExceptionHandling="0" RuntimeLibrary="1" BufferSecurityCheck="false" ForceConformanceInForLoopScope="true" RuntimeTypeInfo="false" OpenMP="FALSE" UsePrecompiledHeader="0" WarningLevel="4" ProgramDataBaseFileName="$(IntDir)\vc80.pdb" AdditionalOptions="/MP " DebugInformationFormat="3" AssemblerOutput="0" Stalls="false" CallAttributedProfiling="0" />
+<Tool Name="VCCustomBuildTool" />
+<Tool Name="VCX360LinkerTool" AdditionalOptions="/dll /entry:&quot;_DllMainCRTStartup&quot; /include:&quot;XboxKrnlBuildNumber&quot;" AdditionalDependencies="d3d9d.lib d3dx9d.lib xgraphicsd.lib xapilibd.lib xaudiod2.lib x3daudiod.lib xmcored.lib xboxkrnl.lib xbdm.lib libcmt.lib" OutputFile="$(OutDir)/$(ProjectName).dll" LinkIncremental="2" GenerateDebugInformation="true" ModuleDefinitionFile="DllModule.def" />
+<Tool Name="VCPreBuildEventTool" CommandLine="" />
+<Tool Name="VCPreLinkEventTool" />
+<Tool Name="VCPostBuildEventTool" CommandLine="" />
+<Tool Name="VCX360ImageTool" ProjectDefaults="" AdditionalSections="" />
+<Tool Name="XboxDeploymentTool" DeploymentType="1" EmulationType="0" DeploymentFiles="$(RemoteRoot)=$(ImagePath);" RemoteRoot="xe:\Samples\DynamicLinkLibrary" />
+<DebuggerTool />
+</Configuration>
+<Configuration Name="CodeAnalysis|Xbox 360" OutputDirectory="CodeAnalysis" IntermediateDirectory="CodeAnalysis" CharacterSet="2" UseOfMFC="-1" UseOfATL="0" ConfigurationType="2">
+<Tool Name="VCCLX360CompilerTool" Optimization="0" EnableIntrinsicFunctions="true" AdditionalIncludeDirectories="..\..\Common;..\..\..\Modules" PreprocessorDefinitions="_DEBUG;_XBOX;XBOX;XBOX_SAMPLE;_XBOX_CRT_DEPRECATE_INSECURE;" ExceptionHandling="0" RuntimeLibrary="1" BufferSecurityCheck="false" ForceConformanceInForLoopScope="true" RuntimeTypeInfo="false" OpenMP="FALSE" UsePrecompiledHeader="0" ProgramDataBaseFileName="$(IntDir)\vc80.pdb" WarningLevel="4" AdditionalOptions="" DebugInformationFormat="3" AssemblerOutput="0" Stalls="false" CallAttributedProfiling="0" PREfast="2" />
+<Tool Name="VCCustomBuildTool" />
+<Tool Name="VCX360LinkerTool" AdditionalOptions="/dll /entry:&quot;_DllMainCRTStartup&quot; /include:&quot;XboxKrnlBuildNumber&quot;" AdditionalDependencies="d3d9d.lib d3dx9d.lib xgraphicsd.lib xapilibd.lib xaudiod2.lib x3daudiod.lib xmcored.lib xboxkrnl.lib xbdm.lib libcmt.lib" OutputFile="$(OutDir)/$(ProjectName).dll" LinkIncremental="2" GenerateDebugInformation="true" ModuleDefinitionFile="DllModule.def" />
+<Tool Name="VCPreBuildEventTool" CommandLine="" />
+<Tool Name="VCPreLinkEventTool" />
+<Tool Name="VCPostBuildEventTool" CommandLine="" />
+<Tool Name="VCX360ImageTool" ProjectDefaults="" AdditionalSections="" />
+<Tool Name="XboxDeploymentTool" DeploymentType="1" EmulationType="0" DeploymentFiles="$(RemoteRoot)=$(ImagePath);" RemoteRoot="xe:\Samples\DynamicLinkLibrary" />
+</Configuration>
+<Configuration Name="Profile|Xbox 360" OutputDirectory="Profile" IntermediateDirectory="Profile" CharacterSet="2" UseOfMFC="-1" UseOfATL="0" ConfigurationType="2">
+<Tool Name="VCCLX360CompilerTool" InlineFunctionExpansion="1" Optimization="3" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="2" AdditionalIncludeDirectories="..\..\Common;..\..\..\Modules" PreprocessorDefinitions="NDEBUG;_XBOX;XBOX;XBOX_SAMPLE;_XBOX_CRT_DEPRECATE_INSECURE;PROFILE;" ExceptionHandling="0" StringPooling="true" RuntimeLibrary="0" BufferSecurityCheck="false" EnableFunctionLevelLinking="true" ForceConformanceInForLoopScope="true" RuntimeTypeInfo="false" OpenMP="FALSE" UsePrecompiledHeader="0" ProgramDataBaseFileName="$(IntDir)\vc80.pdb" WarningLevel="4" AdditionalOptions="/MP " DebugInformationFormat="3" AssemblerOutput="0" Stalls="false" CallAttributedProfiling="0" />
+<Tool Name="VCCustomBuildTool" />
+<Tool Name="VCX360LinkerTool" AdditionalOptions="/ignore:4089 /dll /entry:&quot;_DllMainCRTStartup&quot; /include:&quot;XboxKrnlBuildNumber&quot;" AdditionalDependencies="d3d9i.lib d3dx9i.lib xgraphics.lib xapilibi.lib xaudio2.lib x3daudioi.lib xmcorei.lib xboxkrnl.lib xbdm.lib libcmt.lib" OutputFile="$(OutDir)/$(ProjectName).dll" IgnoreDefaultLibraryNames="xapilib.lib" GenerateDebugInformation="true" OptimizeReferences="2" EnableCOMDATFolding="1" SetChecksum="true" ModuleDefinitionFile="DllModule.def" />
+<Tool Name="VCPreBuildEventTool" CommandLine="" />
+<Tool Name="VCPreLinkEventTool" />
+<Tool Name="VCPostBuildEventTool" CommandLine="" />
+<Tool Name="VCX360ImageTool" ProjectDefaults="" AdditionalSections="" />
+<Tool Name="XboxDeploymentTool" DeploymentType="1" EmulationType="0" DeploymentFiles="$(RemoteRoot)=$(ImagePath);" RemoteRoot="xe:\Samples\DynamicLinkLibrary" />
+</Configuration>
+<Configuration Name="Profile_FastCap|Xbox 360" OutputDirectory="Profile_FastCap" IntermediateDirectory="Profile_FastCap" CharacterSet="2" UseOfMFC="-1" UseOfATL="0" ConfigurationType="2">
+<Tool Name="VCCLX360CompilerTool" InlineFunctionExpansion="1" Optimization="3" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="2" AdditionalIncludeDirectories="..\..\Common;..\..\..\Modules" PreprocessorDefinitions="NDEBUG;_XBOX;XBOX;XBOX_SAMPLE;_XBOX_CRT_DEPRECATE_INSECURE;PROFILE;FASTCAP;" ExceptionHandling="0" StringPooling="true" RuntimeLibrary="0" BufferSecurityCheck="false" EnableFunctionLevelLinking="true" ForceConformanceInForLoopScope="true" RuntimeTypeInfo="false" OpenMP="FALSE" ProgramDataBaseFileName="$(IntDir)\vc80.pdb" UsePrecompiledHeader="0" WarningLevel="4" AdditionalOptions="/MP " DebugInformationFormat="3" FastCAP="true" AssemblerOutput="0" Stalls="false" CallAttributedProfiling="1" />
+<Tool Name="VCCustomBuildTool" />
+<Tool Name="VCX360LinkerTool" AdditionalOptions="/ignore:4089 /dll /entry:&quot;_DllMainCRTStartup&quot; /include:&quot;XboxKrnlBuildNumber&quot;" AdditionalDependencies="d3d9.lib d3dx9.lib xgraphics.lib xapilib.lib xaudio2.lib x3daudio.lib xmcore.lib xboxkrnl.lib xbdm.lib libcmt.lib" OutputFile="$(OutDir)/$(ProjectName).dll" GenerateDebugInformation="true" OptimizeReferences="2" EnableCOMDATFolding="1" SetChecksum="true" ModuleDefinitionFile="DllModule.def" />
+<Tool Name="VCPreBuildEventTool" CommandLine="" />
+<Tool Name="VCPreLinkEventTool" />
+<Tool Name="VCPostBuildEventTool" CommandLine="" />
+<Tool Name="VCX360ImageTool" ProjectDefaults="" AdditionalSections="" />
+<Tool Name="XboxDeploymentTool" DeploymentType="1" EmulationType="0" DeploymentFiles="$(RemoteRoot)=$(ImagePath);" RemoteRoot="xe:\Samples\DynamicLinkLibrary" />
+</Configuration>
+<Configuration Name="Release|Xbox 360" OutputDirectory="Release" IntermediateDirectory="Release" CharacterSet="2" UseOfMFC="-1" UseOfATL="0" ConfigurationType="2">
+<Tool Name="VCCLX360CompilerTool" InlineFunctionExpansion="2" Optimization="3" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="2" AdditionalIncludeDirectories="..\..\Common;..\..\..\Modules" PreprocessorDefinitions="NDEBUG;_XBOX;XBOX;XBOX_SAMPLE;_XBOX_CRT_DEPRECATE_INSECURE;" ExceptionHandling="0" StringPooling="true" RuntimeLibrary="0" BufferSecurityCheck="false" EnableFunctionLevelLinking="true" ForceConformanceInForLoopScope="true" RuntimeTypeInfo="false" OpenMP="FALSE" UsePrecompiledHeader="0" ProgramDataBaseFileName="$(IntDir)\vc80.pdb" WarningLevel="4" AdditionalOptions="/MP " DebugInformationFormat="3" AssemblerOutput="0" Stalls="false" />
+<Tool Name="VCCustomBuildTool" />
+<Tool Name="VCX360LinkerTool" AdditionalOptions="/ignore:4089 /dll /entry:&quot;_DllMainCRTStartup&quot; /include:&quot;XboxKrnlBuildNumber&quot;" AdditionalDependencies="d3d9.lib d3dx9.lib xgraphics.lib xapilib.lib xaudio2.lib x3daudio.lib xmcore.lib xboxkrnl.lib xbdm.lib libcmt.lib" OutputFile="$(OutDir)/$(ProjectName).dll" GenerateDebugInformation="true" OptimizeReferences="2" EnableCOMDATFolding="2" SetChecksum="true" ModuleDefinitionFile="DllModule.def" />
+<Tool Name="VCPreBuildEventTool" CommandLine="" />
+<Tool Name="VCPreLinkEventTool" />
+<Tool Name="VCPostBuildEventTool" CommandLine="" />
+<Tool Name="VCX360ImageTool" ProjectDefaults="" AdditionalSections="" />
+<Tool Name="XboxDeploymentTool" DeploymentType="1" EmulationType="0" DeploymentFiles="$(RemoteRoot)=$(ImagePath);" RemoteRoot="xe:\Samples\DynamicLinkLibrary" />
+</Configuration>
+<Configuration Name="Release_LTCG|Xbox 360" OutputDirectory="Release_LTCG" IntermediateDirectory="Release_LTCG" CharacterSet="2" UseOfMFC="-1" UseOfATL="0" WholeProgramOptimization="1" ConfigurationType="2">
+<Tool Name="VCCLX360CompilerTool" InlineFunctionExpansion="2" Optimization="3" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="2" AdditionalIncludeDirectories="..\..\Common;..\..\..\Modules" PreprocessorDefinitions="NDEBUG;_XBOX;XBOX;XBOX_SAMPLE;_XBOX_CRT_DEPRECATE_INSECURE;LTCG;" ExceptionHandling="0" StringPooling="true" RuntimeLibrary="0" BufferSecurityCheck="false" EnableFunctionLevelLinking="true" ForceConformanceInForLoopScope="true" RuntimeTypeInfo="false" OpenMP="FALSE" UsePrecompiledHeader="0" ProgramDataBaseFileName="$(IntDir)\vc80.pdb" WarningLevel="4" AdditionalOptions="/MP " DebugInformationFormat="3" />
+<Tool Name="VCCustomBuildTool" />
+<Tool Name="VCX360LinkerTool" AdditionalOptions="/ignore:4089 /dll /entry:&quot;_DllMainCRTStartup&quot; /include:&quot;XboxKrnlBuildNumber&quot;" AdditionalDependencies="d3d9ltcg.lib d3dx9.lib xgraphics.lib xapilib.lib xaudio2.lib x3daudioltcg.lib xmcoreltcg.lib xboxkrnl.lib xbdm.lib libcmt.lib" OutputFile="$(OutDir)/$(ProjectName).dll" GenerateDebugInformation="true" OptimizeReferences="2" EnableCOMDATFolding="2" SetChecksum="true" ModuleDefinitionFile="DllModule.def" />
+<Tool Name="VCPreBuildEventTool" CommandLine="" />
+<Tool Name="VCPreLinkEventTool" />
+<Tool Name="VCPostBuildEventTool" CommandLine="" />
+<Tool Name="VCX360ImageTool" ProjectDefaults="" AdditionalSections="" />
+<Tool Name="XboxDeploymentTool" DeploymentType="1" EmulationType="0" DeploymentFiles="$(RemoteRoot)=$(ImagePath);" RemoteRoot="xe:\Samples\DynamicLinkLibrary" />
+</Configuration>
+</Configurations>
+<References />
+<Files>
+      <File RelativePath=".\DLLModule.cpp" />
+      <File RelativePath=".\DLLModule.def" />
+
+  </Files>
+<Globals />
+</VisualStudioProject>
