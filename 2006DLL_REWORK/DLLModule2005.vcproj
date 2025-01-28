@@ -310,7 +310,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="2"
 				AdditionalIncludeDirectories="..\;..\2006DLL_REWORK;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Lua\src&quot;;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Marathon&quot;;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Boost&quot;"
-				PreprocessorDefinitions="NDEBUG;_XBOX;XBOX;XBOX_SAMPLE;_XBOX_CRT_DEPRECATE_INSECURE;"
+				PreprocessorDefinitions="_RELEASE;_XBOX;XBOX;_XENON;_WIN32;BOOST_DISABLE_THREADS"
 				StringPooling="true"
 				ExceptionHandling="1"
 				RuntimeLibrary="0"
