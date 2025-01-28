@@ -28,6 +28,7 @@ BOOL APIENTRY DllMain( HANDLE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
+		STH2006DLLMain();
         break;
     case DLL_THREAD_ATTACH:
         break;

@@ -1,0 +1,12 @@
+*.suo
+*.ncp
+*.lib
+*.pdb
+*.map
+*.idb
+*.obj
+*.dll
+*.exp
+*.xex
+2006DLL_REWORK/Release
+bin

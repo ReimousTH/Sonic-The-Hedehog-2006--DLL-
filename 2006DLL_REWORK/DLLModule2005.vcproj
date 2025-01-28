@@ -280,8 +280,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Xbox 360"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
+			OutputDirectory="..\bin\Build\$(ConfigurationName)\$(RootNameSpace)"
+			IntermediateDirectory="..\bin\Cache\$(ConfigurationName)\$(RootNameSpace)"
 			ConfigurationType="2"
 			UseOfMFC="-1"
 			UseOfATL="0"
@@ -309,10 +309,10 @@
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="2"
-				AdditionalIncludeDirectories="..\..\Common;..\..\..\Modules;..\"
+				AdditionalIncludeDirectories="..\;..\2006DLL_REWORK;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Lua\src&quot;;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Marathon&quot;;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Boost&quot;"
 				PreprocessorDefinitions="NDEBUG;_XBOX;XBOX;XBOX_SAMPLE;_XBOX_CRT_DEPRECATE_INSECURE;"
 				StringPooling="true"
-				ExceptionHandling="0"
+				ExceptionHandling="1"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="true"
@@ -320,7 +320,7 @@
 				RuntimeTypeInfo="false"
 				OpenMP="false"
 				UsePrecompiledHeader="0"
-				WarningLevel="4"
+				WarningLevel="0"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -337,6 +337,7 @@
 				AdditionalOptions="/ignore:4089 /dll /entry:&quot;_DllMainCRTStartup&quot; /include:&quot;XboxKrnlBuildNumber&quot;"
 				AdditionalDependencies="d3d9.lib d3dx9.lib xgraphics.lib xapilib.lib xaudio.lib x3daudio.lib xboxkrnl.lib xbdm.lib libcmt.lib"
 				OutputFile="$(OutDir)/$(ProjectName).dll"
+				AdditionalLibraryDirectories=""
 				ModuleDefinitionFile="DllModule.def"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
@@ -348,6 +349,7 @@
 			/>
 			<Tool
 				Name="VCX360ImageTool"
+				OutputFileName="$(OutDir)\Test.xex"
 				ProjectDefaults=""
 				AdditionalSections=""
 			/>
@@ -457,6 +459,14 @@
 		</Configuration>
 	</Configurations>
 	<References>
+		<ProjectReference
+			ReferencedProjectIdentifier="{24CAEC08-5ADD-4CAB-ADF1-7DF0BA63D1D6}"
+			RelativePathToProject=".\Sonic-The-Hedgehog-2006-Marathon-Library\Lua\LUA.vcproj"
+		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{0E0DAD94-E64A-4E1E-8E88-10A7F23F50BD}"
+			RelativePathToProject=".\Sonic-The-Hedgehog-2006-Marathon-Library\Marathon\Marathon.vcproj"
+		/>
 	</References>
 	<Files>
 		<Filter
@@ -482,6 +492,138 @@
 				RelativePath=".\Core\2006DLL.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Core\Debug.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Core\Debug.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="ZLua"
+			>
+			<File
+				RelativePath=".\ZLua\ZLua.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ZLua\ZLua.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Patch"
+			>
+			<Filter
+				Name="LuaExtension"
+				>
+				<File
+					RelativePath=".\Patch\LuaExtension\DebugLog.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\DebugLog.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_BIT.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_BIT.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_Buffer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_Buffer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_LuaLCommonObject.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_LuaLCommonObject.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_Memory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_Memory.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_OpenState.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_OpenState.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_PlayerRework.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_PlayerRework.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_StateIMashine.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_StateIMashine.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_StateMachine2.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_StateMachine2.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_Uint64.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_Uint64.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_Vector.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_Vector.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\MessagesUtil.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\MessagesUtil.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\DLLModule.cpp"
