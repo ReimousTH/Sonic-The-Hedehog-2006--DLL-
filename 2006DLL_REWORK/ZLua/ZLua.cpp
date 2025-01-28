@@ -108,6 +108,7 @@ void ZLua::UseBaseLibsEx(lua_State* L){
 	
 	lua_register(L,"WriteVirtualBytes",WriteVirtualBytes);
 	lua_register(L,"WriteVirtualBytesRange",WriteVirtualBytesRange);
+	lua_register(L,"WriteVirtialBytes",WriteVirtualBytes);
 
 	
 
@@ -136,12 +137,18 @@ const char* ZLua::GetGlobalString(const char* string){
 extern "C" bool ZLua::GetGlobalBool(const char* string){
 
 
-	lua_getglobal(this->L,string);
-	if (lua_isboolean(this->L,-1)){
-		return lua_toboolean(this->L,-1);	
+	lua_getglobal(this->L, string);
+
+	
+	if (lua_isboolean(this->L, -1)) {
+		return lua_toboolean(this->L, -1);	
 	}
-	lua_pop(this->L,1);
-	return false;
+
+
+	lua_pop(this->L, 1);
+
+
+	
 }
 
 

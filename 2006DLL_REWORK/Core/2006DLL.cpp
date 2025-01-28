@@ -1,7 +1,9 @@
 #include "2006DLL.h"
 #include <string>
 
-#include "Patch/LuaExtension/DebugLog.h"
+
+#include <Patch/Common/XEXALLOCATORS.H>
+#include <Patch/Common/XEXALLOCATORS_UNDEF.H>
 
 
 struct FPair{
@@ -12,6 +14,12 @@ struct FPair{
 
 FPair functions[] = {
 	{"LuaExtension", DebugLogV2::GlobalInstall},
+	{"DevTitleV2", DevTitleV2::GlobalInstall},
+	{"NoArcMode", ArcRemover::GlobalInstall},
+	{"TimeSystemRestore", TimeSystem::GlobalInstall},
+	{"CompleteGauge", CompleteGauge::GlobalInstall},
+	{"AmyLOS", AmyLOS::GlobalInstall},
+	{"TagBattleExtension", TagBattleMain::GlobalInstall},
 };
 
 
@@ -27,7 +35,7 @@ void STH2006DLLMain()
 	lua_file.DoFile(true);
 
 	for (int i = 0;i<sizeof(functions)/sizeof(FPair);i++){
-		if (lua_file.GetGlobalBool(functions[0].Name)){
+		if (lua_file.GetGlobalBool(functions[i].Name) == true){
 			functions[i].Function();
 			log << functions[i].Name << "\n";
 		}

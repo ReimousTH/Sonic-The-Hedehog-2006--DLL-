@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LUA", "Sonic-The-Hedgehog-2
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Marathon", "Sonic-The-Hedgehog-2006-Marathon-Library\Marathon\Marathon.vcproj", "{0E0DAD94-E64A-4E1E-8E88-10A7F23F50BD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AtgFramework", "ATG_LIB\AtgFramework2005.vcproj", "{91D208A6-9936-47FD-9659-67205C3EB0AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Xbox 360 = Debug|Xbox 360
@@ -46,6 +48,16 @@ Global
 		{0E0DAD94-E64A-4E1E-8E88-10A7F23F50BD}.Release_LTCG|Xbox 360.Build.0 = Release_LTCG|Xbox 360
 		{0E0DAD94-E64A-4E1E-8E88-10A7F23F50BD}.Release|Xbox 360.ActiveCfg = Release|Xbox 360
 		{0E0DAD94-E64A-4E1E-8E88-10A7F23F50BD}.Release|Xbox 360.Build.0 = Release|Xbox 360
+		{91D208A6-9936-47FD-9659-67205C3EB0AB}.Debug|Xbox 360.ActiveCfg = Debug|Xbox 360
+		{91D208A6-9936-47FD-9659-67205C3EB0AB}.Debug|Xbox 360.Build.0 = Debug|Xbox 360
+		{91D208A6-9936-47FD-9659-67205C3EB0AB}.Profile_FastCap|Xbox 360.ActiveCfg = Profile_FastCap|Xbox 360
+		{91D208A6-9936-47FD-9659-67205C3EB0AB}.Profile_FastCap|Xbox 360.Build.0 = Profile_FastCap|Xbox 360
+		{91D208A6-9936-47FD-9659-67205C3EB0AB}.Profile|Xbox 360.ActiveCfg = Profile|Xbox 360
+		{91D208A6-9936-47FD-9659-67205C3EB0AB}.Profile|Xbox 360.Build.0 = Profile|Xbox 360
+		{91D208A6-9936-47FD-9659-67205C3EB0AB}.Release_LTCG|Xbox 360.ActiveCfg = Release_LTCG|Xbox 360
+		{91D208A6-9936-47FD-9659-67205C3EB0AB}.Release_LTCG|Xbox 360.Build.0 = Release_LTCG|Xbox 360
+		{91D208A6-9936-47FD-9659-67205C3EB0AB}.Release|Xbox 360.ActiveCfg = Release|Xbox 360
+		{91D208A6-9936-47FD-9659-67205C3EB0AB}.Release|Xbox 360.Build.0 = Release|Xbox 360
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

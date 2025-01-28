@@ -309,7 +309,7 @@
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="2"
-				AdditionalIncludeDirectories="..\;..\2006DLL_REWORK;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Lua\src&quot;;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Marathon&quot;;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Boost&quot;"
+				AdditionalIncludeDirectories="..\;..\2006DLL_REWORK;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Lua\src&quot;;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Marathon&quot;;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Boost&quot;;..\ATG_LIB"
 				PreprocessorDefinitions="_RELEASE;_XBOX;XBOX;_XENON;_WIN32;BOOST_DISABLE_THREADS"
 				StringPooling="true"
 				ExceptionHandling="1"
@@ -335,7 +335,7 @@
 			<Tool
 				Name="VCX360LinkerTool"
 				AdditionalOptions="/ignore:4089 /dll /entry:&quot;_DllMainCRTStartup&quot; /include:&quot;XboxKrnlBuildNumber&quot;"
-				AdditionalDependencies="d3d9.lib d3dx9.lib xgraphics.lib xapilib.lib xaudio.lib x3daudio.lib xboxkrnl.lib xbdm.lib libcmt.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib xgraphics.lib xapilib.lib xaudio.lib x3daudio.lib xboxkrnl.lib xbdm.lib libcmt.lib xnet.lib"
 				OutputFile="$(OutDir)/$(ProjectName).dll"
 				AdditionalLibraryDirectories=""
 				ModuleDefinitionFile="DllModule.def"
@@ -467,6 +467,10 @@
 			ReferencedProjectIdentifier="{0E0DAD94-E64A-4E1E-8E88-10A7F23F50BD}"
 			RelativePathToProject=".\Sonic-The-Hedgehog-2006-Marathon-Library\Marathon\Marathon.vcproj"
 		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{91D208A6-9936-47FD-9659-67205C3EB0AB}"
+			RelativePathToProject=".\ATG_LIB\AtgFramework2005.vcproj"
+		/>
 	</References>
 	<Files>
 		<Filter
@@ -490,6 +494,10 @@
 			</File>
 			<File
 				RelativePath=".\Core\2006DLL.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Core\All06Functions.hpp"
 				>
 			</File>
 			<File
@@ -623,6 +631,194 @@
 					RelativePath=".\Patch\LuaExtension\MessagesUtil.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="Common"
+				>
+				<File
+					RelativePath=".\Patch\Common\XEXALLOCATORS.H"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\Common\XEXALLOCATORS_UNDEF.H"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="TimeSystem"
+				>
+				<File
+					RelativePath=".\Patch\TimeSystem\TimeSystem.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\TimeSystem\TimeSystem.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="ArcRemover"
+				>
+				<File
+					RelativePath=".\Patch\ArcRemover\ArcRemover.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\ArcRemover\ArcRemover.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Characters"
+				>
+				<File
+					RelativePath=".\Patch\Characters\Amy.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\Characters\Amy.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="CompleteGauge"
+				>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_CommonStates.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_CommonStates.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_PostureCommon.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_PostureCommon.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_SonicContext.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_SonicContext.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_SonicEffect.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_SonicEffect.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_SonicGauge.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_SonicGauge.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_SonicModel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_SonicModel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_SonicSound.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_SonicSound.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_SonicStates.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\CompleteGauge\CompleteGauge_SonicStates.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="DevTitle"
+				>
+				<File
+					RelativePath=".\Patch\DevTitle\DevTitle.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\DevTitle\DevTitle.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Inverse"
+				>
+				<File
+					RelativePath=".\Patch\Inverse\Inverse.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\Inverse\Inverse.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="TagBattleExtension"
+				>
+				<File
+					RelativePath=".\Patch\TagBattleExtension\TagBattleMain.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\TagBattleExtension\TagBattleMain.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\TagBattleExtension\TagBattleMain_InBattle.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\TagBattleExtension\TagBattleMain_InBattle.h"
+					>
+				</File>
+				<Filter
+					Name="Online"
+					>
+					<File
+						RelativePath=".\Patch\TagBattleExtension\Online\Socket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Patch\TagBattleExtension\Online\Socket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Patch\TagBattleExtension\Online\TagBattleOnline.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Patch\TagBattleExtension\Online\TagBattleOnline.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<File
