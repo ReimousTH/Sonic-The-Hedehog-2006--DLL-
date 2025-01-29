@@ -19,6 +19,7 @@ extern "C" {
 
 #include <string>
 
+#include <Core/Debug.h>
 #include "LuaExtension_Memory.h"
 #include "LuaExtension_Buffer.h"
 #include "LuaExtension_Uint64.h"

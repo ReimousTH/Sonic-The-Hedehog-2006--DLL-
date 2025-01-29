@@ -49,13 +49,13 @@ namespace CompleteGauge{
 		if ((_this->Input & LN_GAMEPAD_BUTTON_RT_PRESS) != 0){
 			Sonicteam::DocMarathonImp* impl = 	*(Sonicteam::DocMarathonImp**)(*(UINT32*)0x82D3B348 + 0x180);
 			Sonicteam::GameImp* gameimp = *(Sonicteam::GameImp**)(impl->DocCurrentMode + 0x6C);
-			Sonicteam::Prop::Library* mgr =  gameimp->GamePropLibary[Sonicteam::GameImp::GamePropLibaryVariant::Waveocean];
+			Sonicteam::Prop::Scene* mgr =  gameimp->GameProp[0].get();
 
 			std::string Viser;
 		
 
 	
-			std::map<std::string, int>* _map_ = (std::map<std::string,int>*)&(mgr->LibraryPropIndex);
+			std::map<std::string, int>* _map_ = (std::map<std::string,int>*)&(mgr->ScenePlacament);
 
 			for (std::map<std::string, int>::iterator it =_map_->begin(); it != _map_->end(); ++it) {
 
@@ -68,7 +68,7 @@ namespace CompleteGauge{
 			}
 
 
-		//	PushXenonMessage(L"Test",Viser.c_str());
+			PushXenonMessage(L"Test",Viser.c_str());
 			
 		}
 

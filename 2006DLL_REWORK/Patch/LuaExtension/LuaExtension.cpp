@@ -473,6 +473,7 @@ namespace DebugLogV2{
 	
 		Sonicteam::Prop::InstanceSetData* ObjData =  new Sonicteam::Prop::InstanceSetData(bufferX, OBJ_ID, Pos, Rot);
 		ObjData->ParamsCount = PropParamsCount;
+	
 
 
 
@@ -538,46 +539,57 @@ namespace DebugLogV2{
 
 
 
-		Sonicteam::Prop::Instance* InstnceProp =  BranchTo(0x8245A080,Sonicteam::Prop::Instance*,malloc06(0x14),PropScenePTR,ObjData,&RefObjectTypePropClass);
-		Sonicteam::Prop::EntityHandle* EntityHandle = BranchTo(0x82461128,Sonicteam::Prop::EntityHandle*,malloc06(0x1c),PropScenePTR,LastIndex);
-		EntityHandle->PropInstance = InstnceProp;
-		//*(Sonicteam::Prop::Instance**)(EntityHandle + 0x18) = InstnceProp;
-
-
-		Sonicteam::SoX::RefCountObject* RUU = (Sonicteam::SoX::RefCountObject*)EntityHandle;
-
 
 		
-
-		Sonicteam::Prop::ActorCreatorCreationData buffer = Sonicteam::Prop::ActorCreatorCreationData(InstnceProp,EntityHandle,0,std::string(OBJ_ID));
-	//	int buffer[0x30]= {0};
-	//	BranchTo(0x8245C680,int,&buffer,&InstnceProp,&EntityHandle,0,&std::string(OBJ_ID));
+// BranchTo(0x8245A080,Sonicteam::Prop::Instance*,malloc06(0x14),PropScenePTR,ObjData,&RefObjectTypePropClass);
+		
 
 
+	//	Sonicteam::Prop::EntityHandle* EntityHandle = BranchTo(0x82461128,Sonicteam::Prop::EntityHandle*,malloc06(0x1c),PropScenePTR,LastIndex);
+
+		Sonicteam::Prop::Instance* InstnceProp = new Sonicteam::Prop::Instance(PropScenePTR,ObjData,RefObjectTypePropClass);
+		Sonicteam::Prop::EntityHandle* EntityHandle = new Sonicteam::Prop::EntityHandle(PropScenePTR,LastIndex);
+		EntityHandle->PropInstance = InstnceProp;
+
+		Sonicteam::Prop::ActorCreatorCreationData buffer = Sonicteam::Prop::ActorCreatorCreationData(InstnceProp,EntityHandle,0,std::string(InstnceProp->InstanceClass->ClassPropData->ClassName));
+		PropScenePTR->ScenePropInstance.push_back(InstnceProp);
+		PropScenePTR->ScenePlacament[ObjData->ObjectName] = LastIndex;
 
 
+
+		std::vector<Sonicteam::SoX::Scenery::SPAabbNodeVector> vector_test = std::vector<Sonicteam::SoX::Scenery::SPAabbNodeVector>(LastIndex + 1);
+		for (int i = 0;i<vector_test.size();i++){
+
+			Sonicteam::Prop::InstanceSetData* in = PropScenePTR->ScenePropInstance[i]->InstanceSetData;
+			
+			vector_test[i].minX= in->Position.x - 1;
+			vector_test[i].minY= in->Position.y - 1;
+			vector_test[i].minZ= in->Position.z - 1;
+
+			vector_test[i].maxX= in->Position.x + 1;
+			vector_test[i].maxY= in->Position.y + 1;
+			vector_test[i].maxZ= in->Position.z + 1;
+		}
+
+
+		PropScenePTR->PropSceneWorld->SceneryAabbTree->SPAabbTreeInitialize(PropScenePTR->PropSceneWorld,&vector_test[0],LastIndex + 1);
+
+	
 
 		Sonicteam::Prop::Manager* PropManger = PropScenePTR->PropManager;
-
-		
-
 		Sonicteam::Prop::ActorCreators* ActorCreatorsVar =  PropManger->ActorCreators.lock().get();
 		Sonicteam::Actor* obj_actor =  ActorCreatorsVar->ActorCreator[std::string(OBJ_ID)]->CreateActor(ActorCreatorsVar->NamedActor,&ActorCreatorsVar->GameImp,&buffer);
 		
+		Sonicteam::Prop::SceneActor sactor;
+		sactor.Flag1 = 0x40000000;
+		sactor.Flag2 = 4;
+		sactor.ObjActor = 0;
+		sactor.ObjActorHandle = 0;
+		PropScenePTR->SceneObject.push_back(sactor);
+		
+
 		
 	
-		Sonicteam::Prop::SceneActor SceneActor;
-		SceneActor.Flag1  = 0;
-		SceneActor.Flag2 = 0;
-		SceneActor.ObjActorHandle = 0;
-		SceneActor.ObjActor = 0;
-
-	
-
-	
-
-//		PropScenePTR->SceneObject.push_back(SceneActor); cause crash :why: tho?
-		PropScenePTR->ScenePropInstance.push_back(InstnceProp);
 
 
 		//EntityHandleAndObjectVector->push_back(dummy_container_entityhandle_Object(EntityHandle,result));
