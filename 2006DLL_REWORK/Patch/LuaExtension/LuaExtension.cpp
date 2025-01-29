@@ -279,6 +279,32 @@ namespace DebugLogV2{
 		return -1;
 	}
 
+	extern "C" GameLIB_PreloadPlayer(lua_State* L){
+
+		Sonicteam::DocMarathonImp* impl = 	*(Sonicteam::DocMarathonImp**)(*(UINT32*)0x82D3B348 + 0x180);
+		Sonicteam::GameImp* gameimp = *(Sonicteam::GameImp**)(impl->DocCurrentMode + 0x6C);
+
+		Sonicteam::SoX::Message message =  Sonicteam::SoX::Message(0x15016,0xD,0);
+		gameimp->OnMessageRecieved(&message);
+
+		return 0;
+	}
+	extern "C" GameLIB_LoadEvent(lua_State* L){
+		Sonicteam::DocMarathonImp* impl = 	*(Sonicteam::DocMarathonImp**)(*(UINT32*)0x82D3B348 + 0x180);
+		Sonicteam::GameImp* gameimp = *(Sonicteam::GameImp**)(impl->DocCurrentMode + 0x6C);
+
+	//	Sonicteam::SoX::Message message =  Sonicteam::SoX::Message(0x15032,(int)lua_tostring(L,1),(int)lua_tostring(L,1));
+	//	gameimp->OnMessageRecieved(&message);
+
+
+		
+	
+	//	gameimp->OnMessageRecieved(&Sonicteam::SoX::Message(0x1502F,0x0,0));
+
+
+
+		return 0;
+	}
 
 	extern "C" GameLIB_PlayerIndexToActorIDRestore(lua_State* L){
 
@@ -313,14 +339,17 @@ namespace DebugLogV2{
 		XMVECTOR Pos = {0};
 		XMVECTOR Rot = {0};
 		const char* Placement = "default";
+		bool _Save_ = false;
 		int PlacementIndex = 0;
-		if (lua_istable(L,3)){
+		if (lua_istable(L,3) &&  atgs > 2){
 
 			lua_pushvalue06(L,3);
 			lua_pushstring06(L,"Position");
 			lua_gettable(L,-2); 
 			Pos = Vector__GetVectorTable(L,-1);
 			lua_pop(L,2);
+
+
 
 			lua_pushvalue06(L,3);
 			lua_pushstring06(L,"Rotation");
@@ -332,10 +361,22 @@ namespace DebugLogV2{
 			lua_pushstring06(L,"Placement");
 			lua_gettable(L,-2); 
 
-
 			if (lua_isstring(L,-1)){
 				Placement = lua_tostring(L,-1);
 			}
+			lua_pop(L,2);
+
+
+			lua_pushvalue06(L,3);
+			lua_pushstring06(L,"Save");
+			lua_gettable(L,-2); 
+
+			if (lua_isboolean(L,-1)){
+				_Save_ = lua_toboolean(L,-1);
+			}
+			lua_pop(L,2);
+
+
 
 
 		}
@@ -358,14 +399,14 @@ namespace DebugLogV2{
 
 		std::map<std::string, boost::any> _params;
 
-
-		lua_pushnil(L);
-		while (lua_next(L, 2) != 0) {
-			if (lua_isstring(L, -2)) {
-				const char* keyF = lua_tostring(L, -2);
-				std::string key = keyF;
-				int valueType = lua_type(L, -1);
-				switch (valueType) {
+		if (lua_istable(L,2) && atgs > 1) {
+			lua_pushnil(L);
+			while (lua_next(L, 2) != 0) {
+				if (lua_isstring(L, -2)) {
+					const char* keyF = lua_tostring(L, -2);
+					std::string key = keyF;
+					int valueType = lua_type(L, -1);
+					switch (valueType) {
 			case LUA_TBOOLEAN:
 				_params[key] = static_cast<bool>(lua_toboolean(L, -1));
 				break;
@@ -375,40 +416,38 @@ namespace DebugLogV2{
 			case LUA_TSTRING:
 				_params[key] = std::string(lua_tostring(L, -1));
 				break;
+					}
 				}
+
+				// Pop the value, keep the key for the next iteration
+				lua_pop(L, 1);
 			}
 
-			// Pop the value, keep the key for the next iteration
+			// Assuming Lua state is initialized and used in the code
 			lua_pop(L, 1);
 		}
-
-		// Assuming Lua state is initialized and used in the code
-
-
-		lua_pop(L, 1);
-
 
 
 
 		const char* OBJ_ID =  lua_tostring(L,1);
-
 		Sonicteam::DocMarathonImp* impl = 	*(Sonicteam::DocMarathonImp**)(*(UINT32*)0x82D3B348 + 0x180);
 		Sonicteam::GameImp* gameimp = *(Sonicteam::GameImp**)(impl->DocCurrentMode + 0x6C);
 		Sonicteam::Prop::Manager* GamePropManager =   gameimp->GamePropManager.get();
 		Sonicteam::Prop::ClassRegistry* PropSceneClass = GamePropManager->PropClassRegistry.get();
 
 
+		if (gameimp->GamePropActorCreators.get()->ActorCreator.find(OBJ_ID) == gameimp->GamePropActorCreators.get()->ActorCreator.end()){
+			lua_pushnil(L);
+			return 1;
+		}
 
 		Sonicteam::Prop::Class* RefObjectTypePropClass = PropSceneClass->_registry_[std::string(OBJ_ID)];
-		//BranchTo(0x82456DA0,int,&RefObjectTypePropClass,PropSceneClass,&std::string(OBJ_ID)); //GetObjectTypePropClass
 
-		///
+	
 		std::map<std::string,int> _props_origin_params;
 
 
 		std::vector<std::pair<std::string,boost::any>> _sorted_params;
-		//	std::map<std::string,boost::any> _sorted_params; //need unordered
-
 
 		Sonicteam::Prop::ClassPropParamData* PropData =   RefObjectTypePropClass->ClassPropData;
 		int PropParamsCount =  PropData->ClassParamInfoCount;
@@ -423,8 +462,6 @@ namespace DebugLogV2{
 
 			std::string key = std::string(ParameterName);
 			_props_origin_params[key] = ParameterType;
-
-	
 
 			if (_params.find(key) ==  _params.end()){
 
@@ -454,8 +491,6 @@ namespace DebugLogV2{
 
 
 			_sorted_params.push_back(std::make_pair(std::string(ParameterName),_params[std::string(ParameterName)]));
-
-			//ShowXenonMessage(L"MSG",ParameterType,0);
 		}
 
 
@@ -552,43 +587,46 @@ namespace DebugLogV2{
 		EntityHandle->PropInstance = InstnceProp;
 
 		Sonicteam::Prop::ActorCreatorCreationData buffer = Sonicteam::Prop::ActorCreatorCreationData(InstnceProp,EntityHandle,0,std::string(InstnceProp->InstanceClass->ClassPropData->ClassName));
-		PropScenePTR->ScenePropInstance.push_back(InstnceProp);
-		PropScenePTR->ScenePlacament[ObjData->ObjectName] = LastIndex;
+		
+		
+		if (_Save_){
+		
+			PropScenePTR->ScenePropInstance.push_back(InstnceProp);
+			PropScenePTR->ScenePlacament[ObjData->ObjectName] = LastIndex;
 
 
+			std::vector<Sonicteam::SoX::Scenery::SPAabbNodeVector> vector_test = std::vector<Sonicteam::SoX::Scenery::SPAabbNodeVector>(LastIndex + 1);
+			for (int i = 0;i<vector_test.size();i++){
 
-		std::vector<Sonicteam::SoX::Scenery::SPAabbNodeVector> vector_test = std::vector<Sonicteam::SoX::Scenery::SPAabbNodeVector>(LastIndex + 1);
-		for (int i = 0;i<vector_test.size();i++){
+				Sonicteam::Prop::InstanceSetData* in = PropScenePTR->ScenePropInstance[i]->InstanceSetData;
 
-			Sonicteam::Prop::InstanceSetData* in = PropScenePTR->ScenePropInstance[i]->InstanceSetData;
-			
-			vector_test[i].minX= in->Position.x - 1;
-			vector_test[i].minY= in->Position.y - 1;
-			vector_test[i].minZ= in->Position.z - 1;
+				vector_test[i].minX= in->Position.x - in->DrawDistance;
+				vector_test[i].minY= in->Position.y - in->DrawDistance;
+				vector_test[i].minZ= in->Position.z - in->DrawDistance;
 
-			vector_test[i].maxX= in->Position.x + 1;
-			vector_test[i].maxY= in->Position.y + 1;
-			vector_test[i].maxZ= in->Position.z + 1;
+				vector_test[i].maxX= in->Position.x + in->DrawDistance;
+				vector_test[i].maxY= in->Position.y + in->DrawDistance;
+				vector_test[i].maxZ= in->Position.z + in->DrawDistance;
+			}
+
+
+			PropScenePTR->PropSceneWorld->SceneryAabbTree->SPAabbTreeInitialize(PropScenePTR->PropSceneWorld,&vector_test[0],LastIndex + 1);
+
+
+			Sonicteam::Prop::SceneActor sactor;
+			sactor.Flag1 = 0x40000000;
+			sactor.Flag2 = 4;
+			sactor.ObjActor = 0;
+			sactor.ObjActorHandle = 0;
+			PropScenePTR->SceneObject.push_back(sactor);
+		
 		}
 
-
-		PropScenePTR->PropSceneWorld->SceneryAabbTree->SPAabbTreeInitialize(PropScenePTR->PropSceneWorld,&vector_test[0],LastIndex + 1);
-
-	
+		
 
 		Sonicteam::Prop::Manager* PropManger = PropScenePTR->PropManager;
 		Sonicteam::Prop::ActorCreators* ActorCreatorsVar =  PropManger->ActorCreators.lock().get();
 		Sonicteam::Actor* obj_actor =  ActorCreatorsVar->ActorCreator[std::string(OBJ_ID)]->CreateActor(ActorCreatorsVar->NamedActor,&ActorCreatorsVar->GameImp,&buffer);
-		
-		Sonicteam::Prop::SceneActor sactor;
-		sactor.Flag1 = 0x40000000;
-		sactor.Flag2 = 4;
-		sactor.ObjActor = 0;
-		sactor.ObjActorHandle = 0;
-		PropScenePTR->SceneObject.push_back(sactor);
-		
-
-		
 	
 
 
@@ -606,6 +644,8 @@ namespace DebugLogV2{
 	{	
 		WRITE_DWORD(0x82026A04,GameLIB_NewActorRestore);
 		WRITE_DWORD(0x820269C4,GameLIB_PlayerIndexToActorIDRestore);
+		//WRITE_DWORD(0x820269D4,GameLIB_PreloadPlayer);
+		//WRITE_DWORD(0x82026A0C,GameLIB_LoadEvent);
 		return 0;
 	}
 
