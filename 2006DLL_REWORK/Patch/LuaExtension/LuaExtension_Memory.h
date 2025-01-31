@@ -7,6 +7,7 @@ extern "C" {
 #include <lauxlib.h>
 }
 
+#include <Core/Debug.h>
 
 #include "MessagesUtil.h"
 #include <xtl.h>
@@ -90,6 +91,8 @@ namespace DebugLogV2 {
 	extern "C" Memory_QueryProtect(lua_State* L);
 
 	
+
+	extern "C" Memory_CallFuncF(lua_State* L);
 	extern "C" Memory_CallFunc(lua_State* L);
 	extern "C" Memory_AsInt(lua_State* L);
 	extern "C" Memory_AsFloat(lua_State* L);

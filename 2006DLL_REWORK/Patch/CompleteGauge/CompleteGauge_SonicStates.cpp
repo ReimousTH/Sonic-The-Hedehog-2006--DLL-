@@ -30,7 +30,7 @@ namespace CompleteGauge{
 	float ObjPlayerGetCurrentAnimTime(Sonicteam::Player::State::CommonContext* _context){
 
 		Sonicteam::Player::Score* score =  _context->ScorePlugin.get();
-		int ObjPlayer = score->PtrObjectPlayer;
+		int ObjPlayer = (int)score->PtrObjectPlayer;
 		int ModelPlayer = *(int*)(ObjPlayer + 0xD4);
 		int ObjectPackageModel = *(int*)(ModelPlayer + 0x30);
 		int IntrpoalateAnimationPackageModel = *(int*)(ObjectPackageModel + 0x98); //InterpolateAnimation Mostly
@@ -49,7 +49,7 @@ namespace CompleteGauge{
 	void ObjPlayerSetCurrentAnimTime(Sonicteam::Player::State::CommonContext* _context,float value){
 
 		Sonicteam::Player::Score* score =  _context->ScorePlugin.get();
-		int ObjPlayer = score->PtrObjectPlayer;
+		int ObjPlayer = (int)score->PtrObjectPlayer;
 		int ModelPlayer = *(int*)(ObjPlayer + 0xD4);
 		int ObjectPackageModel = *(int*)(ModelPlayer + 0x30);
 		int IntrpoalateAnimationPackageModel = *(int*)(ObjectPackageModel + 0x98); //InterpolateAnimation Mostly
@@ -69,7 +69,7 @@ namespace CompleteGauge{
 	int ObjPlayerGetCurrentAnim(Sonicteam::Player::State::CommonContext* _context){
 
 		Sonicteam::Player::Score* score =  _context->ScorePlugin.get();
-		int ObjPlayer = score->PtrObjectPlayer;
+		int ObjPlayer = (int)score->PtrObjectPlayer;
 		int ModelPlayer = *(int*)(ObjPlayer + 0xD4);
 		int ObjectPackageModel = *(int*)(ModelPlayer + 0x30);
 	
@@ -81,7 +81,7 @@ namespace CompleteGauge{
 	void ObjPlayerSetCurrentAnimation(Sonicteam::Player::State::CommonContext* _context,int value){
 
 		Sonicteam::Player::Score* score =  _context->ScorePlugin.get();
-		int ObjPlayer = score->PtrObjectPlayer;
+		int ObjPlayer = (int)score->PtrObjectPlayer;
 		int ModelPlayer = *(int*)(ObjPlayer + 0xD4);
 		int ObjectPackageModel = *(int*)(ModelPlayer + 0x30);
 		BranchTo(0x8222F490,int,ObjectPackageModel,value);
@@ -108,7 +108,7 @@ namespace CompleteGauge{
 	void Switch(Sonicteam::Player::State::CommonContext* _context,const char* lua_name,const char* package_name,const char* sound_name,const char* char_name){
 
 		Sonicteam::Player::Score* score =  _context->ScorePlugin.get();
-		int ObjPlayer = score->PtrObjectPlayer;
+		int ObjPlayer = (int)score->PtrObjectPlayer;
 
 		if (*(std::string*)(ObjPlayer + 0x1D8) == char_name ){
 			return;
@@ -258,9 +258,7 @@ namespace CompleteGauge{
 		for (std::vector<boost::shared_ptr<Sonicteam::Player::IDynamicLink>>::iterator  it = IDynamicLinkP->begin();it!=IDynamicLinkP->end();it++ ){
 
 			for (std::vector<boost::shared_ptr<Sonicteam::Player::IPlugIn>>::iterator  it_2 = IPluginP->begin();it_2!=IPluginP->end();it_2++ ){
-
-				Sonicteam::Player::IPlugIn* plug = (*it_2).get();
-				(*it)->OnLink(plug);
+				(*it)->OnLink(*it_2);
 			}
 		}
 

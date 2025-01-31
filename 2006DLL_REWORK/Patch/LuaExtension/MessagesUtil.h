@@ -17,6 +17,7 @@ extern "C" {
 //#include "AtgInput.h"
 #include <sstream>
 #include <string>
+#include <AtgInput.h>
 
 #define  _BYTE char
 

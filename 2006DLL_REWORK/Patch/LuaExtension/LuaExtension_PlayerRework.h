@@ -28,6 +28,8 @@ extern "C" {
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 
+#include <Player/ObjectPlayer.h>
+
 #include "LuaExtension_Memory.h"
 
 
@@ -51,6 +53,7 @@ namespace DebugLogV2 {
 	void GetPlayerActorsR(UINT32* pstack,bool AI);
 	extern "C" int Player__NEW(lua_State* L);
 	extern "C" int PlayerR__GetName(lua_State* L);
+	extern "C" int PlayerR__SetName(lua_State* L);
 	extern "C" int PlayerR__Reload(lua_State*L);
 	extern "C" int PlayerR__SWAP(lua_State*L);
 
@@ -74,6 +77,18 @@ namespace DebugLogV2 {
 
 	extern "C" int PlayerR__GetMachine2(lua_State* L);
 	extern "C" int PlayerR__GetIPluginByName(lua_State* L);
+
+	extern "C" int PlayerR__OpenPackage(lua_State* L);
+	extern "C" int PlayerR__OpenModel(lua_State* L);
+	extern "C" int PlayerR__OpenSound(lua_State* L);
+	extern "C" int PlayerR__OpenOther(lua_State* L);
+	extern "C" int PlayerR__OpenEffect(lua_State* L);
+
+
+	extern "C" int PlayerR__IDynamicLink(lua_State* L);
+	extern "C" int PlayerR__IVarible(lua_State* L);
+	extern "C" int PlayerR__RemovePlugin(lua_State* L);
+
 	
 
 

@@ -1553,10 +1553,10 @@ int __fastcall ObjectUpdate(int a1, double a2){
 
 	
 	
-			 PlayerContext->ContextFlags = NetworkPlayer_DATA->ContextFlags;
+			 PlayerContext->ContextIFFlag2 = NetworkPlayer_DATA->ContextFlags;
 			 PlayerContext->ExportPostureRequestFlag = NetworkPlayer_DATA->ExportPostureRequestFlag;
 			 PlayerContext->ExportWeaponRequestFlag = NetworkPlayer_DATA->ExportWeaponRequestFlag;
-			 PlayerContext->UnknownFlags01 = NetworkPlayer_DATA->UnknownFlags01;
+			 PlayerContext->ContextIFFlag = NetworkPlayer_DATA->UnknownFlags01;
 			 PlayerContext->UnknownFlags0xC8 = NetworkPlayer_DATA->UnknownFlags0xC8;
 			 PlayerContext->StickFixedRotationMb = NetworkPlayer_DATA->StickFixedRotationMb;
 
@@ -1682,10 +1682,10 @@ int __fastcall ObjectUpdate(int a1, double a2){
 			 _data2_.AnimationID =   PlayerContext->CurrentAnimation;
 			 _data2_.AnimationState = PlayerContext->AnimationState;
 			 if (dynamic_cast<Sonicteam::Player::State::CommonContext*>(PlayerContext)){
-				 _data2_.ContextFlags = PlayerContext->ContextFlags;
+				 _data2_.ContextFlags = PlayerContext->ContextIFFlag2;
 				 _data2_.ExportPostureRequestFlag = PlayerContext->ExportPostureRequestFlag;
 				 _data2_.ExportWeaponRequestFlag = PlayerContext->ExportWeaponRequestFlag;
-				 _data2_.UnknownFlags01 = PlayerContext->UnknownFlags01;
+				 _data2_.UnknownFlags01 = PlayerContext->ContextIFFlag;
 				 _data2_.UnknownFlags0xC8 = PlayerContext->UnknownFlags0xC8;
 				 _data2_.StickFixedRotationMb = PlayerContext->StickFixedRotationMb;
 
@@ -1735,10 +1735,10 @@ int __fastcall ObjectUpdate(int a1, double a2){
 			 }
 
 			 if (dynamic_cast<Sonicteam::Player::State::CommonContext*>(PlayerContext)){
-				 Players_DATA[_socket.GetXUID(0)].ContextFlags = PlayerContext->ContextFlags;
+				 Players_DATA[_socket.GetXUID(0)].ContextFlags = PlayerContext->ContextIFFlag2;
 				 Players_DATA[_socket.GetXUID(0)].ExportPostureRequestFlag = PlayerContext->ExportPostureRequestFlag;
 				 Players_DATA[_socket.GetXUID(0)].ExportWeaponRequestFlag = PlayerContext->ExportWeaponRequestFlag;
-				 Players_DATA[_socket.GetXUID(0)].UnknownFlags01 = PlayerContext->UnknownFlags01;
+				 Players_DATA[_socket.GetXUID(0)].UnknownFlags01 = PlayerContext->ContextIFFlag;
 				 Players_DATA[_socket.GetXUID(0)].UnknownFlags0xC8 = PlayerContext->UnknownFlags0xC8;
 				 Players_DATA[_socket.GetXUID(0)].StickFixedRotationMb = PlayerContext->StickFixedRotationMb;
 			 }

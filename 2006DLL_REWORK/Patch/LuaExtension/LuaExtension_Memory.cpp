@@ -78,6 +78,7 @@ namespace DebugLogV2{
 		lua_pushstring06(L, "IsValidPTR"); lua_pushcfunction06(L, Memory__IsValidPTR); 	lua_settable06(L, -3);
 
 		lua_pushstring06(L, "CallFunc"); lua_pushcfunction06(L, Memory_CallFunc); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "CallFuncF"); lua_pushcfunction06(L, Memory_CallFuncF); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "AsInt"); lua_pushcfunction06(L, Memory_AsInt); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "AsFloat"); lua_pushcfunction06(L, Memory_AsFloat); 	lua_settable06(L, -3);
 
@@ -538,7 +539,9 @@ namespace DebugLogV2{
 				move += lua_tonumber(L,2);
 			}
 		}
+	
 
+	
 
 	
 			switch (type){
@@ -716,6 +719,124 @@ namespace DebugLogV2{
 		__asm{
 			mr r3,r3_value
 		}
+	}
+
+	extern "C" Memory_CallFuncF(lua_State* L){
+		int args = lua_gettop(L);
+		unsigned long long registers_values[9];
+		double registers_values_float[9];
+		char* registers_values_string[9]; //only to free 
+		unsigned long long registers_values_or[31];
+
+		int arg_count = 0;
+
+		for (int i = 2; i <= args; i++) {
+
+			if (lua_isnumber(L, i)) {
+				registers_values[arg_count] = (int)lua_tonumber(L, i);
+				registers_values_float[arg_count] = lua_tonumber(L, i); // Use double for float
+				arg_count++;
+			}
+
+			else if (lua_istable(L,i)){
+
+				lua_getmetatable06(L,i);
+				luaL_getmetatable06(L,"Uint64Meta");
+				if (lua_rawequal(L,-1,-2)){
+
+					lua_pop(L,1);
+					lua_pushstring06(L, "part1");
+					lua_gettable(L, i);
+					unsigned long value_1 = (unsigned long)lua_touserdata(L, -1);
+
+
+					lua_pushstring06(L, "part2");
+					lua_gettable(L, i);
+					unsigned long value_2 = (unsigned long)lua_touserdata(L, -1);
+
+
+					registers_values[arg_count] = ((unsigned long long)value_1 << 32) | value_2; 
+					arg_count++;
+				}
+
+				lua_pop(L,1);
+			}
+			else if (lua_islightuserdata(L, i)) {
+
+				registers_values[arg_count] = (unsigned long long)lua_touserdata(L, i);
+				arg_count++;
+			}
+			else if (lua_isstring(L,i)){
+				registers_values[arg_count] = (unsigned long long)lua_tostring(L, i);
+				arg_count++;
+			}
+		}
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		int ptr =  (int)lua_touserdata(L,-1);
+
+		lua_pushstring06(L,"move");
+		lua_gettable(L,1);
+		int move =  (int)lua_touserdata(L,-1);
+
+		int func_ptr = ptr + move;
+
+
+
+		int return_value = 0;
+		float return_value_float = 0.0;
+
+
+		unsigned long long r3_value = registers_values[0];
+		unsigned long long r4_value = registers_values[1];
+		unsigned long long r5_value = registers_values[2];
+		unsigned long long r6_value = registers_values[3];
+		unsigned long long r7_value = registers_values[4];
+		unsigned long long r8_value = registers_values[5];
+		unsigned long long r9_value = registers_values[6];
+
+
+		float f1_value = registers_values_float[0];
+		float f2_value = registers_values_float[1];
+		float f3_value = registers_values_float[2];
+		float f4_value = registers_values_float[3];
+		float f5_value = registers_values_float[4];
+		float f6_value = registers_values_float[5];
+		float f7_value = registers_values_float[6];
+
+
+
+		__asm{
+			mr r3,r3_value
+				mr r4,r4_value
+				mr r5,r5_value
+				mr r6,r6_value
+				mr r7,r7_value
+				mr r8,r8_value
+				mr r9,r9_value
+
+				fmr fp1,f1_value
+				fmr fp2,f2_value
+				fmr fp3,f3_value
+				fmr fp4,f4_value
+				fmr fp5,f5_value
+				fmr fp6,f6_value
+				fmr fp7,f7_value
+
+		}
+
+		__asm{
+			    mtctr func_ptr 
+				bctrl
+				mr return_value,r3
+				fmr return_value_float,fp1
+		}
+
+
+		lua_pushnumber(L,return_value_float);
+		return 1;
+
 	}
 	extern "C" Memory_CallFunc(lua_State* L)
 	{

@@ -38,7 +38,7 @@ namespace CompleteGauge{
 
 		//decide 
 		Sonicteam::Player::Score* score =  _this->ScorePlugin.get();
-		Sonicteam::Player::State::IMachine* Mashine =  *(Sonicteam::Player::State::IMachine**)(score->PtrObjectPlayer + 0xE4);
+		Sonicteam::Player::State::IMachine* Mashine =  score->PtrObjectPlayer->PlayerMachine.get();
 		int StateID = Mashine->GetCurrentMashineStateID();
 
 		if (StateID == 0x4D || StateID == 0x4A || StateID == 0x4B || _this->isShrink || _this->isSlowTime){
@@ -166,7 +166,7 @@ namespace CompleteGauge{
 
 
 		//Complete Output Flag
-		_this->UnknownFlags01 |= (LVL_UP ? 0x10000000 : 0) | 
+		_this->ContextIFFlag |= (LVL_UP ? 0x10000000 : 0) | 
                          (FULL_GAUGE ? 0x20000000 : 0) |
                          (Homing_Smash_Charge ? 0x8000000 : 0) |
                          (Homing_Smash_Release ? 0x4000000 : 0) ;

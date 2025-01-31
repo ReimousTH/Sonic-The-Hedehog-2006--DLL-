@@ -5,6 +5,9 @@
 #include <Patch/Common/XEXALLOCATORS.H>
 #include <Patch/Common/XEXALLOCATORS_UNDEF.H>
 
+#include <vector>
+
+
 
 struct FPair{
 	const char* Name;
@@ -27,9 +30,14 @@ FPair functions[] = {
 void STH2006DLLMain()
 {
 
-	HookV2::IsNotEmulatedHardWare =  HookV2::CheckIsNotEmulatedHardWare();
 
+
+	HookV2::IsNotEmulatedHardWare =  HookV2::CheckIsNotEmulatedHardWare();
 	ZLua lua_file = ZLua("game:\\common\\DLL.lua");
+
+	DebugLogV2::ThreadLog = lua_file.GetGlobalBool("ThreadLog");
+
+
 	std::stringstream log;
 	std::wstringstream wlog;
 	lua_file.DoFile(true);

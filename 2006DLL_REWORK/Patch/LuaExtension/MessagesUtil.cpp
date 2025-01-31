@@ -154,7 +154,7 @@ DWORD WINAPI ThreadProc( LPVOID lpParameter )
 
 	while (true){
 
-		/*
+		
 		ATG::GAMEPAD* gc = ATG::Input::GetMergedInput(0);
 
 
@@ -165,8 +165,8 @@ DWORD WINAPI ThreadProc( LPVOID lpParameter )
 			XShowMessageBoxUI(0,L"DebugLog V2.0",DebugLogV2::ConcatenateStrings(log).c_str(),1,g_pwstrButtonsXx,1,XMB_ALERTICON,&result,&m_Overlapped);
 
 
-		//	while (result.dwButtonPressed != 0){
-		//	}
+			while (result.dwButtonPressed != 0){
+			}
 			Sleep(1000);
 
 
@@ -178,7 +178,7 @@ DWORD WINAPI ThreadProc( LPVOID lpParameter )
 			DebugLogV2::log.clear();
 
 		}
-		*/
+	
 
 
 	}
