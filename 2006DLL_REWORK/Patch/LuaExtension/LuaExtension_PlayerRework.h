@@ -33,7 +33,7 @@ extern "C" {
 #include "LuaExtension_Memory.h"
 
 
-
+#include <algorithm>
 
 #define _DWORD DWORD
 #define _BYTE BYTE
@@ -82,11 +82,14 @@ namespace DebugLogV2 {
 	extern "C" int PlayerR__OpenModel(lua_State* L);
 	extern "C" int PlayerR__OpenSound(lua_State* L);
 	extern "C" int PlayerR__OpenOther(lua_State* L);
+	extern "C" int PlayerR__OpenOtherParameter(lua_State* L);
 	extern "C" int PlayerR__OpenEffect(lua_State* L);
 
 
 	extern "C" int PlayerR__IDynamicLink(lua_State* L);
 	extern "C" int PlayerR__IVarible(lua_State* L);
+	extern "C" int PlayerR__IDynamicLink2(lua_State* L);
+	extern "C" int PlayerR__IEventerListener(lua_State* L);
 	extern "C" int PlayerR__RemovePlugin(lua_State* L);
 
 	

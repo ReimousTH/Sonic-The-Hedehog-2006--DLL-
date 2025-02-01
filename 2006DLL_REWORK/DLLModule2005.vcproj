@@ -337,11 +337,11 @@
 				AdditionalOptions="/ignore:4089 /dll /entry:&quot;_DllMainCRTStartup&quot; /include:&quot;XboxKrnlBuildNumber&quot;"
 				AdditionalDependencies="d3d9.lib d3dx9.lib xgraphics.lib xapilib.lib xaudio.lib x3daudio.lib xboxkrnl.lib xbdm.lib libcmt.lib xnet.lib"
 				OutputFile="$(OutDir)/$(ProjectName).dll"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="&quot;..\Havok\lib\win32_net_9-0\release_multithreaded&quot;"
 				ModuleDefinitionFile="DllModule.def"
 				GenerateDebugInformation="true"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
+				OptimizeReferences="1"
+				EnableCOMDATFolding="1"
 				SetChecksum="true"
 			/>
 			<Tool

@@ -36,7 +36,11 @@ namespace DebugLogV2{
 		BranchTo(0x825D7D18,int,LS); //luaopen_table06
 		luaL_openlibf06(LS, 0,(const luaL_reg*)0x8203B8A8,15);
 		BranchTo(0x82639830,int,LS); //open script
+		
 
+		luaopen_debug(LS);
+		luaopen_string(LS);
+	
 
 	
 		MessageUtilGlobalInstall(LS);
