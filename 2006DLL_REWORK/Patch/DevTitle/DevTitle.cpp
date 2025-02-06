@@ -215,43 +215,6 @@ namespace DevTitleV2{
 		return BranchTo(0x825E8D78,int,result,a2);
 	}
 
-	static void ClearTaskFunc(Sonicteam::SoX::Engine::Task* task){
-		*(int*)task = 0;
-	};
-
-
-	HOOK(Sonicteam::SoX::Engine::Task*,__stdcall,sub_0x825F0298,0x825F0298,Sonicteam::SoX::Engine::Task* a1,int a2){
-
-		//ShowXenonMessage(L"MSG","DestroyObject");
-		
-		a1->Empty(a1);
-		a1->EmptyParent(a1);
-		a1->TaskList.ForEach(ClearTaskFunc);
-		a1->TaskList.Empty();
-	
-
-		a1->LComponentList.ForEach(0);
-		a1->LComponentList.Empty();
-
-		a1->LinkedComponent.RemoveLink();
-
-
-		Sonicteam::SoX::Memory::IUDestructible::DestroyObject(a1,(int)a2);
-		return 0;
-
-
-	}
-
-	HOOK_EXTERN_C(Sonicteam::SoX::Engine::Task*, __fastcall,sub_82581470,0x82581470 ,void* a1,Sonicteam::SoX::Engine::Doc* doc){
-
-		return new(a1)Sonicteam::SoX::Engine::Task(doc);
-	}
-
-
-	HOOK_EXTERN_C(Sonicteam::SoX::Component*, __fastcall,sub_825BAAA0,0x825BAAA0 ,void* a1,Sonicteam::SoX::Component* comp){
-
-		return new(a1)Sonicteam::SoX::Component(comp);
-	}
 
 
 

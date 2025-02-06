@@ -120,7 +120,6 @@ namespace DebugLogV2{
 	void OnStateChangeRework(Sonicteam::Player::State::Machine2* _this,boost::shared_ptr<Sonicteam::SoX::AI::State<Sonicteam::Player::State::IContext>> NextState,Sonicteam::Player::State::IContext* context){
 
 		Sonicteam::Player::State::Machine2* machine2 = dynamic_cast<Sonicteam::Player::State::Machine2*>(_this);
-
 		if (NextState){
 
 			if (_this->CurrentState){

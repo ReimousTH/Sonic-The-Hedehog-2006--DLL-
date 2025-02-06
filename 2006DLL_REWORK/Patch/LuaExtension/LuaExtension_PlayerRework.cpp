@@ -28,15 +28,10 @@ namespace DebugLogV2{
 		lua_pushstring06(LS,"AI"); lua_pushboolean(LS,false); lua_settable06(LS,-3); // AI = 0
 		lua_pushstring06(LS,"__index"); lua_pushvalue(LS,-2); lua_settable06(LS,-3); // __index = PlayerMeta
 
-
-
-
-
 	
 		lua_newtable06(LS);lua_pushstring06(LS, "__index");luaL_getmetatable06(LS, "MemoryMeta");lua_settable06(LS, -3); lua_setmetatable06(LS, -2); //setmetatable(PlayerMeta, { __index = MemoryMeta })
 
-		
-
+	
 
 		lua_pushstring06(LS, "GetName");lua_pushcfunction06(LS, PlayerR__GetName);lua_settable06(LS, -3); // Equivalent to table["GetName"] = PlayerR__GetName
 		lua_pushstring06(LS, "SetName");lua_pushcfunction06(LS, PlayerR__SetName);lua_settable06(LS, -3); // Equivalent to table["GetName"] = PlayerR__GetName
@@ -55,10 +50,32 @@ namespace DebugLogV2{
 
 
 		lua_pushstring06(LS, "OpenPackage");lua_pushcfunction06(LS, PlayerR__OpenPackage);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
+		lua_pushstring06(LS, "OpenFrame");lua_pushcfunction06(LS, PlayerR__OpenFrame);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
+		lua_pushstring06(LS, "OpenInput");lua_pushcfunction06(LS, PlayerR__OpenInput);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
 		lua_pushstring06(LS, "OpenModel");lua_pushcfunction06(LS, PlayerR__OpenModel);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
+		lua_pushstring06(LS, "OpenZock");lua_pushcfunction06(LS, PlayerR__OpenZock);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
+		lua_pushstring06(LS, "OpenPerformance");lua_pushcfunction06(LS, PlayerR__OpenPerformance);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
+		lua_pushstring06(LS, "OpenBody");lua_pushcfunction06(LS, PlayerR__OpenBody);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
+		lua_pushstring06(LS, "OpenAutomaticDead");lua_pushcfunction06(LS, PlayerR__OpenAutomaticDead);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
 		lua_pushstring06(LS, "OpenSound");lua_pushcfunction06(LS, PlayerR__OpenSound);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
 		lua_pushstring06(LS, "OpenEffect");lua_pushcfunction06(LS, PlayerR__OpenEffect);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
 		lua_pushstring06(LS, "OpenOther");lua_pushcfunction06(LS, PlayerR__OpenOther);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
+		lua_pushstring06(LS, "OpenImpulse");   lua_pushcfunction06(LS, PlayerR__OpenImpulse);   lua_settable06(LS, -3);
+		lua_pushstring06(LS, "OpenPath");      lua_pushcfunction06(LS, PlayerR__OpenPath);      lua_settable06(LS, -3);
+		lua_pushstring06(LS, "OpenLightDash"); lua_pushcfunction06(LS, PlayerR__OpenLightDash); lua_settable06(LS, -3);
+		lua_pushstring06(LS, "OpenScore");     lua_pushcfunction06(LS, PlayerR__OpenScore);     lua_settable06(LS, -3);
+		lua_pushstring06(LS, "OpenBodyList");  lua_pushcfunction06(LS, PlayerR__OpenBodyList);  lua_settable06(LS, -3);
+		lua_pushstring06(LS, "OpenLockOn");    lua_pushcfunction06(LS, PlayerR__OpenLockOn);    lua_settable06(LS, -3);
+		lua_pushstring06(LS, "OpenGameMaster");lua_pushcfunction06(LS, PlayerR__OpenGameMaster);lua_settable06(LS, -3);
+
+		lua_pushstring06(LS, "OpenEventer");   lua_pushcfunction06(LS, PlayerR__OpenEventer);   lua_settable06(LS, -3);
+		lua_pushstring06(LS, "OpenWeapons");   lua_pushcfunction06(LS, PlayerR__OpenWeapons);   lua_settable06(LS, -3);
+		lua_pushstring06(LS, "OpenPostureControl"); lua_pushcfunction06(LS, PlayerR__OpenPostureControl); lua_settable06(LS, -3);
+		lua_pushstring06(LS, "OpenGravity");   lua_pushcfunction06(LS, PlayerR__OpenGravity);   lua_settable06(LS, -3);
+		lua_pushstring06(LS, "OpenState");     lua_pushcfunction06(LS, PlayerR__OpenState);     lua_settable06(LS, -3);
+		lua_pushstring06(LS, "OpenGauge");     lua_pushcfunction06(LS, PlayerR__OpenGauge);     lua_settable06(LS, -3);
+
+		
 		lua_pushstring06(LS, "OpenOtherParameter");lua_pushcfunction06(LS, PlayerR__OpenOtherParameter);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
 		lua_pushstring06(LS, "DynamicLink");lua_pushcfunction06(LS, PlayerR__IDynamicLink);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
 		lua_pushstring06(LS, "IDynamicLink");lua_pushcfunction06(LS, PlayerR__IDynamicLink2);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
@@ -642,34 +659,302 @@ namespace DebugLogV2{
 	}
 
 
-	// Helper function for dynamic_cast and removal
+	extern "C" int PlayerR__OpenFrame(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+		int arg2 = lua_tonumber(L,2);
 
 
-#define ModelMatcherOP(Type) \
-	bool operator()(const boost::shared_ptr<Type>& ptr) const { \
-	return dynamic_cast<Sonicteam::Player::IModel*>(ptr.get()) == model_remove; \
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+
+		BranchTo(0x8219BAE8,int,L);
+
+
+		lua_pushlightuserdata(L,OBJPlayer->FindPluginLast("frame").get());
+		return 1;
+
+
 	}
 
-	struct ModelMatcher {
-		Sonicteam::Player::IModel* model_remove;
-
-		ModelMatcher(Sonicteam::Player::IModel* model) : model_remove(model) {}
-
-		ModelMatcherOP(Sonicteam::Player::IPlugIn);
-		ModelMatcherOP(Sonicteam::Player::IVariable);
-		ModelMatcherOP(Sonicteam::Player::IDynamicLink);
-		ModelMatcherOP(Sonicteam::Player::IFlagCommunicator);
-		ModelMatcherOP(Sonicteam::Player::IStepable);
-		ModelMatcherOP(Sonicteam::Player::IExportExternalFlag);
-		ModelMatcherOP(Sonicteam::Player::IExportPostureRequestFlag);
-		ModelMatcherOP(Sonicteam::Player::IExportWeaponRequestFlag);
-		ModelMatcherOP(Sonicteam::Player::IImportAnimation);
-		ModelMatcherOP(Sonicteam::Player::INotification);
-//		ModelMatcherOP(int);
-	};
+	extern "C" int PlayerR__OpenInput(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+		int arg2 = lua_tonumber(L,2);
 
 
 
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+
+		BranchTo(0x8219BBE8 ,int,L);
+
+		const char* find_array[] = {
+			"input",
+			"input",
+			"input snowboard",
+			"input vehicle", //not reg
+			"input"
+		};
+
+
+		lua_pushlightuserdata(L,OBJPlayer->FindPluginLast(find_array[arg2]).get()); //module
+
+
+
+		return 1;
+
+	}
+
+	extern "C" int PlayerR__OpenZock(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+		BranchTo(0x8219CA80,int,L);
+		lua_pushlightuserdata(L,OBJPlayer->FindPluginLast("zock").get()); //module
+		return 1;
+	}
+
+	extern "C" int PlayerR__OpenPerformance(lua_State* L)
+	{
+		lua_pushlightuserdata(L,(void*)0);
+		return 1;
+	}
+
+	extern "C" int PlayerR__OpenImpulse(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+	
+
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+
+		BranchTo(0x8219CBC8,int,L);
+
+		lua_pushlightuserdata(L,OBJPlayer->FindPluginLast("impulse").get()); //module
+
+
+		return 1;
+
+	}
+
+	extern "C" int PlayerR__OpenPath(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+		int arg2 = lua_tonumber(L,2);
+
+
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+
+		BranchTo(0x8219CD10,int,L);
+
+		lua_newtable06(L);
+
+		lua_pushlightuserdata(L,OBJPlayer->PlayerPath.get());
+		lua_rawseti06(L,-2,1);
+
+		lua_pushlightuserdata(L,OBJPlayer->PlayerPathGuide.get());
+		lua_rawseti06(L,-2,2);
+
+		lua_pushlightuserdata(L,OBJPlayer->PlayerPathCollision.get());
+		lua_rawseti06(L,-2,3);
+
+		
+
+
+		return 1;
+
+	}
+
+	extern "C" int PlayerR__OpenLightDash(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+
+
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+
+		BranchTo(0x821FAB88,int,L);
+
+
+		lua_pushlightuserdata(L,OBJPlayer->FindPluginLast("path_ld").get()); //module
+		return 1;
+
+	}
+
+	extern "C" int PlayerR__OpenScore(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+		BranchTo(0x8219D030,int,L);
+
+		
+		lua_pushlightuserdata(L,OBJPlayer->PlayerScore.get());
+		return 1;
+	}
+
+	extern "C" int PlayerR__OpenBodyList(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+		BranchTo(0x8219D178,int,L);
+
+		lua_pushlightuserdata(L,OBJPlayer->FindPluginLast("bodylist").get()); //module
+		return 1;
+
+	}
+
+	extern "C" int PlayerR__OpenLockOn(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+
+		const char* arg2 = lua_tostring(L, 2);
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+		BranchTo(0x8219D220,int,L);
+
+		lua_pushlightuserdata(L,OBJPlayer->FindPluginLast(arg2).get()); //module
+		return 1;
+	}
+
+	extern "C" int PlayerR__OpenGameMaster(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+
+
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+		BranchTo(0x8219D378 ,int,L);
+
+		lua_pushlightuserdata(L,OBJPlayer->PlayerGameMaster.get());
+		return 1;
+	}
+
+	extern "C" int PlayerR__OpenEventer(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+		BranchTo(0x8219D538 ,int,L);
+
+		lua_pushlightuserdata(L,OBJPlayer->PlayerEventer.get());
+		return 1;
+	}
+
+	extern "C" int PlayerR__OpenBody(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+		BranchTo(0x8219E430,int,L);
+		lua_pushlightuserdata(L,OBJPlayer->FindPluginLast("physicsbody").get()); //module
+		return 1;
+	}
+
+	extern "C" int PlayerR__OpenAutomaticDead(lua_State* L)
+	{
+		return 0;
+	}
+
+	extern "C" int PlayerR__OpenWeapons(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+		int arg2 = lua_tonumber(L,2);
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+
+		BranchTo(0x8219E670,int,L);
+
+		const char* find_array[] = {
+			"omega_weapons",
+			"shadow_weapons",
+			"sonic_weapons",
+			"venice_weapons",
+			"tails_weapons",
+			"amy_weapons",
+			"blaze_weapons",
+			"blaze_weapons", //knuckles_weapons
+			"blaze_weapons", //rouge_weapons
+			"sonic_weapons", //princess_weapons
+			"boss_silver_weapons",
+			"",
+			"supershadow_weapons",
+			"venice_weapons"
+		};
+
+
+		lua_pushlightuserdata(L,OBJPlayer->FindPluginLast(find_array[arg2]).get()); //module
+
+
+
+		return 1;
+
+
+	}
 
 
 	extern "C" int PlayerR__OpenModel(lua_State* L)
@@ -714,6 +999,67 @@ namespace DebugLogV2{
 		
 
 	
+		return 1;
+	}
+
+	extern "C" int PlayerR__OpenPostureControl(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+		int arg2 = lua_tonumber(L,2);
+
+
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+
+		BranchTo(0x8219C468,int,L);
+
+	
+		lua_pushlightuserdata(L,OBJPlayer->PlayerPosture.get()); //module
+		return 1;
+
+
+	}
+
+	extern "C" int PlayerR__OpenGravity(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+	
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+
+		BranchTo(0x8219C850,int,L);
+		lua_pushlightuserdata(L,OBJPlayer->PlayerGravity.get());
+		return 1;
+
+
+	}
+
+	extern "C" int PlayerR__OpenState(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+
+		BranchTo(0x8219C960,int,L);
+
+
+		lua_pushlightuserdata(L,OBJPlayer->PlayerMachine.get());
 		return 1;
 	}
 
@@ -824,6 +1170,30 @@ namespace DebugLogV2{
 
 
 		return 1;
+
+	}
+
+	extern "C" int PlayerR__OpenGauge(lua_State* L)
+	{
+		int arg_count = lua_gettop(L);
+		int arg2 = lua_tonumber(L,2);
+
+
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+		lua_pushlightuserdata(L,(void*)&OBJPlayer);
+		lua_replace(L,1);
+
+
+		BranchTo(0x8219EFB8,int,L);
+
+
+		lua_pushlightuserdata(L,OBJPlayer->PlayerGauge.get());
+
+		return 1;
+
 
 	}
 
@@ -1017,57 +1387,110 @@ namespace DebugLogV2{
 	extern "C" int PlayerR__IDynamicLink2(lua_State* L)
 	{
 		int args = lua_gettop(L);
+
 		lua_pushstring(L, "ptr");
 		lua_gettable(L, 1);
+
 		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L, -1);
+		lua_pop(L, 1); // Remove the userdata from the stack
 
-
-		for (int i = 2; i <= args; i++) {
+		for (int i = 2; i <= args; ++i)
+		{
 			boost::shared_ptr<Sonicteam::Player::IPlugIn> find_plugin;
 
-			for (std::vector<boost::shared_ptr<Sonicteam::Player::IPlugIn>>::iterator it = OBJPlayer->PlayerPlugins.begin(); 
-				it != OBJPlayer->PlayerPlugins.end(); it++) {
-					if (lua_isstring(L,i)){
-						if ((*it)->PluginName == lua_tostring(L, i)) {
-							find_plugin = *it;
-						}
+			//Find Plugin by Name or Userdata
+			for (std::vector<boost::shared_ptr<Sonicteam::Player::IPlugIn>>::iterator it = OBJPlayer->PlayerPlugins.begin();
+				it != OBJPlayer->PlayerPlugins.end(); ++it)
+			{
+				if (!(*it)) continue; // Safe check for null plugin
+
+				if (lua_isstring(L, i))
+				{
+					const char* plugin_name = lua_tostring(L, i);
+					if (plugin_name && (*it)->PluginName == plugin_name) // Add null check for lua_tostring and PluginName
+					{
+						find_plugin = *it;
+						break;
 					}
-					else if (lua_isuserdata(L,i)){
-						if ((*it).get() == (Sonicteam::Player::IPlugIn*)lua_touserdata(L, i)) {
-							find_plugin = *it;
-							break;
-						}
+				}
+				else if (lua_isuserdata(L, i))
+				{
+					Sonicteam::Player::IPlugIn* plugin_ptr = (Sonicteam::Player::IPlugIn*)lua_touserdata(L, i);
+					if (plugin_ptr && (*it).get() == plugin_ptr) //Safe check
+					{
+						find_plugin = *it;
+						break;
 					}
-
-			}
-			OBJPlayer->PlayerEventer->OnLink(find_plugin);
-
-			for (std::vector<boost::shared_ptr<Sonicteam::Player::IDynamicLink>>::iterator it = OBJPlayer->PlayerIDynamicLink.begin(); 
-				it != OBJPlayer->PlayerIDynamicLink.end(); it++){
-					(*it)->OnLink(find_plugin);
-			}
-			if (boost::shared_ptr<Sonicteam::Player::IDynamicLink> variable =  boost::dynamic_pointer_cast<Sonicteam::Player::IDynamicLink>(find_plugin)){
-
-
-				for (std::vector<boost::shared_ptr<Sonicteam::Player::IPlugIn>>::iterator it = OBJPlayer->PlayerPlugins.begin(); 
-					it != OBJPlayer->PlayerPlugins.end(); it++) {
-						variable->OnLink(*it);
 				}
 			}
 
 
+			// Find and Link IDynamicLinks based on userdata
+			for (std::vector<boost::shared_ptr<Sonicteam::Player::IDynamicLink>>::iterator it = OBJPlayer->PlayerIDynamicLink.begin();
+				it != OBJPlayer->PlayerIDynamicLink.end(); ++it)
+			{
+				if (!(*it)) continue; //Safe check
+
+				if (lua_isuserdata(L, i))
+				{
+					Sonicteam::Player::IDynamicLink* dynamic_link_ptr = (Sonicteam::Player::IDynamicLink*)lua_touserdata(L, i);
+					if (dynamic_link_ptr && (*it).get() == dynamic_link_ptr)
+					{
+						for (std::vector<boost::shared_ptr<Sonicteam::Player::IPlugIn>>::iterator jt = OBJPlayer->PlayerPlugins.begin();
+							jt != OBJPlayer->PlayerPlugins.end(); ++jt)
+						{
+							if (*jt) //Safe check
+								(*it)->OnLink(*jt);
+						}
+						break; // Found the IDynamicLink, no need to continue searching
+					}
+					Sonicteam::Player::IDynamicLink* dynamic_posture_ptr = dynamic_cast<Sonicteam::Player::IDynamicLink*>((Sonicteam::Player::IPostureControl*)lua_touserdata(L, i));
+					if (dynamic_link_ptr && (*it).get() == dynamic_posture_ptr)
+					{
+						for (std::vector<boost::shared_ptr<Sonicteam::Player::IPlugIn>>::iterator jt = OBJPlayer->PlayerPlugins.begin();
+							jt != OBJPlayer->PlayerPlugins.end(); ++jt)
+						{
+							if (*jt) //Safe check
+								(*it)->OnLink(*jt);
+						}
+						break; // Found the IDynamicLink, no need to continue searching
+					}
+
+
+				}
+			}
+
+
+
+			if (find_plugin.get()){
+				if (OBJPlayer->PlayerEventer) // Null check for PlayerEventer
+					OBJPlayer->PlayerEventer->OnLink(find_plugin);
+
+				for (std::vector<boost::shared_ptr<Sonicteam::Player::IDynamicLink>>::iterator it = OBJPlayer->PlayerIDynamicLink.begin();
+					it != OBJPlayer->PlayerIDynamicLink.end(); ++it)
+				{
+					if (*it) //Safe check
+						(*it)->OnLink(find_plugin);
+				}
+
+				boost::shared_ptr<Sonicteam::Player::IDynamicLink> variable = boost::dynamic_pointer_cast<Sonicteam::Player::IDynamicLink>(find_plugin);
+				if (variable)
+				{
+					for (std::vector<boost::shared_ptr<Sonicteam::Player::IPlugIn>>::iterator it = OBJPlayer->PlayerPlugins.begin();
+						it != OBJPlayer->PlayerPlugins.end(); ++it)
+					{
+						if (*it) //Safe check
+							variable->OnLink(*it);
+					}
+				}
+			}
 		}
 
 		return 0;
 	}
 
-
 	extern "C" int PlayerR__IEventerListener(lua_State* L)
 	{
-
-		
-
-		
 
 		return 0;
 	}
@@ -1078,7 +1501,13 @@ namespace DebugLogV2{
 		lua_pushstring06(L,"ptr");
 		lua_gettable(L,1);
 		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
+
+
 		const char* plug =  lua_tostring(L,2);
+
+		if (strcmp(plug,"Eventer") == 0){
+			OBJPlayer->RemovePlugin(OBJPlayer->PlayerEventer);
+		}
 
 
 

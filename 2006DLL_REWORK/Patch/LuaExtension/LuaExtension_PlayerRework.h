@@ -79,9 +79,32 @@ namespace DebugLogV2 {
 	extern "C" int PlayerR__GetIPluginByName(lua_State* L);
 
 	extern "C" int PlayerR__OpenPackage(lua_State* L);
+	extern "C" int PlayerR__OpenFrame(lua_State* L);
+	extern "C" int PlayerR__OpenInput(lua_State* L);
+
 	extern "C" int PlayerR__OpenModel(lua_State* L);
+	extern "C" int PlayerR__OpenPostureControl(lua_State* L);
+	extern "C" int PlayerR__OpenGravity(lua_State* L);
+	extern "C" int PlayerR__OpenState(lua_State* L);
+	extern "C" int PlayerR__OpenZock(lua_State* L);
+	extern "C" int PlayerR__OpenPerformance(lua_State* L);
+	extern "C" int PlayerR__OpenImpulse(lua_State* L);
+	extern "C" int PlayerR__OpenPath(lua_State* L);
+	extern "C" int PlayerR__OpenLightDash(lua_State* L);
+	extern "C" int PlayerR__OpenScore(lua_State* L);
+	extern "C" int PlayerR__OpenBodyList(lua_State* L);
+	extern "C" int PlayerR__OpenLockOn(lua_State* L);
+	extern "C" int PlayerR__OpenGameMaster(lua_State* L);
+	extern "C" int PlayerR__OpenEventer(lua_State* L);
+
+
 	extern "C" int PlayerR__OpenSound(lua_State* L);
+	extern "C" int PlayerR__OpenBody(lua_State* L);
+	extern "C" int PlayerR__OpenAutomaticDead(lua_State* L);
+
+	extern "C" int PlayerR__OpenWeapons(lua_State* L);
 	extern "C" int PlayerR__OpenOther(lua_State* L);
+	extern "C" int PlayerR__OpenGauge(lua_State* L);
 	extern "C" int PlayerR__OpenOtherParameter(lua_State* L);
 	extern "C" int PlayerR__OpenEffect(lua_State* L);
 

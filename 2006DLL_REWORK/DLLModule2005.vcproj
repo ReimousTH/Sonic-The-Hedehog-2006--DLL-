@@ -484,6 +484,10 @@
 				RelativePath=".\Hook\HookBase.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Hook\HookNew.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Core"
@@ -524,6 +528,10 @@
 		<Filter
 			Name="Patch"
 			>
+			<File
+				RelativePath=".\Hook\HookNew.h"
+				>
+			</File>
 			<Filter
 				Name="LuaExtension"
 				>

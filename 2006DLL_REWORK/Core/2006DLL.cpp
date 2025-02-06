@@ -4,7 +4,11 @@
 
 #include <Patch/Common/XEXALLOCATORS.H>
 #include <Patch/Common/XEXALLOCATORS_UNDEF.H>
+#include <Sox/StepableThread.h>
 
+#include <Sox/Engine/Task.h>
+
+#include <Hook/HookNew.h>
 #include <vector>
 
 
@@ -26,9 +30,89 @@ FPair functions[] = {
 };
 
 
+void* myFunc1(double value) {
+
+	
+	if (ATG::Input::GetMergedInput()->wPressedButtons & XINPUT_GAMEPAD_Y){
+	
+	}
+	return 0;
+}
+
+
+void* myFunc2() {
+
+	
+	
+	return 0;
+}
+
+
+HOOKV3(0x828CBDC0, int, TestFunc01, (int,int,int),(arg1,arg2,arg3),int arg1,int arg2,int arg3) {
+	
+	PushXenonMessage(L"MSG","T1");
+	return 0;
+}
+
+HOOKV3(0x828CBDC0, int, TestFunc02, (int,int,int),(arg1,arg2,arg3),int arg1,int arg2,int arg3) {
+
+	PushXenonMessage(L"MSG","T2");
+	return 0;
+}
+
+HOOKV3(0x828CBFD8, int, TestFunc03, (void*,unsigned int,short*),(_this,index,buffer),void* _this,unsigned int index,short* buffer) {
+
+
+	buffer[0] = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+	buffer[1] = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+	buffer[2] = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+	buffer[3] = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+
+	return 1;
+}
+
+
+HOOKV3(0x825BAAA0, Sonicteam::SoX::Component*,ComponentNewConstructor,(Sonicteam::SoX::Component*,Sonicteam::SoX::Component*),(_this,component),Sonicteam::SoX::Component* _this, Sonicteam::SoX::Component* component){
+	
+	return new (_this) Sonicteam::SoX::Component(component);
+}
+
+HOOKV3(0x82581500,Sonicteam::SoX::Engine::Task*,TaskNewConstructor,(Sonicteam::SoX::Engine::Task*,Sonicteam::SoX::Engine::Task*),(_this,task), Sonicteam::SoX::Engine::Task* _this,Sonicteam::SoX::Engine::Task* task){
+	return new (_this) Sonicteam::SoX::Engine::Task(task);
+}
+
+HOOKV3(0x82581470,Sonicteam::SoX::Engine::Task*,TaskNewConstructor2,(Sonicteam::SoX::Engine::Task*,Sonicteam::SoX::Engine::Doc*),(_this,doc), Sonicteam::SoX::Engine::Task* _this,Sonicteam::SoX::Engine::Doc* doc){
+	return new (_this) Sonicteam::SoX::Engine::Task(doc);
+}
+
+
+
 
 void STH2006DLLMain()
 {
+	
+	BranchTo(0x825383D8,int); //INIT HEAP Early
+	HookNew::SaveBuffer = new std::map<void*, std::vector<HookNew*>>();
+	HookNew::IsEmulated();
+
+
+	//INSTALL_HOOKV3(TestFunc01);
+	//INSTALL_HOOKV3(TestFunc02);
+//	INSTALL_HOOKV3EX(TestFunc03,1,false);
+	INSTALL_HOOKV3EX(ComponentNewConstructor,-1,true);
+	INSTALL_HOOKV3EX(TaskNewConstructor,-1,true);
+	INSTALL_HOOKV3EX(TaskNewConstructor2,-1,true);
+//	INSTALL_HOOKV3EX(ComponentNewDestructor,1,false);
+
+//	boost::function<void*(double)> func1 = myFunc1;
+//	boost::function<void*(void)> func2 = myFunc2;
+
+//	Sonicteam::SoX::StepableThread* Thread = new Sonicteam::SoX::StepableThread("Test",func1,func2,1);
+	//Thread->Resume();
+	//SetEvent(	Thread->StartEvent);
+
+
+
 
 
 
