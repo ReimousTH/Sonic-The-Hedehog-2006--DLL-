@@ -69,6 +69,8 @@ namespace DebugLogV2{
 		GlobalInstall_PlayerRework(LS);
 		OpenState_GlobalInstall(LS);
 
+		GlobalInstall__LoadReAttachArc(LS);
+
 	
 		return sub_825DB498H(LS);
 	}

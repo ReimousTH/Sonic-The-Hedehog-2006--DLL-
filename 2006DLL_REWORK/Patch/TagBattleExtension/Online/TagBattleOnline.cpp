@@ -1072,7 +1072,7 @@ int __fastcall MainModeOnMessageRecieved(Sonicteam::SoX::MessageReceiver* _this,
 	a1 = a1 -0x20;
 	int extra_flag = *(int *)(a1 + 0x50) ;
 
-	switch ( msg->MessageInfo )
+	switch ( msg->MessageID )
 	{
 	case 0x1C001:
 		std::stringstream ss;
@@ -1094,10 +1094,10 @@ int __fastcall GameImpOnMessageRecieved(Sonicteam::SoX::MessageReceiver* _this,S
 	int extra_flag = *(int *)(a1 + 0x50) ;
 
 	std::stringstream ss;
-	ss << "[MainMode][MessageReceiver]" << msg->MessageInfo << "-" << msg->MessageInfo2;
+	ss << "[MainMode][MessageReceiver]" << msg->MessageID << "-" << (msg->GetValueAt<int>(0));
 	DebugLogV2::PrintNextFixed(ss.str());
 
-	switch ( msg->MessageInfo )
+	switch ( msg->MessageID )
 	{
 	case 0x1C001:
 
@@ -1132,18 +1132,18 @@ static void SpawnPPLPlayers(){
 
 
 
-	#define  GAMEIMP_ON_LEVEL 1
-	#define  GAMEIMP_ON_CUTSCENE 2
-	#define  GAMEIMP_ON_CGI_CUTSCENE 3
-	#define  GAMEIMP_ON_RESULT 4
-	#define  GAMEIMP_ON_CUTSCENE_END 5
-	#define  GAMEIMP_DESTROY_ALL 9
+#define  GAMEIMP_ON_LEVEL 1
+#define  GAMEIMP_ON_CUTSCENE 2
+#define  GAMEIMP_ON_CGI_CUTSCENE 3
+#define  GAMEIMP_ON_RESULT 4
+#define  GAMEIMP_ON_CUTSCENE_END 5
+#define  GAMEIMP_DESTROY_ALL 9
 
-	#define GAMEIMP_MY_SWAP_TERRAIN 1
-	#define GAMEIMP_MY_RESPAWN 2
-	#define GAMEIMP_MY_CUTSCENE 4
-	#define GAMEIMP_MY_CUTSCENE_EN 8
-	#define GAMEIMP_MY_DESTROY 0x10
+#define GAMEIMP_MY_SWAP_TERRAIN 1
+#define GAMEIMP_MY_RESPAWN 2
+#define GAMEIMP_MY_CUTSCENE 4
+#define GAMEIMP_MY_CUTSCENE_EN 8
+#define GAMEIMP_MY_DESTROY 0x10
 
 #define  GAMEIMP_START_LEVEL 1
 #define  GAMEIMP_START_CUTSCENE 2
@@ -1763,8 +1763,8 @@ int __fastcall ObjectEvents(int a1, Sonicteam::SoX::Message* msg){
     int result = BranchTo(0x82197598,int,a1,msg);
 
 
-	if (_socket.IsWorks() && (msg->MessageInfo2 - 0x20) == GetLocalPlayer()){
-		if (msg->MessageInfo == 0x13010 && result){
+	if (_socket.IsWorks() && (msg->GetValueAt<int>(0) - 0x20) == GetLocalPlayer()){
+		if (msg->MessageID == 0x13010 && result){
 	
 			
 		}
@@ -1779,11 +1779,11 @@ int __fastcall GameIMPMessageReciever(int a1, Sonicteam::SoX::Message* a2){
 
 
 
-	if (a2->MessageInfo != 122884 && a2->MessageInfo != 86089){
+	if (a2->MessageID != 122884 && a2->MessageID != 86089){
 
 		std::stringstream test; 
-		if (GameIMP_MESSAGES.find(a2->MessageInfo) == GameIMP_MESSAGES.end()){
-			test << "[GameImp][Message] " << std::hex << a2->MessageInfo;
+		if (GameIMP_MESSAGES.find(a2->MessageID) == GameIMP_MESSAGES.end()){
+			test << "[GameImp][Message] " << std::hex << a2->MessageID;
 		//	DebugLogV2::log.push_back(test.str());
 		//	DebugLogV2::PrintNextFixed(test.str());
 		}
@@ -1802,23 +1802,23 @@ int __fastcall GameIMPMessageReciever(int a1, Sonicteam::SoX::Message* a2){
 
 	if (_socket.IsWorks() && (_socket.IsClient() || _socket.IsServer())){
 
-		if (a2->MessageInfo == 0x15009){
-			if ( BranchTo(0x82167CA0,int,a1,a2->MessageInfo2) == 0){
+		if (a2->MessageID == 0x15009){
+			if ( BranchTo(0x82167CA0,int,a1,a2->GetValueAt<int>(0)) == 0){
 					SMDATA_PPL_CHANGE_RINGS _data3;
 					_data3.sender_xuid = _socket.GetXUID(0);
-					_data3.RingsCount =   a2->MessageInfo3;	
+					_data3.RingsCount =   a2->GetValueAt<int>(4);	
 					SocketMessage msg3  =  DEFINE_SOCKET_MESSAGE_FROM_CONST_DATA(_data3);
 					_socket.SendUDPMessageToSRCL(&msg3);
-					Players_DATA[_socket.GetXUID(0)].RingsCount = a2->MessageInfo3;		
+					Players_DATA[_socket.GetXUID(0)].RingsCount = a2->GetValueAt<int>(4);	
 				}
 		}
 
-		if (a2->MessageInfo == 0x15016){
+		if (a2->MessageID == 0x15016){
 			//ShowXenonMessage(L"MSG","T");
 
 		}
 		//StartObjInfo
-		if (a2->MessageInfo == 0x1500A && *(int*)((int)a2 + 0x30) == 0){
+		if (a2->MessageID == 0x1500A && *(int*)((int)a2 + 0x30) == 0){
 
 			const char* plr_lua =  *(const char**)((int)a2 + 0x34);
 	//	ShowXenonMessage(L"MSG",plr_lua);

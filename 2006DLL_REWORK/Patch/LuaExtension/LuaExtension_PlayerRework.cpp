@@ -1237,111 +1237,7 @@ namespace DebugLogV2{
 	extern "C" int PlayerR__IDynamicLink(lua_State* L)
 	{
 
-		lua_pushstring06(L,"ptr");
-		lua_gettable(L,1);
-		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)lua_touserdata(L,-1);
-
-
-		lua_pushstring06(L,"Flags");
-		lua_gettable(L,1);
-		int Flags = (int)lua_touserdata(L,-1);
-
-
-
-
-		if ((Flags & REOPEN_DYNLINK(REOPEN_MODEL)) != 0){
-
-			for (std::vector<boost::shared_ptr<Sonicteam::Player::IDynamicLink>>::iterator it = OBJPlayer->PlayerIDynamicLink.begin(); 
-				it != OBJPlayer->PlayerIDynamicLink.end();it++ ) {	
-					(*it)->OnLink(boost::dynamic_pointer_cast<Sonicteam::Player::IPlugIn>(OBJPlayer->PlayerModel));
-			}
-			OBJPlayer->PlayerEventer->OnLink(OBJPlayer->PlayerModel);
-		}
-
-	
-
-
-
-		if ((Flags & REOPEN_DYNLINK(REOPEN_SOUND)) != 0){
-
-			boost::shared_ptr<Sonicteam::Player::IPlugIn> sound_plugin;
-			for (std::vector<boost::shared_ptr<Sonicteam::Player::IPlugIn>>::iterator it = OBJPlayer->PlayerPlugins.begin(); 
-				it != OBJPlayer->PlayerPlugins.end();it++ ) {	
-					if ((*it)->PluginName == "sound"){
-						sound_plugin =  *it;
-					}
-
-			}
-	
-			for (std::vector<boost::shared_ptr<Sonicteam::Player::IDynamicLink>>::iterator it = OBJPlayer->PlayerIDynamicLink.begin(); 
-				it != OBJPlayer->PlayerIDynamicLink.end();it++ ) {	
-					(*it)->OnLink(boost::dynamic_pointer_cast<Sonicteam::Player::IPlugIn>(sound_plugin));
-			}
-
-			OBJPlayer->PlayerEventer->EventerListener.push_back(boost::dynamic_pointer_cast<Sonicteam::Player::IEventerListener>(sound_plugin));
-
-		}
-
-
-		if ((Flags & REOPEN_DYNLINK(REOPEN_EFFECT)) != 0){
-
-			boost::shared_ptr<Sonicteam::Player::IPlugIn> effect_plugin;
-			for (std::vector<boost::shared_ptr<Sonicteam::Player::IPlugIn>>::iterator it = OBJPlayer->PlayerPlugins.begin(); 
-				it != OBJPlayer->PlayerPlugins.end();it++ ) {	
-					if ((*it)->PluginName == "effect"){
-						effect_plugin =  *it;
-					}
-
-			}
-
-			for (std::vector<boost::shared_ptr<Sonicteam::Player::IDynamicLink>>::iterator it = OBJPlayer->PlayerIDynamicLink.begin(); 
-				it != OBJPlayer->PlayerIDynamicLink.end();it++ ) {	
-					(*it)->OnLink(boost::dynamic_pointer_cast<Sonicteam::Player::IPlugIn>(effect_plugin));
-			}
-
-			OBJPlayer->PlayerEventer->EventerListener.push_back(boost::dynamic_pointer_cast<Sonicteam::Player::IEventerListener>(effect_plugin));
-
-		}
-
-		if ((Flags & REOPEN_DYNLINK(REOPEN_OPENOTHERPARAMETER)) != 0){
-
-			boost::shared_ptr<Sonicteam::Player::IPlugIn> other_parameter;
-			for (std::vector<boost::shared_ptr<Sonicteam::Player::IPlugIn>>::iterator it = OBJPlayer->PlayerPlugins.begin(); 
-				it != OBJPlayer->PlayerPlugins.end();it++ ) {	
-					if ((*it)->PluginName == "other parameter"){
-						other_parameter =  *it;
-					}
-			}
-
-			for (std::vector<boost::shared_ptr<Sonicteam::Player::IDynamicLink>>::iterator it = OBJPlayer->PlayerIDynamicLink.begin(); 
-				it != OBJPlayer->PlayerIDynamicLink.end();it++ ) {	
-					(*it)->OnLink(boost::dynamic_pointer_cast<Sonicteam::Player::IPlugIn>(other_parameter));
-			}
-
-		
-		}
-
-
-
-
-
-
-		Flags &= ~REOPEN_DYNLINK(REOPEN_SOUND);
-		Flags &= ~REOPEN_DYNLINK(REOPEN_MODEL);
-
-		Flags &= ~REOPEN_DYNLINK(REOPEN_OTHER);
-
-		Flags &= ~REOPEN_DYNLINK(REOPEN_EFFECT);
-		Flags &= ~REOPEN_DYNLINK(REOPEN_OPENOTHERPARAMETER);
-		
-
-		lua_pushstring06(L,"Flags");
-		lua_pushlightuserdata(L,(void*)Flags);
-		lua_settable06(L,1);
-
 		return 0;
-
-
 	}
 
 	
@@ -1444,6 +1340,7 @@ namespace DebugLogV2{
 						}
 						break; // Found the IDynamicLink, no need to continue searching
 					}
+					/*
 					Sonicteam::Player::IDynamicLink* dynamic_posture_ptr = dynamic_cast<Sonicteam::Player::IDynamicLink*>((Sonicteam::Player::IPostureControl*)lua_touserdata(L, i));
 					if (dynamic_link_ptr && (*it).get() == dynamic_posture_ptr)
 					{
@@ -1455,6 +1352,7 @@ namespace DebugLogV2{
 						}
 						break; // Found the IDynamicLink, no need to continue searching
 					}
+					*/
 
 
 				}

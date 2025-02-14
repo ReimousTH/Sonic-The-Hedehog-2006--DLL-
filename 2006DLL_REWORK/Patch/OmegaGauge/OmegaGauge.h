@@ -1,0 +1,4 @@
+namespace OmegaGauge{
+
+	void GlobalInstall();
+}

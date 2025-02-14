@@ -4,13 +4,22 @@
 
 #include <Patch/Common/XEXALLOCATORS.H>
 #include <Patch/Common/XEXALLOCATORS_UNDEF.H>
+#include <Patch/FileSystemNew/FileSystemNew.h>
+#include <Patch/TailsGauge/TailsGauge.h>
+#include <Patch/OmegaGauge/OmegaGauge.h>
+
+
+
 #include <Sox/StepableThread.h>
-
 #include <Sox/Engine/Task.h>
-
 #include <Hook/HookNew.h>
 #include <vector>
 
+
+#include <Sox/ResourceManager.h>
+#include <Sox/ExFileSystem.h>
+#include <System/Singleton.h>
+#include <System/CreateStatic.h>
 
 
 struct FPair{
@@ -27,6 +36,9 @@ FPair functions[] = {
 	{"CompleteGauge", CompleteGauge::GlobalInstall},
 	{"AmyLOS", AmyLOS::GlobalInstall},
 	{"TagBattleExtension", TagBattleMain::GlobalInstall},
+	{"FileSystemNew", FileSystemNew::GlobalInstall},
+	{"TailsGauge", TailsGauge::GlobalInstall},
+	{"OmegaHoverGauge",OmegaGauge::GlobalInstall}
 };
 
 
@@ -86,22 +98,48 @@ HOOKV3(0x82581470,Sonicteam::SoX::Engine::Task*,TaskNewConstructor2,(Sonicteam::
 }
 
 
+HOOKV3(0x825D4B50,void*,DefaultDebugListenerFunc01,(void*,const char*),(_this,str), void* _this, const char* str){
+	PushXenonMessage(L"MSG","test");
+	DebugLogV2::log.push_back(std::string(str));
+	return (void*)0;
+}
+
+void DefaultDebugListenerFunc01Test(void* _this, const char* str){
+	PushXenonMessage(L"MSG","test");
+	DebugLogV2::log.push_back(std::string(str));
+}
+
+
 
 
 void STH2006DLLMain()
 {
 	
+
+ //	Sonicteam::SoX::ExFileSystem& instance = Sonicteam::System::Singleton<Sonicteam::SoX::ExFileSystem, Sonicteam::System::CreateStatic<Sonicteam::SoX::ExFileSystem>>::getInstance();
+//	instance.FileSystemGetFullPath(std::string("test"),1);
+
+	
+	SSINGLETON(Sonicteam::SoX::ResourceManager)::getInstance((void*)0x82D3B224); //ResourceManager
+
+
+
+	//	auto* system = SINGLETON(Sonicteam::SoX::ExFileSystem,Sonicteam::System::CreateStatic).getInstance(0x82000000);
+
 	BranchTo(0x825383D8,int); //INIT HEAP Early
 	HookNew::SaveBuffer = new std::map<void*, std::vector<HookNew*>>();
 	HookNew::IsEmulated();
 
+	
 
 	//INSTALL_HOOKV3(TestFunc01);
 	//INSTALL_HOOKV3(TestFunc02);
 //	INSTALL_HOOKV3EX(TestFunc03,1,false);
-	INSTALL_HOOKV3EX(ComponentNewConstructor,-1,true);
-	INSTALL_HOOKV3EX(TaskNewConstructor,-1,true);
-	INSTALL_HOOKV3EX(TaskNewConstructor2,-1,true);
+//	INSTALL_HOOKV3EX(ComponentNewConstructor,-1,true);
+//	INSTALL_HOOKV3EX(TaskNewConstructor,-1,true);
+//	INSTALL_HOOKV3EX(TaskNewConstructor2,-1,true);
+//	INSTALL_HOOKV3EX(DefaultDebugListenerFunc01,-1,true);
+	//WRITE_DWORD(0X82048BC0,DefaultDebugListenerFunc01Test);
 //	INSTALL_HOOKV3EX(ComponentNewDestructor,1,false);
 
 //	boost::function<void*(double)> func1 = myFunc1;

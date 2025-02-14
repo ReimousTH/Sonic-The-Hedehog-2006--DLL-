@@ -1,10 +1,7 @@
 #pragma once
 #include "CompleteGauge_SonicContext.h"
-
-
-
 #include "CompleteGauge_SonicGauge.h"
-
+#include <Sox/ResourceManager.h>
 
 
 
@@ -17,6 +14,9 @@ namespace CompleteGauge{
 
 
 	//Core
+
+
+    #define quick int,std::map<std::string, void*>
 	void SonicContextOnStep(SonicContextExtended *_this, double a2){
 
 
@@ -55,19 +55,17 @@ namespace CompleteGauge{
 		
 
 	
-			std::map<std::string, int>* _map_ = (std::map<std::string,int>*)&(mgr->ScenePlacament);
+			std::map<quick>* _map_ = (std::map<quick>*)&(Sonicteam::SoX::ResourceManager::MarathonInstance->ResourceRegistryHandle);
 
-			for (std::map<std::string, int>::iterator it =_map_->begin(); it != _map_->end(); ++it) {
+			for (std::map<quick>::iterator it =_map_->begin(); it != _map_->end(); ++it) {
 
-					Viser.append(it->first);
-					Viser.append(":");
-					std::stringstream str; str << std::hex << it->second;
+				for (std::map<std::string, void*>::iterator jt =it->second.begin(); jt != it->second.end(); ++jt) {
+
+					std::stringstream str;   str << std::hex << it->first  << " : "  << std::hex << jt->first << " : " << std::hex  << &jt->second;
 					Viser.append(str.str());
 					Viser.append("\n");
-				
+				}	
 			}
-
-
 			PushXenonMessage(L"Test",Viser.c_str());
 			
 		}

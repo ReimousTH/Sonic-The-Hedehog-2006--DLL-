@@ -340,8 +340,8 @@
 				AdditionalLibraryDirectories="&quot;..\Havok\lib\win32_net_9-0\release_multithreaded&quot;"
 				ModuleDefinitionFile="DllModule.def"
 				GenerateDebugInformation="true"
-				OptimizeReferences="1"
-				EnableCOMDATFolding="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
 				SetChecksum="true"
 			/>
 			<Tool
@@ -565,6 +565,14 @@
 				</File>
 				<File
 					RelativePath=".\Patch\LuaExtension\LuaExtension_Buffer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_LoadReAttachArc.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_LoadReAttachArc.h"
 					>
 				</File>
 				<File
@@ -827,6 +835,42 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="FileSystemNew"
+				>
+				<File
+					RelativePath=".\Patch\FileSystemNew\FileSystemNew.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\FileSystemNew\FileSystemNew.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="TailsGauge"
+				>
+				<File
+					RelativePath=".\Patch\TailsGauge\TailsGauge.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\TailsGauge\TailsGauge.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="OmegaGauge"
+				>
+				<File
+					RelativePath=".\Patch\OmegaGauge\OmegaGauge.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\OmegaGauge\OmegaGauge.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<File
