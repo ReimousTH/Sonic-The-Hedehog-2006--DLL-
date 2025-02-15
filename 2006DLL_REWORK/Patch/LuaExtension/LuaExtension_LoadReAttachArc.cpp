@@ -60,7 +60,7 @@ namespace DebugLogV2{
 
 		bool result = false;
 		if (ResourceManager->ResourceRegistryHandle[index].find(ArcHandle->ResourceStr3) == ResourceManager->ResourceRegistryHandle[index].end()){
-			ResourceManager->ResourceRegistryHandle[index][ArcHandle->ResourceStr3] = ArcHandle;
+			ResourceManager->ResourceRegistryHandle[index][ArcHandle->ResourceStr3] =  REF_TYPE(Sonicteam::SoX::IResource)(ArcHandle);
 			result = true;
 		}
 

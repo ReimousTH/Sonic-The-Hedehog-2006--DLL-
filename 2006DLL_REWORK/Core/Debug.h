@@ -29,7 +29,7 @@ XOVERLAPPED* PushXenonMessage(LPCWSTR Title,T value,XOVERLAPPED* m_Overlapped)
 	LPCWSTR g_pwstrButtonsX_INL[1] = { L"------------OK----------------" };
 	std::wstringstream ss;
 	ss <<std::hex << value;
-	XShowMessageBoxUI(0,Title,ss.str().c_str(),1,g_pwstrButtonsX_INL,1,XMB_ALERTICON,&result,m_Overlapped);
+	XShowMessageBoxUI(0,Title,ss.str().c_str(),1,g_pwstrButtonsX_INL,1,XMB_ERRORICON,&result,m_Overlapped);
 	return m_Overlapped;
 }
 

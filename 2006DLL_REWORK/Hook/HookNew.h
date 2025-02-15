@@ -86,7 +86,7 @@
 
 
 
-#define HOOKADDR(address) HookNew::UseEmulatedAddress == true ? (void*)(0x10000000 + (DWORD)address) : (void*)(0x10000000 + (DWORD)address)
+#define HOOKADDR(address) HookNew::UseEmulatedAddress == true ? (void*)(0x10000000 + (DWORD)address) : (void*)(0 + (DWORD)address)
 
 class HookNew {
 public:
@@ -100,8 +100,11 @@ public:
 
 	// Function to create a hook
 	static void CreateHook(void* Target, void* TargetMap, void* Original,char RunPosition,bool block);
+	static void memcpy(void * _Dst,const void * _Src,size_t _Size);
 	static bool IsEmulated();
 	static bool UseEmulatedAddress;
+
+	
 
 
 

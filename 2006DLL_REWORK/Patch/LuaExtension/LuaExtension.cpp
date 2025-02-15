@@ -582,23 +582,23 @@ namespace DebugLogV2{
 
 	//	Sonicteam::Prop::EntityHandle* EntityHandle = BranchTo(0x82461128,Sonicteam::Prop::EntityHandle*,malloc06(0x1c),PropScenePTR,LastIndex);
 
-		Sonicteam::Prop::Instance* InstnceProp = new Sonicteam::Prop::Instance(PropScenePTR,ObjData,RefObjectTypePropClass);
+		Sonicteam::Prop::Instance* InstnceProp = new Sonicteam::Prop::Instance(PropScenePTR,ObjData,REF_TYPE(Sonicteam::Prop::Class)(RefObjectTypePropClass));
 		Sonicteam::Prop::EntityHandle* EntityHandle = new Sonicteam::Prop::EntityHandle(PropScenePTR,LastIndex);
-		EntityHandle->PropInstance = InstnceProp;
+		EntityHandle->PropInstance = REF_TYPE(Sonicteam::Prop::Instance)(InstnceProp);
 
-		Sonicteam::Prop::ActorCreatorCreationData buffer = Sonicteam::Prop::ActorCreatorCreationData(InstnceProp,EntityHandle,0,std::string(InstnceProp->InstanceClass->ClassPropData->ClassName));
+		Sonicteam::Prop::ActorCreatorCreationData buffer = Sonicteam::Prop::ActorCreatorCreationData(REF_TYPE(Sonicteam::Prop::Instance)(InstnceProp),REF_TYPE(Sonicteam::Prop::EntityHandle)(EntityHandle),0,std::string(InstnceProp->InstanceClass.get()->ClassPropData->ClassName));
 		
 		
 		if (_Save_){
 		
-			PropScenePTR->ScenePropInstance.push_back(InstnceProp);
+			PropScenePTR->ScenePropInstance.push_back(REF_TYPE(Sonicteam::Prop::Instance)(InstnceProp));
 			PropScenePTR->ScenePlacament[ObjData->ObjectName] = LastIndex;
 
 
 			std::vector<Sonicteam::SoX::Scenery::SPAabbNodeVector> vector_test = std::vector<Sonicteam::SoX::Scenery::SPAabbNodeVector>(LastIndex + 1);
 			for (int i = 0;i<vector_test.size();i++){
 
-				Sonicteam::Prop::InstanceSetData* in = PropScenePTR->ScenePropInstance[i]->InstanceSetData;
+				Sonicteam::Prop::InstanceSetData* in = PropScenePTR->ScenePropInstance[i].get()->InstanceSetData;
 
 				vector_test[i].minX= in->Position.x - in->DrawDistance;
 				vector_test[i].minY= in->Position.y - in->DrawDistance;
@@ -610,7 +610,7 @@ namespace DebugLogV2{
 			}
 
 
-			PropScenePTR->PropSceneWorld->SceneryAabbTree->SPAabbTreeInitialize(PropScenePTR->PropSceneWorld,&vector_test[0],LastIndex + 1);
+			PropScenePTR->PropSceneWorld.get()->SceneryAabbTree.get()->SPAabbTreeInitialize(PropScenePTR->PropSceneWorld.get(),&vector_test[0],LastIndex + 1);
 
 
 			Sonicteam::Prop::SceneActor sactor;

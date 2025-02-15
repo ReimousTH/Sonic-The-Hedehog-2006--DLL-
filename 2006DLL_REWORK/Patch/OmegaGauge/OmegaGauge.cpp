@@ -7,10 +7,20 @@
 #include <Player/Gauge/SonicGauge.h>
 #include <Player/State/BasedObject.h>
 
+#include <Player/OmegaLaser.h>
+
 #include <Core/Debug.h>
 
 #include <Hook/HookBase.h>
 #include <Hook/HookNew.h>
+
+#include <Sox/RefCountObject.h>
+#include <CsdObject.h>
+
+
+#include <iostream>
+#include <sstream>
+#include <string>
 
 namespace OmegaGauge{
 
@@ -19,8 +29,7 @@ namespace OmegaGauge{
 	class OmegaContextEx : public Sonicteam::Player::State::CommonContext {
 	public:
 
-		unsigned int uint0x230;
-		unsigned int uint0x234;
+		boost::shared_ptr<void*> OmegaWeapons;
 		unsigned int uint0x238;
 		unsigned int uint0x23C;
 		unsigned int uint0x240;
@@ -40,8 +49,16 @@ namespace OmegaGauge{
 	
 		boost::shared_ptr<Sonicteam::Player::IGauge> c_omega_gauge_module; //0x260
 		unsigned int LockOnSoundID; //0x268
-		REF_TYPE(Sonicteam::SoX::RefCountObject) LockOnSound; //0x26C
-		unsigned int Init; //0x270
+
+		std::vector<REF_TYPE(Sonicteam::SoX::RefCountObject)> LockOnSound; //0x26C
+		unsigned int Init; //0x27C
+
+
+		REF_TYPE(Sonicteam::CsdObject) CSDObject; //0x280
+		REF_TYPE(Sonicteam::SoX::RefCountObject) CSDSHADER; //0x284
+		REF_TYPE(Sonicteam::SoX::RefCountObject) CSDTechniqueCSD3D; //0x288
+		std::vector<REF_TYPE(Sonicteam::SoX::Scenery::Drawable)> CSDObjectDrawable; //0x28C
+		int LockOnCount; //0x29C
 
 	};
 
@@ -56,18 +73,38 @@ namespace OmegaGauge{
 		BranchTo(0x82213440,int,_this,&plugin);
 	}
 
-	void* OmegaContextDestroy(OmegaContextEx* ex,int flag){
+	void* OmegaContextDestroy(OmegaContextEx* _this,int flag){
 
-		ex->c_omega_gauge_module.reset(); //reset_pointer
-		ex->LockOnSound = 0;
-		return BranchTo(0x822133D8,void*,ex,flag);
+		_this->c_omega_gauge_module.reset(); //reset_pointer
+		_this->LockOnSound.clear();
+	
+
+		for (std::vector<REF_TYPE(Sonicteam::SoX::Scenery::Drawable)>::iterator it = _this->CSDObjectDrawable.begin();it != _this->CSDObjectDrawable.end();it++){
+			(*it).get()->ClearDrawable();
+			(*it).get()->Release(); //why ? because ClearDrawable seems do not remove reference at all, (some
+		}
+		_this->CSDObjectDrawable.clear();
+
+		return BranchTo(0x822133D8,void*,_this,flag);
 	}
 
 
 	void OmegaContextOnUpdate(OmegaContextEx* _this,float delta){
 
+
+		if (_this->CSDObject.param){
+			_this->CSDObject.get()->CsdLink0x8(delta);
+		}
+
+
 		Sonicteam::Player::ObjectPlayer* obj =  _this->ScorePlugin->PtrObjectPlayer;
 		Sonicteam::Player::RootFrame* frame = obj->RootFrame.param;
+
+		int Weapons =  (int)_this->OmegaWeapons.get();
+		int Weapons5C = *(int*)(Weapons + 0x5C) ; //OMegaLaser
+		int Weapons5C88 = *(int*)(Weapons5C + 0x88);
+		Sonicteam::Player::OmegaLaser* OmegaLaser = *(Sonicteam::Player::OmegaLaser**)(Weapons + 0x5C) ;
+
 
 
 
@@ -76,9 +113,21 @@ namespace OmegaGauge{
 
 
 		if (_this->Init == 0) {
+
+		
+			Sonicteam::SoX::Scenery::World* GraphicBufferGuess =  (doc_obj->DocGetWorld(7).get());
+
+
 			_this->Init = 1;
 			int SoundBankID = BranchTo(0x82585D58,int,AudioModule,"player_omega");
 			_this->LockOnSoundID = BranchTo(0x82584C00,int,AudioModule,SoundBankID,"lockon");
+
+			_this->CSDSHADER = BranchTo(0x82371620,REF_TYPE(Sonicteam::SoX::RefCountObject),&std::string("shader/primitive/csd3D.fx"));
+			_this->CSDTechniqueCSD3D  = BranchTo(0x828B94B8,REF_TYPE(Sonicteam::SoX::RefCountObject),_this->CSDSHADER.get(),"TechniqueCSD3D");
+			_this->CSDObject  = BranchTo(0x82617570,REF_TYPE(Sonicteam::CsdObject),&std::string("sprite/pausemenu/pausemenu"));
+			_this->CSDObject.get()->MarathonPlaySceneAnimation("pause_menu","pause6");
+			_this->CSDObject.get()->SetFlag0x20(0x401); //SetRenderFlag
+
 
 		}
 	
@@ -89,12 +138,97 @@ namespace OmegaGauge{
 		Sonicteam::Player::State::IMachine*  machine =  obj->PlayerMachine.get();
 		int StateID = machine->GetCurrentMashineStateID();
 
-		if (_this->IsLockOn && _this->LockOnSound.param == 0 ){
-			_this->LockOnSound = BranchTo(0x82585480 ,REF_TYPE(Sonicteam::SoX::RefCountObject),AudioModule,_this->LockOnSoundID,&frame->RFPosition0xF0,0);
+
+
+
+
+		if (_this->IsLockOn){
+
+			//Update Trigger
+			if (_this->LockOnCount != OmegaLaser->Entities.size()){
+
+				int Difference =  OmegaLaser->Entities.size() - _this->LockOnCount;
+				if (Difference > 0){
+					for (int i = 0;i<Difference;i++){
+						BranchTo(0x82585480 ,REF_TYPE(Sonicteam::SoX::RefCountObject),AudioModule,_this->LockOnSoundID,&frame->RFPosition0xF0,0); //no need to save them
+					}
+				}
+				else if (Difference < 0){
+
+				}
+
+				_this->LockOnCount = OmegaLaser->Entities.size();
+			}
+			
+			for (std::vector<REF_TYPE(Sonicteam::SoX::Scenery::Drawable)>::iterator it = _this->CSDObjectDrawable.begin();it != _this->CSDObjectDrawable.end();it++){
+				(*it).get()->ClearDrawable();
+				(*it).get()->Release();
+			}
+			_this->CSDObjectDrawable.clear();
+
+	
+			if (_this->LockOnCount > 0){
+				Sonicteam::SoX::Scenery::World* GraphicBufferGuess =  (doc_obj->DocGetWorld(7).get());
+
+	
+			
+				int cc = 0;
+				for (std::deque<Sonicteam::Player::EntitiesContainer>::iterator it = OmegaLaser->Entities.begin(); 
+					it != OmegaLaser->Entities.end(); ++it) {
+
+
+						Sonicteam::Player::EntitiesContainer* havokbody = &(*it);
+						Sonicteam::SoX::Physics::Havok::BodyHavok* body = static_cast<Sonicteam::SoX::Physics::Havok::BodyHavok*>(havokbody->Entity.get());
+						if (havokbody->Entity.get()) {
+
+						
+						XMVECTOR pos = body->GetPosition();
+					
+				
+	
+						REF_TYPE(Sonicteam::CsdObject) CSD_LOCAL = _this->CSDObject;
+						Sonicteam::SoX::Scenery::Drawable* CSDObjectDrawable = ((Sonicteam::SoX::Scenery::Drawable* (__fastcall *)(int,int,REF_TYPE(Sonicteam::CsdObject)))0x82616C68)(malloc06(0xA0),doc_obj->DocGetMyGraphicDevice(),CSD_LOCAL);
+						((void* (__fastcall *)(Sonicteam::SoX::Scenery::Drawable*,REF_TYPE(Sonicteam::SoX::RefCountObject)))0x82616EB0)(CSDObjectDrawable,_this->CSDTechniqueCSD3D) ;
+					   
+						
+
+						GraphicBufferGuess->WorldAddDrawable(CSDObjectDrawable);
+						
+
+				
+						int CsdObjectDrawable_INT = (int)CSDObjectDrawable;
+						*(char *)(CsdObjectDrawable_INT + 0x74) = 1;
+						*(XMVECTOR *)(CsdObjectDrawable_INT + 0x80) = pos;
+						*(float *)(CsdObjectDrawable_INT + 0x94) = 1000000.0;
+						_this->CSDObjectDrawable.push_back(CSDObjectDrawable);
+					
+						cc++;
+						std::stringstream ss;
+						ss <<  pos.x  <<  " : " <<  pos.y << " : " << pos.z << std::endl;
+						ss <<  havokbody  << std::endl;
+		
+
+			
+					
+					//	PushXenonMessage(L"MSG",ss.str().c_str());
+						}
+				
+				}
+			}
+
 		}
-		else if (!_this->IsLockOn && _this->LockOnSound.param != 0){
-			_this->LockOnSound = 0;
+		else{
+			_this->LockOnCount = 0;
+			for (std::vector<REF_TYPE(Sonicteam::SoX::Scenery::Drawable)>::iterator it = _this->CSDObjectDrawable.begin();it != _this->CSDObjectDrawable.end();it++){
+				(*it).get()->ClearDrawable();
+				(*it).get()->Release(); //why ? because ClearDrawable seems do not remove reference at all, (some
+			}
+			_this->CSDObjectDrawable.clear();
 		}
+
+
+
+
 
 		if ( Sonicteam::Player::SonicGauge* gauge =  dynamic_cast<Sonicteam::Player::SonicGauge*>(_this->c_omega_gauge_module.get())){
 
@@ -135,12 +269,16 @@ namespace OmegaGauge{
 
 	HOOKV3(0x822132E8,void*,OmegaContextConstructor,(OmegaContextEx*),(_this),OmegaContextEx* _this){
 		memset((void*)&_this->c_omega_gauge_module,0,0x8);
-		memset((void*)&_this->LockOnSound,0,0x4);
 		_this->Init = 0;
 		_this->LockOnSoundID = -1;
+		_this->LockOnCount = 0;
 
 
-
+		memset((void*)&_this->CSDObject,0,0x4);
+		memset((void*)&_this->CSDSHADER,0,0x4);
+		memset((void*)&_this->CSDTechniqueCSD3D,0,0x4);
+		memset((void*)&_this->CSDObjectDrawable,0,0xC);
+		memset((void*)&_this->LockOnSound,0,0xC);
 
 
 		return _this;
@@ -211,7 +349,7 @@ namespace OmegaGauge{
 
 		INSTALL_HOOKV3EX(OmegaContextConstructor,1,false);
 		WRITE_DWORD(0x8200AAD4,ContextOmegaOnLink);
-		WRITE_DWORD(0x821B5DD4,0x38600274);
+		WRITE_DWORD(0x821B5DD4,0x386002A0);
 		WRITE_DWORD(0x8200AADC,OmegaContextDestroy);
 		WRITE_DWORD(0x8200AAE4,OmegaContextOnUpdate);
 

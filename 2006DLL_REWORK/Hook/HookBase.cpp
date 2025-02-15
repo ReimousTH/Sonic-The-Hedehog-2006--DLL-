@@ -21,15 +21,16 @@ bool HookV2::CheckIsNotEmulatedHardWare()
 {
 
 	MEMORY_BASIC_INFORMATION data;
+	SIZE_T result = VirtualQuery((void*)0x92000600, &data, sizeof(data));
 
-	VirtualQuery((void*)0x92000600, &data,0);
-	if (data.Protect){
+	if (result == 0) {
+		return true;
+	}
+
+	// Check if the memory is protected (you can adjust the condition as needed)
+	if (data.Protect & (PAGE_NOACCESS | PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE)) {
 		return false;
 	}
-	return true;
-	
-
-
 
 
 }

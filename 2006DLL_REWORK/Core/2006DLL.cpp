@@ -10,6 +10,7 @@
 
 
 
+#include <Sox/Perfomance.h>
 #include <Sox/StepableThread.h>
 #include <Sox/Engine/Task.h>
 #include <Hook/HookNew.h>
@@ -120,15 +121,12 @@ void STH2006DLLMain()
 //	instance.FileSystemGetFullPath(std::string("test"),1);
 
 	
-	SSINGLETON(Sonicteam::SoX::ResourceManager)::getInstance((void*)0x82D3B224); //ResourceManager
-
 
 
 	//	auto* system = SINGLETON(Sonicteam::SoX::ExFileSystem,Sonicteam::System::CreateStatic).getInstance(0x82000000);
 
-	BranchTo(0x825383D8,int); //INIT HEAP Early
-	HookNew::SaveBuffer = new std::map<void*, std::vector<HookNew*>>();
-	HookNew::IsEmulated();
+
+
 
 	
 
@@ -145,7 +143,7 @@ void STH2006DLLMain()
 //	boost::function<void*(double)> func1 = myFunc1;
 //	boost::function<void*(void)> func2 = myFunc2;
 
-//	Sonicteam::SoX::StepableThread* Thread = new Sonicteam::SoX::StepableThread("Test",func1,func2,1);
+	//Sonicteam::SoX::StepableThread* Thread = new Sonicteam::SoX::StepableThread("Test",func1,func2,1);
 	//Thread->Resume();
 	//SetEvent(	Thread->StartEvent);
 
@@ -154,29 +152,45 @@ void STH2006DLLMain()
 
 
 
+	SSINGLETON(Sonicteam::SoX::ResourceManager)::getInstance((void*)0x82D3B224); //ResourceManager
+	SSINGLETON(Sonicteam::SoX::PerformanceFrequency)::getInstance((void*)0x82D3B209);
+	BranchTo(0x825383D8,int); //INIT HEAP Early
+
+
+
+
+	HookNew::SaveBuffer = new std::map<void*, std::vector<HookNew*>>();
+	HookNew::IsEmulated();
 	HookV2::IsNotEmulatedHardWare =  HookV2::CheckIsNotEmulatedHardWare();
 	ZLua lua_file = ZLua("game:\\common\\DLL.lua");
-
-	DebugLogV2::ThreadLog = lua_file.GetGlobalBool("ThreadLog");
-
-
 	std::stringstream log;
 	std::wstringstream wlog;
-	lua_file.DoFile(true);
 
+
+	lua_file.DoFile(true);
+	DebugLogV2::ThreadLog = lua_file.GetGlobalBool("ThreadLog");
 	for (int i = 0;i<sizeof(functions)/sizeof(FPair);i++){
 		if (lua_file.GetGlobalBool(functions[i].Name) == true){
 			functions[i].Function();
 			log << functions[i].Name << "\n";
 		}
 	}
-	wlog << "DLL [" << __DATE__ << " ; " << __TIME__ << "]" << " Patch List ";
+	
 
-	XOVERLAPPED overlap;
-	overlap.hEvent = CreateEvent(0,false,false,0);
-	PushXenonMessage(wlog.str().c_str(),log.str().c_str(),&overlap);
-	WaitForSingleObject(overlap.hEvent,INFINITE);
-	CloseHandle(overlap.hEvent);
+
+
+	
+	if (HookNew::IsEmulated()){ //  because i cant show Messages To Xbox360 , why tho?
+		wlog << "DLL [" << __DATE__ << " ; " << __TIME__ << "]" << " Patch List ";
+		XOVERLAPPED overlap;
+		overlap.hEvent = CreateEvent(0,false,false,0);
+		PushXenonMessage(wlog.str().c_str(),log.str().c_str(),&overlap);
+		WaitForSingleObject(overlap.hEvent,INFINITE);
+		CloseHandle(overlap.hEvent);
+	}
+	
+	
+
 
 	//PushXenonMessage(L"MSG","Test");
 }

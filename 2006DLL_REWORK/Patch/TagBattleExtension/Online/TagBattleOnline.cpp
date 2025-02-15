@@ -193,7 +193,7 @@ struct PPL_DATA{
 	Sonicteam::CsdObject* CSD;
 	Sonicteam::SoX::RefCountObject* CSD_SHADER;
 	Sonicteam::SoX::RefCountObject* TechniqueCSD3D;
-	Sonicteam::SoX::RefCountObject* CsdObjectDrawable;
+	Sonicteam::SoX::Scenery::Drawable* CsdObjectDrawable;
 
 	std::string scene;
 	int object_player;
@@ -453,7 +453,7 @@ void DestroyLabelByXUID(XUID xuid){
 
 
 	Sonicteam::DocMarathonImp* impl = 	*(Sonicteam::DocMarathonImp**)(*(UINT32*)0x82D3B348 + 0x180);
-	boost::shared_ptr<unsigned int> GraphicBufferGuess =  (impl->DocDoculistAction01(7));
+	boost::shared_ptr<Sonicteam::SoX::Scenery::World> GraphicBufferGuess =  (impl->DocGetWorld(7));
 	if (GraphicBufferGuess.get()){
 
 		// Use find to get an iterator to the element
@@ -494,7 +494,7 @@ void SpawnPlayerLabelByXUID(XUID xuid){
 
 
 	Sonicteam::DocMarathonImp* impl = 	*(Sonicteam::DocMarathonImp**)(*(UINT32*)0x82D3B348 + 0x180);
-	boost::shared_ptr<unsigned int> GraphicBufferGuess =  (impl->DocDoculistAction01(7));
+	boost::shared_ptr<Sonicteam::SoX::Scenery::World> GraphicBufferGuess =  (impl->DocGetWorld(7));
 	if (GraphicBufferGuess.get()){ //WorldImp
 
 
@@ -515,14 +515,17 @@ void SpawnPlayerLabelByXUID(XUID xuid){
 
 	
 
-	d->CsdObjectDrawable =  (Sonicteam::SoX::RefCountObject*)BranchTo(0x82616C68,int,malloc06(0xA0),impl->DocGetMyGraphicDevice(),&d->CSD);
+	d->CsdObjectDrawable =  (Sonicteam::SoX::Scenery::Drawable*)BranchTo(0x82616C68,int,malloc06(0xA0),impl->DocGetMyGraphicDevice(),&d->CSD);
 	d->CsdObjectDrawable->GetObject<int>();
 	BranchTo(0x82616EB0,int,d->CsdObjectDrawable,&Players_DATA[xuid].TechniqueCSD3D);
 
 
 	
 	
-	(*(void (__fastcall **)(_DWORD, int *))(*GraphicBufferGuess + 0x14))((_DWORD)GraphicBufferGuess.get(), (int*)&d->CsdObjectDrawable);
+	
+
+//	GraphicBufferGuess.get()->WorldAddDrawable(d->CsdObjectDrawable);
+
 	Players_DATA[xuid].CSD->MarathonPlaySceneAnimation("enemy_powergage","DefaultAnim");
 
 	if (Players_DATA[xuid].object_player){

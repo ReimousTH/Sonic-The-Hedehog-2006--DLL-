@@ -8,7 +8,18 @@ std::map<void*, std::vector<HookNew*>>* HookNew::SaveBuffer;
 
 int HookNew::SavedBufferSIZE = 0;
 
+
+void HookNew::memcpy(void * _Dst,const void * _Src,size_t _Size){
+
+	DWORD OPrct;//ProtectionFlag
+	VirtualProtectEx(GetModuleHandle(NULL),	HOOKADDR(_Dst),_Size,4,&OPrct); 
+	std::memcpy(HOOKADDR(_Dst),_Src,_Size);
+	VirtualProtectEx(GetModuleHandle(NULL),HOOKADDR(_Dst),_Size,OPrct,&OPrct);
+}
+
 void HookNew::CreateHook(void* Target, void* TargetMap, void* Original,char RunPosition,bool block) {
+
+
 	const DWORD Buffer = reinterpret_cast<DWORD>(HookNew::SavedBufferFunc);
 	const DWORD BufferSize = HookNew::SavedBufferSIZE;
 	const DWORD BufferPoint = Buffer + BufferSize;
@@ -48,10 +59,13 @@ void HookNew::CreateHook(void* Target, void* TargetMap, void* Original,char RunP
 				BranchBuffer[2] = POWERPC_MTCTR(12);
 				BranchBuffer[3] = 0x4E800420 | linked;
 
-				memcpy(HOOKADDR(StartPos), BranchBuffer, sizeof(BranchBuffer)); // Copy data to hook address
+				
+
+		
+				memcpy((void*)(StartPos), BranchBuffer, sizeof(BranchBuffer)); // Copy data to hook address
 				StartPos += sizeof(BranchBuffer);
 			} else {
-				memcpy(HOOKADDR(StartPos), &Instruction, sizeof(Instruction)); // Copy data to hook address
+				memcpy((void*)(StartPos), &Instruction, sizeof(Instruction)); // Copy data to hook address
 				StartPos += sizeof(Instruction);
 			}
 			OriginalPos += 4; // Move to the next instruction
@@ -63,7 +77,7 @@ void HookNew::CreateHook(void* Target, void* TargetMap, void* Original,char RunP
 		BranchBuffer[2] = POWERPC_MTCTR(12);
 		BranchBuffer[3] = 0x4E800420;
 
-		memcpy(HOOKADDR(StartPos), BranchBuffer, sizeof(BranchBuffer)); // Final copy for target
+		memcpy((void*)(StartPos), BranchBuffer, sizeof(BranchBuffer)); // Final copy for target
 		StartPos += sizeof(BranchBuffer);
 
 		// Update saved buffer size
@@ -75,7 +89,7 @@ void HookNew::CreateHook(void* Target, void* TargetMap, void* Original,char RunP
 		BranchBuffer[2] = POWERPC_MTCTR(12);
 		BranchBuffer[3] = 0x4E800420;
 
-		memcpy(HOOKADDR(Original), BranchBuffer, sizeof(BranchBuffer)); // Final copy for original hook
+		memcpy((void*)(Original), BranchBuffer, sizeof(BranchBuffer)); // Final copy for original hook
 	}
 
 	(*HookNew::SaveBuffer)[Original].push_back(hook);
@@ -86,11 +100,21 @@ void HookNew::CreateHook(void* Target, void* TargetMap, void* Original,char RunP
 bool HookNew::IsEmulated()
 {
 	MEMORY_BASIC_INFORMATION data;
-	VirtualQuery((void*)0x92000600, &data,0);
-	if (data.Protect){
+	SIZE_T result = VirtualQuery((void*)0x92000600, &data, sizeof(data));
+
+	// Check if VirtualQuery succeeded
+	if (result == 0) {
+		// Handle error (e.g., log it or set a flag)
+		UseEmulatedAddress = false;
+		return false;
+	}
+
+	// Check if the memory is protected (you can adjust the condition as needed)
+	if (data.Protect & (PAGE_NOACCESS | PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE)) {
 		UseEmulatedAddress = true;
 		return true;
 	}
+
 	UseEmulatedAddress = false;
 	return false;
 }
