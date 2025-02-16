@@ -79,10 +79,10 @@ namespace OmegaGauge{
 		_this->LockOnSound.clear();
 	
 
-		for (std::vector<REF_TYPE(Sonicteam::SoX::Scenery::Drawable)>::iterator it = _this->CSDObjectDrawable.begin();it != _this->CSDObjectDrawable.end();it++){
-			(*it).get()->ClearDrawable();
-			(*it).get()->Release(); //why ? because ClearDrawable seems do not remove reference at all, (some
-		}
+		_this->CSDObject = 0;
+		_this->CSDSHADER = 0;
+		_this->CSDTechniqueCSD3D = 0;
+	
 		_this->CSDObjectDrawable.clear();
 
 		return BranchTo(0x822133D8,void*,_this,flag);
@@ -124,9 +124,37 @@ namespace OmegaGauge{
 
 			_this->CSDSHADER = BranchTo(0x82371620,REF_TYPE(Sonicteam::SoX::RefCountObject),&std::string("shader/primitive/csd3D.fx"));
 			_this->CSDTechniqueCSD3D  = BranchTo(0x828B94B8,REF_TYPE(Sonicteam::SoX::RefCountObject),_this->CSDSHADER.get(),"TechniqueCSD3D");
-			_this->CSDObject  = BranchTo(0x82617570,REF_TYPE(Sonicteam::CsdObject),&std::string("sprite/pausemenu/pausemenu"));
-			_this->CSDObject.get()->MarathonPlaySceneAnimation("pause_menu","pause6");
-			_this->CSDObject.get()->SetFlag0x20(0x401); //SetRenderFlag
+			_this->CSDObject  = BranchTo(0x82617570,REF_TYPE(Sonicteam::CsdObject),&std::string("sprite/reticle_DLL"));
+
+			if (_this->CSDObject.get()){
+
+				_this->CSDObject.get()->FCsdObject0x20 = 0x401 ;
+				_this->CSDObject.get()->MarathonPlaySceneLoopAnimation("reticle","omega_reticle");
+
+				if (_this->CSDObject.get()->FCProject){
+
+
+					for (std::map<const char*,Chao::CSD::RCObject<Chao::CSD::CScene>*,STD_MAP_CONST_CHAR_PTR_COMPARATOR>::iterator it = _this->CSDObject.get()->FCProject->CProjectScene.begin();it != _this->CSDObject.get()->FCProject->CProjectScene.end();it++){
+
+						if (it->second && it->second->get()){
+							int v = (int)it->second->get();
+							if (*(int*)v == 0x82037090){
+								*(float*)(v + 0x84) = 75.0;
+							}
+
+
+						}
+					}
+
+				}
+	
+
+			
+		
+			
+			
+			}
+	
 
 
 		}
@@ -160,39 +188,35 @@ namespace OmegaGauge{
 				_this->LockOnCount = OmegaLaser->Entities.size();
 			}
 			
-			for (std::vector<REF_TYPE(Sonicteam::SoX::Scenery::Drawable)>::iterator it = _this->CSDObjectDrawable.begin();it != _this->CSDObjectDrawable.end();it++){
-				(*it).get()->ClearDrawable();
-				(*it).get()->Release();
-			}
+
+			
+		
+
+
 			_this->CSDObjectDrawable.clear();
 
 	
-			if (_this->LockOnCount > 0){
+			if (_this->LockOnCount > 0 && _this->CSDObject.get() ){
 				Sonicteam::SoX::Scenery::World* GraphicBufferGuess =  (doc_obj->DocGetWorld(7).get());
 
-	
 			
 				int cc = 0;
-				for (std::deque<Sonicteam::Player::EntitiesContainer>::iterator it = OmegaLaser->Entities.begin(); 
+				for (std::deque<EntityContainer>::iterator it = OmegaLaser->Entities.begin(); 
 					it != OmegaLaser->Entities.end(); ++it) {
 
-
-						Sonicteam::Player::EntitiesContainer* havokbody = &(*it);
+						EntityContainer* havokbody = &(*it);
 						Sonicteam::SoX::Physics::Havok::BodyHavok* body = static_cast<Sonicteam::SoX::Physics::Havok::BodyHavok*>(havokbody->Entity.get());
 						if (havokbody->Entity.get()) {
-
-						
 						XMVECTOR pos = body->GetPosition();
-					
 				
-	
 						REF_TYPE(Sonicteam::CsdObject) CSD_LOCAL = _this->CSDObject;
 						Sonicteam::SoX::Scenery::Drawable* CSDObjectDrawable = ((Sonicteam::SoX::Scenery::Drawable* (__fastcall *)(int,int,REF_TYPE(Sonicteam::CsdObject)))0x82616C68)(malloc06(0xA0),doc_obj->DocGetMyGraphicDevice(),CSD_LOCAL);
 						((void* (__fastcall *)(Sonicteam::SoX::Scenery::Drawable*,REF_TYPE(Sonicteam::SoX::RefCountObject)))0x82616EB0)(CSDObjectDrawable,_this->CSDTechniqueCSD3D) ;
 					   
 						
 
-						GraphicBufferGuess->WorldAddDrawable(CSDObjectDrawable);
+						REF_TYPE(Sonicteam::SoX::Scenery::Drawable) CDW = REF_TYPE(Sonicteam::SoX::Scenery::Drawable)(CSDObjectDrawable) ;
+						GraphicBufferGuess->WorldAddDrawable(CDW);
 						
 
 				
@@ -200,7 +224,8 @@ namespace OmegaGauge{
 						*(char *)(CsdObjectDrawable_INT + 0x74) = 1;
 						*(XMVECTOR *)(CsdObjectDrawable_INT + 0x80) = pos;
 						*(float *)(CsdObjectDrawable_INT + 0x94) = 1000000.0;
-						_this->CSDObjectDrawable.push_back(CSDObjectDrawable);
+						_this->CSDObjectDrawable.push_back(CDW);
+
 					
 						cc++;
 						std::stringstream ss;
@@ -219,10 +244,6 @@ namespace OmegaGauge{
 		}
 		else{
 			_this->LockOnCount = 0;
-			for (std::vector<REF_TYPE(Sonicteam::SoX::Scenery::Drawable)>::iterator it = _this->CSDObjectDrawable.begin();it != _this->CSDObjectDrawable.end();it++){
-				(*it).get()->ClearDrawable();
-				(*it).get()->Release(); //why ? because ClearDrawable seems do not remove reference at all, (some
-			}
 			_this->CSDObjectDrawable.clear();
 		}
 

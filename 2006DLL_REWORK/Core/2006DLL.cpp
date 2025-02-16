@@ -37,7 +37,7 @@ FPair functions[] = {
 	{"CompleteGauge", CompleteGauge::GlobalInstall},
 	{"AmyLOS", AmyLOS::GlobalInstall},
 	{"TagBattleExtension", TagBattleMain::GlobalInstall},
-	{"FileSystemNew", FileSystemNew::GlobalInstall},
+	//{"FileSystemNew", FileSystemNew::GlobalInstall},
 	{"TailsGauge", TailsGauge::GlobalInstall},
 	{"OmegaHoverGauge",OmegaGauge::GlobalInstall}
 };
@@ -113,8 +113,11 @@ void DefaultDebugListenerFunc01Test(void* _this, const char* str){
 
 
 
+
+
 void STH2006DLLMain()
 {
+	
 	
 
  //	Sonicteam::SoX::ExFileSystem& instance = Sonicteam::System::Singleton<Sonicteam::SoX::ExFileSystem, Sonicteam::System::CreateStatic<Sonicteam::SoX::ExFileSystem>>::getInstance();
@@ -154,14 +157,24 @@ void STH2006DLLMain()
 
 	SSINGLETON(Sonicteam::SoX::ResourceManager)::getInstance((void*)0x82D3B224); //ResourceManager
 	SSINGLETON(Sonicteam::SoX::PerformanceFrequency)::getInstance((void*)0x82D3B209);
+	SSINGLETON(Sonicteam::SoX::ExFileSystem)::getInstance((void*)0x82D37088); 
+
+
+
 	BranchTo(0x825383D8,int); //INIT HEAP Early
-
-
-
-
 	HookNew::SaveBuffer = new std::map<void*, std::vector<HookNew*>>();
 	HookNew::IsEmulated();
 	HookV2::IsNotEmulatedHardWare =  HookV2::CheckIsNotEmulatedHardWare();
+
+
+
+	FileSystemNew::GlobalInstall();
+	FileSystemNew::AddArc("Resources.arc",2,0);
+
+
+
+
+
 	ZLua lua_file = ZLua("game:\\common\\DLL.lua");
 	std::stringstream log;
 	std::wstringstream wlog;
