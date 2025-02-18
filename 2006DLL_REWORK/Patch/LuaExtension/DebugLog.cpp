@@ -70,6 +70,7 @@ namespace DebugLogV2{
 		OpenState_GlobalInstall(LS);
 
 		GlobalInstall__LoadReAttachArc(LS);
+		IO_GlobalInstall(LS);
 
 	
 		return sub_825DB498H(LS);

@@ -75,6 +75,7 @@ namespace DebugLogV2{
 		lua_pushstring06(L, "SetBYTE"); lua_pushcfunction06(L, Memory__SetBYTE); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "SetPointer"); lua_pushcfunction06(L, Memory__SetPointer); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "SetVector"); lua_pushcfunction06(L, Memory__SetVector); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "SetString"); lua_pushcfunction06(L, Memory__SetString); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "IsValidPTR"); lua_pushcfunction06(L, Memory__IsValidPTR); 	lua_settable06(L, -3);
 
 		lua_pushstring06(L, "CallFunc"); lua_pushcfunction06(L, Memory_CallFunc); 	lua_settable06(L, -3);
@@ -432,6 +433,7 @@ namespace DebugLogV2{
 		}
 
 
+		const char* string_param;
 		if (lua_isuserdata(L,arg_value_num)){
 			value = (unsigned int)lua_touserdata(L,arg_value_num);
 		}
@@ -450,8 +452,10 @@ namespace DebugLogV2{
 			const char* s = lua_tostring(L,2);
 			const TCHAR* hexString = _T(s); // Hex string to convert
 			value= _tcstoul(hexString, NULL, 16); // Convert hex string to unsigned long integer
+			string_param = s;
 		}
 		
+		XMVECTOR* vec;
 	
 			switch (type){
 				//DWORD 
@@ -464,11 +468,14 @@ namespace DebugLogV2{
 				*(char*)(ptr + move) = value;
 				break;
 			case 5:
-				XMVECTOR* vec = (XMVECTOR*)(ptr + move);
+				vec = (XMVECTOR*)(ptr + move);
 				lua_rawgeti(L,arg_value_num,1); vec->x = lua_tonumber(L,-1); lua_pop(L,1);
 				lua_rawgeti(L,arg_value_num,2); vec->y = lua_tonumber(L,-1); lua_pop(L,1);
 				lua_rawgeti(L,arg_value_num,3); vec->z = lua_tonumber(L,-1); lua_pop(L,1);
 				lua_rawgeti(L,arg_value_num,4); vec->w = lua_tonumber(L,-1); lua_pop(L,1);
+				break;
+			case 6:
+				strcpy((char*)(ptr + move),string_param);
 				break;
 			}
 
@@ -505,6 +512,11 @@ namespace DebugLogV2{
 		return Memory__SET(L,5);
 
 	}
+
+	extern "C" Memory__SetString(lua_State* L){
+		return Memory__SET(L,6);
+	}
+
 
 
 

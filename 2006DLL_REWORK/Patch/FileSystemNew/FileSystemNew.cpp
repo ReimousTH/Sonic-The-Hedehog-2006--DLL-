@@ -37,7 +37,6 @@ HOOKV3(0x82160B98,void*,CreateMarathonState,(Sonicteam::DocMarathonImp*,void*),(
 		 std::string arc_full_path = FileSystem->FileSystemGetFullPath(it->first,it->second.flag);
 
 		 if (FileSystem->FileSystemIsFileExist(arc_full_path)){
-			// PushXenonMessage(L"MSG",arc_full_path.c_str());
 			 _this->ArcVector1.push_back(ArcHandle(it->first,it->second.flag,it->second.SaveInMemory)); //-1 IF NOT 1 resource is being loaded but ??? something else happend and it destroy object depsite i can find csdobject in memory
 
 		 }

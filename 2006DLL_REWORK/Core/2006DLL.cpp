@@ -23,6 +23,9 @@
 #include <System/CreateStatic.h>
 
 
+#include <Heap.h>
+#include <SpanverseHeap.h>
+
 struct FPair{
 	const char* Name;
 	void(*Function)();
@@ -112,6 +115,11 @@ void DefaultDebugListenerFunc01Test(void* _this, const char* str){
 
 
 
+HOOKV3(0x825E7990,void*,HeapFix,(Sonicteam::Heap*),(_this),Sonicteam::Heap* _this){
+	_this->Initialize(0x100000);
+	return _this;
+}
+
 
 
 
@@ -158,6 +166,7 @@ void STH2006DLLMain()
 	SSINGLETON(Sonicteam::SoX::ResourceManager)::getInstance((void*)0x82D3B224); //ResourceManager
 	SSINGLETON(Sonicteam::SoX::PerformanceFrequency)::getInstance((void*)0x82D3B209);
 	SSINGLETON(Sonicteam::SoX::ExFileSystem)::getInstance((void*)0x82D37088); 
+	SSINGLETON(Sonicteam::SpanverseHeap)::getInstance((void*)0x82D3C620); 
 
 
 
@@ -170,6 +179,10 @@ void STH2006DLLMain()
 
 	FileSystemNew::GlobalInstall();
 	FileSystemNew::AddArc("Resources.arc",2,0);
+
+	//INSTALL_HOOKV3EX(HeapFix,1,false);
+	//WRITE_DWORD(0x82050978,0x825E7B30);
+	//WRITE_DWORD(0x8205097C,0x825E7C10);
 
 
 

@@ -340,6 +340,7 @@ namespace DebugLogV2{
 		XMVECTOR Rot = {0};
 		const char* Placement = "default";
 		bool _Save_ = false;
+		bool _Preload_ = false;
 		int PlacementIndex = 0;
 		if (lua_istable(L,3) &&  atgs > 2){
 
@@ -374,8 +375,19 @@ namespace DebugLogV2{
 			if (lua_isboolean(L,-1)){
 				_Save_ = lua_toboolean(L,-1);
 			}
+
 			lua_pop(L,2);
 
+
+			lua_pushvalue06(L,3);
+			lua_pushstring06(L,"Preload");
+			lua_gettable(L,-2); 
+
+			if (lua_isboolean(L,-1)){
+				_Preload_ = lua_toboolean(L,-1);
+			}
+			
+			lua_pop(L,2);
 
 
 
@@ -570,6 +582,20 @@ namespace DebugLogV2{
 
 
 
+		REF_TYPE(Sonicteam::SoX::RefCountObject) obj = 0;
+		REF_TYPE(Sonicteam::SoX::RefCountObject) params = 0;
+
+
+		if (strcmp(OBJ_ID,"objectphysics") == 0 && _Preload_){
+			std::string object = boost::any_cast<std::string>(_params["objectName"]);
+
+			REF_TYPE(Sonicteam::SoX::RefCountObject) obj = BranchTo(0x8227F438,REF_TYPE(Sonicteam::SoX::RefCountObject),gameimp);
+			REF_TYPE(Sonicteam::SoX::RefCountObject) params =  BranchTo(0x8227F198,REF_TYPE(Sonicteam::SoX::RefCountObject),obj.get(),object.c_str()); //now i need keep that object
+			BranchTo(0X8228DF40,int,params,0);
+
+		
+		
+		}
 
 
 
@@ -630,6 +656,8 @@ namespace DebugLogV2{
 	
 
 
+	
+	
 		//EntityHandleAndObjectVector->push_back(dummy_container_entityhandle_Object(EntityHandle,result));
 		//InstancePropVector->push_back(InstnceProp);
 
@@ -642,6 +670,7 @@ namespace DebugLogV2{
 
 	int GameLIB_GlobalInstall(lua_State* LS)
 	{	
+		//WRITE_DWORD(0x8228E3B0,0x60000000);
 		WRITE_DWORD(0x82026A04,GameLIB_NewActorRestore);
 		WRITE_DWORD(0x820269C4,GameLIB_PlayerIndexToActorIDRestore);
 		//WRITE_DWORD(0x820269D4,GameLIB_PreloadPlayer);
