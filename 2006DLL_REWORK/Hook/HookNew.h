@@ -99,7 +99,7 @@ public:
 	bool Block;
 
 	// Function to create a hook
-	static void CreateHook(void* Target, void* TargetMap, void* Original,char RunPosition,bool block);
+	static void CreateHook(void* Target, void* TargetMap, void* Original,char RunPosition,bool block,int register_choose);
 	static void memcpy(void * _Dst,const void * _Src,size_t _Size);
 	static bool IsEmulated();
 	static bool UseEmulatedAddress;
@@ -162,11 +162,11 @@ public:
 	return_type HookFuncName(__VA_ARGS__) \
 
 #define INSTALL_HOOKV3(HookFuncName) \
-	HookNew::CreateHook(HookFuncName,HookFuncName##MAP,HookFuncName##addressto,-1,false)
+	HookNew::CreateHook(HookFuncName,HookFuncName##MAP,HookFuncName##addressto,-1,false,12)
 
 
-#define INSTALL_HOOKV3EX(HookFuncName,RunPosition,Block) \
-	HookNew::CreateHook(HookFuncName,HookFuncName##MAP,HookFuncName##addressto,RunPosition,Block)
+#define INSTALL_HOOKV3EX(HookFuncName,RunPosition,Block,register_to_use) \
+	HookNew::CreateHook(HookFuncName,HookFuncName##MAP,HookFuncName##addressto,RunPosition,Block,register_to_use)
 
 
 

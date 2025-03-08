@@ -100,10 +100,14 @@ namespace OmegaGauge{
 		Sonicteam::Player::ObjectPlayer* obj =  _this->ScorePlugin->PtrObjectPlayer;
 		Sonicteam::Player::RootFrame* frame = obj->RootFrame.param;
 
-		int Weapons =  (int)_this->OmegaWeapons.get();
-		int Weapons5C = *(int*)(Weapons + 0x5C) ; //OMegaLaser
-		int Weapons5C88 = *(int*)(Weapons5C + 0x88);
-		Sonicteam::Player::OmegaLaser* OmegaLaser = *(Sonicteam::Player::OmegaLaser**)(Weapons + 0x5C) ;
+		Sonicteam::Player::OmegaLaser* OmegaLaser;
+
+		if (int Weapons =  (int)_this->OmegaWeapons.get()){
+			int Weapons5C = *(int*)(Weapons + 0x5C) ; //OMegaLaser
+			int Weapons5C88 = *(int*)(Weapons5C + 0x88);
+			OmegaLaser = *(Sonicteam::Player::OmegaLaser**)(Weapons + 0x5C) ;
+		}
+
 
 
 
@@ -170,7 +174,7 @@ namespace OmegaGauge{
 
 
 
-		if (_this->IsLockOn){
+		if (_this->IsLockOn && OmegaLaser){
 
 			//Update Trigger
 			if (_this->LockOnCount != OmegaLaser->Entities.size()){
@@ -205,8 +209,8 @@ namespace OmegaGauge{
 					it != OmegaLaser->Entities.end(); ++it) {
 
 						EntityContainer* havokbody = &(*it);
-						Sonicteam::SoX::Physics::Havok::BodyHavok* body = static_cast<Sonicteam::SoX::Physics::Havok::BodyHavok*>(havokbody->Entity.get());
-						if (havokbody->Entity.get()) {
+						Sonicteam::SoX::Physics::Havok::BodyHavok* body = static_cast<Sonicteam::SoX::Physics::Havok::BodyHavok*>(havokbody->Entity);
+						if (havokbody->Entity) {
 						XMVECTOR pos = body->GetPosition();
 				
 						REF_TYPE(Sonicteam::CsdObject) CSD_LOCAL = _this->CSDObject;
@@ -368,7 +372,7 @@ namespace OmegaGauge{
 
 
 
-		INSTALL_HOOKV3EX(OmegaContextConstructor,1,false);
+		INSTALL_HOOKV3EX(OmegaContextConstructor,1,false,12);
 		WRITE_DWORD(0x8200AAD4,ContextOmegaOnLink);
 		WRITE_DWORD(0x821B5DD4,0x386002A0);
 		WRITE_DWORD(0x8200AADC,OmegaContextDestroy);

@@ -51,7 +51,7 @@ namespace TailsGauge{
 	void GlobalInstall()
 	{
 
-		INSTALL_HOOKV3EX(TailsContextConstructor,1,false);
+		INSTALL_HOOKV3EX(TailsContextConstructor,1,false,12);
 		WRITE_DWORD(0x8200B7F8,ContextTailsOnLink);
 		WRITE_DWORD(0x821B5FDC,0x38600258);
 		WRITE_DWORD(0x8200B860,ContextDestroy);

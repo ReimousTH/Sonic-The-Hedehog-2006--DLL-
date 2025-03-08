@@ -195,6 +195,9 @@ namespace DebugLogV2{
 	
 			
 		}
+	
+
+
 
 		return 1; // Return userdata to Lua stack
 	}

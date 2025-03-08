@@ -39,6 +39,7 @@ namespace DebugLogV2{
 		lua_pushstring06(LS, "Reload");lua_pushcfunction06(LS, PlayerR__Reload);lua_settable06(LS, -3); // Equivalent to table["Reload"] = PlayerR__Reload
 		lua_pushstring06(LS, "GetPosition");lua_pushcfunction06(LS, PlayerR__GetPosition);lua_settable06(LS, -3); // Equivalent to table["GetPosition"] = PlayerR__GetPosition
 		lua_pushstring06(LS, "SetPosition");lua_pushcfunction06(LS, PlayerR__SetPosition);lua_settable06(LS, -3); // Equivalent to table["SetPosition"] = PlayerR__SetPosition
+		lua_pushstring06(LS, "SetScale");lua_pushcfunction06(LS, PlayerR__SetScale);lua_settable06(LS, -3); // Equivalent to table["SetPosition"] = PlayerR__SetPosition
 		lua_pushstring06(LS, "SetActorPTR");lua_pushcfunction06(LS, PlayerR__SetActorPTR);lua_settable06(LS, -3); // Equivalent to table["SetActorPTR"] = PlayerR__SetActorPTR
 		lua_pushstring06(LS, "GetActorPTR");lua_pushcfunction06(LS, PlayerR__GetActorPTR);lua_settable06(LS, -3); // Equivalent to table["SetActorPTR"] = PlayerR__SetActorPTR
 
@@ -450,6 +451,61 @@ namespace DebugLogV2{
 
 		return 0;
 	}
+	extern "C" int PlayerR__SetScale(lua_State* L)
+	{
+		int args = lua_gettop(L)-1;
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		void* ObjectPlayerPTR = lua_touserdata(L,-1);
+
+
+		Sonicteam::Player::ObjectPlayer* OBJPlayer = (Sonicteam::Player::ObjectPlayer*)ObjectPlayerPTR;
+		XMVECTOR vector = {0};
+
+
+
+		//Vector
+		if (lua_istable(L,2)){
+			vector = Vector__GetVectorTable(L,2);
+
+		}
+		else{
+
+			if (args > 0 && lua_isnumber(L,2) ) vector.x = lua_tonumber(L,2); 
+			if (args > 1 && lua_isnumber(L,3) ) vector.y = lua_tonumber(L,3); 
+			if (args > 2 && lua_isnumber(L,4) ) vector.z = lua_tonumber(L,4); 
+			if (args > 3 && lua_isnumber(L,5) ) vector.w = lua_tonumber(L,5); 
+		}
+
+		Sonicteam::Player::RootFrame* frame =  OBJPlayer->RootFrame.get();
+
+		XMMATRIX currentTransform = frame->FrameGetTransformMatrix2(); // Get the current transformation matrix
+
+
+		// Create a new scaling matrix
+		XMMATRIX scalingMatrix = XMMatrixScaling(vector.x, vector.y, vector.z);
+
+		// Extract translation from the current transformation matrix
+		XMVECTOR translationVector = XMVectorSet(currentTransform.r[3].x, 
+			currentTransform.r[3].y, 
+			currentTransform.r[3].z, 
+			1.0f);
+
+		// Extract rotation (if needed) - here we assume no rotation is needed for simplicity
+		XMMATRIX rotationMatrix = XMMatrixIdentity(); // Replace with actual rotation extraction if needed
+
+		// Combine the new scaling with existing translation and rotation
+		XMMATRIX newTransform = scalingMatrix * rotationMatrix * XMMatrixTranslationFromVector(translationVector);
+
+		// Set the new transform back to the frame or object
+		frame->FrameSetTransformMatrix2(rotationMatrix); // Assuming there's a method to set 
+
+
+
+
+		return 0;
+	}
+
 
 
 	extern "C" int PlayerR__GetActorID(lua_State* L)

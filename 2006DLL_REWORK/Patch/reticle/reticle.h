@@ -1,0 +1,4 @@
+namespace reticle{
+
+	void GlobalInstall();
+}

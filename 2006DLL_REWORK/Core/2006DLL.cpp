@@ -7,6 +7,7 @@
 #include <Patch/FileSystemNew/FileSystemNew.h>
 #include <Patch/TailsGauge/TailsGauge.h>
 #include <Patch/OmegaGauge/OmegaGauge.h>
+#include <Patch/reticle/reticle.h>
 
 
 
@@ -21,6 +22,7 @@
 #include <Sox/ExFileSystem.h>
 #include <System/Singleton.h>
 #include <System/CreateStatic.h>
+#include <Player/IPostureControl.h>
 
 
 #include <Heap.h>
@@ -30,6 +32,8 @@ struct FPair{
 	const char* Name;
 	void(*Function)();
 };
+
+
 
 
 FPair functions[] = {
@@ -120,6 +124,38 @@ HOOKV3(0x825E7990,void*,HeapFix,(Sonicteam::Heap*),(_this),Sonicteam::Heap* _thi
 	return _this;
 }
 
+void __fastcall sub_82200538(Sonicteam::Player::IPostureControl* _this, double a2, int a3){
+	
+
+	BranchTo(0x82200538,int,_this,a2);
+
+	XMVECTOR scalingOrigin = XMVectorSet(1,1,1,1);
+	XMVECTOR rotationOrigin = XMVectorSet(0,0,0,1);
+
+	// Define the scaling orientation quaternion (identity quaternion for no additional orientation)
+	XMVECTOR scalingOrientationQuaternion = XMQuaternionIdentity();
+	XMVECTOR scale = XMVectorSet(0.25,0.25,0.25,1);
+
+
+
+	// Build the transformation matrix
+	XMMATRIX transformationMatrix = XMMatrixTransformation(
+		scalingOrigin,                     // Scaling origin
+		scalingOrientationQuaternion,      // Scaling orientation quaternion
+		scale,                             // Scaling factors
+		rotationOrigin,                    // Rotation origin
+		_this->RotationFixed,                // Rotation quaternion
+		_this->PositionFixed                           // Translation vector (position)
+		);
+
+
+	//_this->RootFrame.get()->FrameSetTransformMatrix2(transformationMatrix);
+
+
+	
+}
+
+
 
 
 
@@ -177,14 +213,15 @@ void STH2006DLLMain()
 
 
 
+
+	WRITE_DWORD(0x82009050,sub_82200538);
 	FileSystemNew::GlobalInstall();
 	FileSystemNew::AddArc("Resources.arc",2,0);
+	reticle::GlobalInstall();
 
 	//INSTALL_HOOKV3EX(HeapFix,1,false);
 	//WRITE_DWORD(0x82050978,0x825E7B30);
 	//WRITE_DWORD(0x8205097C,0x825E7C10);
-
-
 
 
 

@@ -65,7 +65,7 @@ HOOKV3(0x82160B98,void*,CreateMarathonState,(Sonicteam::DocMarathonImp*,void*),(
 
 void FileSystemNew::GlobalInstall()
 {
-	INSTALL_HOOKV3EX(CreateMarathonState,-1,false);
+	INSTALL_HOOKV3EX(CreateMarathonState,-1,false,12);
 }
 
 

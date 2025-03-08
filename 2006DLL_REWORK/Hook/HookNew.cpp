@@ -17,7 +17,7 @@ void HookNew::memcpy(void * _Dst,const void * _Src,size_t _Size){
 	VirtualProtectEx(GetModuleHandle(NULL),HOOKADDR(_Dst),_Size,OPrct,&OPrct);
 }
 
-void HookNew::CreateHook(void* Target, void* TargetMap, void* Original,char RunPosition,bool block) {
+void HookNew::CreateHook(void* Target, void* TargetMap, void* Original,char RunPosition,bool block,int register_choose) {
 
 
 	const DWORD Buffer = reinterpret_cast<DWORD>(HookNew::SavedBufferFunc);
@@ -54,9 +54,9 @@ void HookNew::CreateHook(void* Target, void* TargetMap, void* Original,char RunP
 				int address_to = OriginalPos + BranchOffset;
 
 				// Prepare branch instructions
-				BranchBuffer[0] = POWERPC_LIS(12, POWERPC_HI(address_to));
-				BranchBuffer[1] = POWERPC_ORI(12, 12, POWERPC_LO(address_to));
-				BranchBuffer[2] = POWERPC_MTCTR(12);
+				BranchBuffer[0] = POWERPC_LIS(register_choose, POWERPC_HI(address_to));
+				BranchBuffer[1] = POWERPC_ORI(register_choose, register_choose, POWERPC_LO(address_to));
+				BranchBuffer[2] = POWERPC_MTCTR(register_choose);
 				BranchBuffer[3] = 0x4E800420 | linked;
 
 				
@@ -72,9 +72,9 @@ void HookNew::CreateHook(void* Target, void* TargetMap, void* Original,char RunP
 		}
 
 		// Finalize the branch to the target function
-		BranchBuffer[0] = POWERPC_LIS(12, POWERPC_HI(reinterpret_cast<DWORD>(Original) + 0x10));
-		BranchBuffer[1] = POWERPC_ORI(12, 12, POWERPC_LO(reinterpret_cast<DWORD>(Original) + 0x10));
-		BranchBuffer[2] = POWERPC_MTCTR(12);
+		BranchBuffer[0] = POWERPC_LIS(register_choose, POWERPC_HI(reinterpret_cast<DWORD>(Original) + 0x10));
+		BranchBuffer[1] = POWERPC_ORI(register_choose, register_choose, POWERPC_LO(reinterpret_cast<DWORD>(Original) + 0x10));
+		BranchBuffer[2] = POWERPC_MTCTR(register_choose);
 		BranchBuffer[3] = 0x4E800420;
 
 		memcpy((void*)(StartPos), BranchBuffer, sizeof(BranchBuffer)); // Final copy for target
@@ -84,9 +84,9 @@ void HookNew::CreateHook(void* Target, void* TargetMap, void* Original,char RunP
 		HookNew::SavedBufferSIZE += (StartPos - BufferPoint);
 
 		// Replace original function with branch to target map function
-		BranchBuffer[0] = POWERPC_LIS(12, POWERPC_HI(reinterpret_cast<DWORD>(TargetMap)));
-		BranchBuffer[1] = POWERPC_ORI(12, 12, POWERPC_LO(reinterpret_cast<DWORD>(TargetMap)));
-		BranchBuffer[2] = POWERPC_MTCTR(12);
+		BranchBuffer[0] = POWERPC_LIS(register_choose, POWERPC_HI(reinterpret_cast<DWORD>(TargetMap)));
+		BranchBuffer[1] = POWERPC_ORI(register_choose, register_choose, POWERPC_LO(reinterpret_cast<DWORD>(TargetMap)));
+		BranchBuffer[2] = POWERPC_MTCTR(register_choose);
 		BranchBuffer[3] = 0x4E800420;
 
 		memcpy((void*)(Original), BranchBuffer, sizeof(BranchBuffer)); // Final copy for original hook

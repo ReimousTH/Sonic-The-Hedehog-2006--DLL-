@@ -880,6 +880,108 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Reticle"
+				>
+				<File
+					RelativePath=".\Patch\reticle\reticle.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\reticle\reticle.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="DebugServer"
+				>
+				<File
+					RelativePath=".\Patch\DebugServer\DebugServer.cpp"
+					>
+					<FileConfiguration
+						Name="Release|Xbox 360"
+						ExcludedFromBuild="true"
+						>
+			<Tool
+				Name="VCCLX360CompilerTool"
+			/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Patch\DebugServer\DebugServer.h"
+					>
+					<FileConfiguration
+						Name="Release|Xbox 360"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Patch\DebugServer\Socket.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Xbox 360"
+						>
+			<Tool
+				Name="VCCLX360CompilerTool"
+				ObjectFile="$(IntDir)\$(InputName)1.obj"
+				XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+			/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Profile|Xbox 360"
+						>
+			<Tool
+				Name="VCCLX360CompilerTool"
+				ObjectFile="$(IntDir)\$(InputName)1.obj"
+				XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+			/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Profile_FastCap|Xbox 360"
+						>
+			<Tool
+				Name="VCCLX360CompilerTool"
+				ObjectFile="$(IntDir)\$(InputName)1.obj"
+				XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+			/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Xbox 360"
+						ExcludedFromBuild="true"
+						>
+			<Tool
+				Name="VCCLX360CompilerTool"
+				ObjectFile="$(IntDir)\$(InputName)1.obj"
+				XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+			/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release_LTCG|Xbox 360"
+						>
+			<Tool
+				Name="VCCLX360CompilerTool"
+				ObjectFile="$(IntDir)\$(InputName)1.obj"
+				XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+			/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Patch\DebugServer\Socket.h"
+					>
+					<FileConfiguration
+						Name="Release|Xbox 360"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\DLLModule.cpp"
