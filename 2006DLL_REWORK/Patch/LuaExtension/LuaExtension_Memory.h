@@ -27,12 +27,21 @@ extern "C" {
 
 #include <boost/any.hpp>
 
+#include <Sox/Misc/LinkSoxNode.h>
+#include <Hook/HookNew.h>
+
 
 #define _DWORD DWORD
 #define _BYTE BYTE
 
 
 namespace DebugLogV2 {
+
+
+
+
+
+
 
 
 
@@ -71,7 +80,7 @@ namespace DebugLogV2 {
 
 	extern "C" int Memory__GetPTR(lua_State* L);
 
-	extern "C" int Memory__GetClassName(lua_State* L);
+	extern "C" int Memory__GetRTTI(lua_State* L);
 
 	extern "C" int Memory__IsValidPTR(lua_State* L);
 	extern "C" Memory__CreateMetatableFields(lua_State* L,int value,int move);
@@ -97,6 +106,12 @@ namespace DebugLogV2 {
 	extern "C" Memory_CallFunc(lua_State* L);
 	extern "C" Memory_AsInt(lua_State* L);
 	extern "C" Memory_AsFloat(lua_State* L);
+
+
+
+	extern "C" int Memory_HOOK_OBJECT_NEW(lua_State* L,void* addres_to,int func_arg,HookNew* ref_hgook);
+	extern "C" Memory_HOOK_OBJECT_GC(lua_State* L);
+	extern "C" Memory_HOOK(lua_State* L); //
 
 
 	

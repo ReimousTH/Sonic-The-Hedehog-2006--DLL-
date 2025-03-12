@@ -126,7 +126,7 @@ namespace OmegaGauge{
 			int SoundBankID = BranchTo(0x82585D58,int,AudioModule,"player_omega");
 			_this->LockOnSoundID = BranchTo(0x82584C00,int,AudioModule,SoundBankID,"lockon");
 
-			_this->CSDSHADER = BranchTo(0x82371620,REF_TYPE(Sonicteam::SoX::RefCountObject),&std::string("shader/primitive/csd3D.fx"));
+			_this->CSDSHADER = BranchTo(0x82371620,REF_TYPE(Sonicteam::SoX::RefCountObject),&std::string("shader/primitive/csd3domegalockon.fx"));
 			_this->CSDTechniqueCSD3D  = BranchTo(0x828B94B8,REF_TYPE(Sonicteam::SoX::RefCountObject),_this->CSDSHADER.get(),"TechniqueCSD3D");
 			_this->CSDObject  = BranchTo(0x82617570,REF_TYPE(Sonicteam::CsdObject),&std::string("sprite/reticle_DLL"));
 
@@ -153,9 +153,6 @@ namespace OmegaGauge{
 				}
 	
 
-			
-		
-			
 			
 			}
 	

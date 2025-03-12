@@ -27,6 +27,7 @@
 
 #include <Heap.h>
 #include <SpanverseHeap.h>
+#include <Player/IPostureControl.h>
 
 struct FPair{
 	const char* Name;
@@ -157,12 +158,123 @@ void __fastcall sub_82200538(Sonicteam::Player::IPostureControl* _this, double a
 
 
 
+float lerp(float a, float b, float t)
+{
+	return a + t * (b - a);
+}
+#define clamp(val, minVal, maxVal) ((val < minVal) ? minVal : ((val > maxVal) ? maxVal : val))
+
+HOOKV3(0x821F1E30,void*,PostureCommon,(Sonicteam::Player::IPostureControl*,double),(_this,delta), Sonicteam::Player::IPostureControl* _this, double delta){
+	
+	
+	if (Sonicteam::Player::State::ICommonContextIF* context =  _this->IContextIF.get()){
+		_this->ImpulseZX = context->GetTotalSpeedZ();
+		_this->ImpulseY = context->GetTotalSpeedY();
+	}
+	if ((_this->IPostureControlFlag0x114.PostureRequestFlag & 0x8000) != 0){
+		_this->IPostureControlImport(_this->PlayerGetTransformData(),1.0f);
+	}
+	else{
+		Sonicteam::Player::Input::IListener* AmigoAI = _this->AmigoListener.get();
+		Sonicteam::Player::Input::IListener* InputListener = _this->InputListener.get();
+		if (AmigoAI && AmigoAI->IsListenerEnabled()){ 
+			_this->IPostureControlImport(*AmigoAI->ListenerGetStickVector4(delta,0),AmigoAI->ListenerGetStickPower()); //weird
+		}
+		else if (InputListener && InputListener->IsListenerEnabled()){
+				_this->IPostureControlImport(*InputListener->ListenerGetStickVector4(delta,0),InputListener->ListenerGetStickPower()); //weird
+	
+		}
+	}
+
+	
+	if (Sonicteam::Player::Gravity* gravity = _this->Gravity.get()){
+
+		_this->GravityDirection = *(XMVECTOR*)gravity->GetGravityDirection();
+		_this->GravityDownForce = gravity->GetGravityDownForce();
+		_this->NormalizedSurface = CreateRotationFromUpToDirection(*gravity->GetGravityDirection());
+	}
+
+	Sonicteam::Player::ObjectPlayer* plr = (Sonicteam::Player::ObjectPlayer*)_this->PostureTask;
+	Sonicteam::Player::State::IContext* icontext =  plr->PlayerMachine.get()->GetMashineContext().get();
+	Sonicteam::Player::State::CommonContext* cc  = reinterpret_cast<Sonicteam::Player::State::CommonContext*>(icontext);
+
+
+
+
+	int a1 = (int)_this;
+	float c_slope_rad = *(float*)(a1 + 0x320); // in radians 
+    float slope_dot = (XMVector3Dot(_this->NormalizedSurface, XMVectorSet(0,1,0,1))).x;
+	float current_angle = acosf(clamp(slope_dot, -1.0f, 1.0f));
+
+
+	if ( (_this->ContextIFFlag & (0x40 | 0x8 | 0x100 | 0x20)  ) != 0){
+		float lerp_acc = _this->GravityDownForce / 1024.0 * delta;
+
+		XMVECTOR interpolate_direction = XMVectorSet(0,1,0,1);
+
+
+		if ( _this->GravityDownForce > cc->c_jump_run){
+			lerp_acc *= 4;
+		}
+		if (current_angle > (c_slope_rad)) {
+			interpolate_direction = _this->ImpulseVectorUP; // do not change them
+		}
+		
+
+
+		if ((_this->ContextIFFlag & 0x8) != 0  && (_this->ContextIFFlag & 0x100) == 0 ){
+			lerp_acc = 0.2;
+			interpolate_direction = XMVectorSet(0,1,0,1);
+		}
+		else if ((_this->ContextIFFlag & 0x20) != 0){ //Tails Fly
+			lerp_acc = 0.1;
+			interpolate_direction = XMVectorSet(0,1,0,1);
+		}
+
+	
+
+
+		_this->ImpulseVectorUP = XMVectorLerp(_this->ImpulseVectorUP,interpolate_direction,lerp_acc);
+	
+	}
+
+	else if ((_this->ContextIFFlag & 0x400) != 0){
+
+
+		struct Spline
+		{
+			XMVECTOR VPosition; // 
+			XMVECTOR Up;   // 
+			XMVECTOR Tangent; //probably
+		};
+
+		if (*(int*)(a1 + 0x340)){
+			int PlayerPath = *(int*)(a1 + 0x340) - 0x20; // - IPosturePlugIn
+			int PathAnimationController= *(int*)(PlayerPath + 0x44); // - IPosturePlugIn
+			if (PathAnimationController && *(int*)(PathAnimationController) == 0x8204D3E0){
+				Spline* _spline = (Spline*)(PathAnimationController + 0x20);
+				_this->NormalizedSurface = _spline->Tangent;
+				_this->ImpulseVectorUP = _spline->Up;
+			}
+		}
+		
+
+
+	}
+
+
+
+	return 0;
+}
+
+
+
 
 
 void STH2006DLLMain()
 {
 	
-	
+
 
  //	Sonicteam::SoX::ExFileSystem& instance = Sonicteam::System::Singleton<Sonicteam::SoX::ExFileSystem, Sonicteam::System::CreateStatic<Sonicteam::SoX::ExFileSystem>>::getInstance();
 //	instance.FileSystemGetFullPath(std::string("test"),1);
@@ -217,11 +329,17 @@ void STH2006DLLMain()
 	WRITE_DWORD(0x82009050,sub_82200538);
 	FileSystemNew::GlobalInstall();
 	FileSystemNew::AddArc("Resources.arc",2,0);
-	reticle::GlobalInstall();
+	
+	
+	
+	
 
 	//INSTALL_HOOKV3EX(HeapFix,1,false);
 	//WRITE_DWORD(0x82050978,0x825E7B30);
 	//WRITE_DWORD(0x8205097C,0x825E7C10);
+
+	reticle::GlobalInstall();
+	INSTALL_HOOKV3EX(PostureCommon,-1,1,11);
 
 
 

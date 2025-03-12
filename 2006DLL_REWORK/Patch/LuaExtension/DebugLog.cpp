@@ -1,4 +1,4 @@
-#include "DebugLog.h"
+ #include "DebugLog.h"
 
 #include <Prop/Manager.h>
 #include <Prop/GenerateArea.h>

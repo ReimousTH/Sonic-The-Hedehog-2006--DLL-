@@ -1560,7 +1560,7 @@ int __fastcall ObjectUpdate(int a1, double a2){
 			 PlayerContext->ExportPostureRequestFlag = NetworkPlayer_DATA->ExportPostureRequestFlag;
 			 PlayerContext->ExportWeaponRequestFlag = NetworkPlayer_DATA->ExportWeaponRequestFlag;
 			 PlayerContext->ContextIFFlag = NetworkPlayer_DATA->UnknownFlags01;
-			 PlayerContext->UnknownFlags0xC8 = NetworkPlayer_DATA->UnknownFlags0xC8;
+			 PlayerContext->ExternalFlag = NetworkPlayer_DATA->UnknownFlags0xC8;
 			 PlayerContext->StickFixedRotationMb = NetworkPlayer_DATA->StickFixedRotationMb;
 
 
@@ -1689,7 +1689,7 @@ int __fastcall ObjectUpdate(int a1, double a2){
 				 _data2_.ExportPostureRequestFlag = PlayerContext->ExportPostureRequestFlag;
 				 _data2_.ExportWeaponRequestFlag = PlayerContext->ExportWeaponRequestFlag;
 				 _data2_.UnknownFlags01 = PlayerContext->ContextIFFlag;
-				 _data2_.UnknownFlags0xC8 = PlayerContext->UnknownFlags0xC8;
+				 _data2_.UnknownFlags0xC8 = PlayerContext->ExternalFlag;
 				 _data2_.StickFixedRotationMb = PlayerContext->StickFixedRotationMb;
 
 					 if ( Sonicteam::Player::State::SonicContext* sonic_context =  dynamic_cast<Sonicteam::Player::State::SonicContext*>(PlayerContext)){
@@ -1742,7 +1742,7 @@ int __fastcall ObjectUpdate(int a1, double a2){
 				 Players_DATA[_socket.GetXUID(0)].ExportPostureRequestFlag = PlayerContext->ExportPostureRequestFlag;
 				 Players_DATA[_socket.GetXUID(0)].ExportWeaponRequestFlag = PlayerContext->ExportWeaponRequestFlag;
 				 Players_DATA[_socket.GetXUID(0)].UnknownFlags01 = PlayerContext->ContextIFFlag;
-				 Players_DATA[_socket.GetXUID(0)].UnknownFlags0xC8 = PlayerContext->UnknownFlags0xC8;
+				 Players_DATA[_socket.GetXUID(0)].UnknownFlags0xC8 = PlayerContext->ExternalFlag;
 				 Players_DATA[_socket.GetXUID(0)].StickFixedRotationMb = PlayerContext->StickFixedRotationMb;
 			 }
 

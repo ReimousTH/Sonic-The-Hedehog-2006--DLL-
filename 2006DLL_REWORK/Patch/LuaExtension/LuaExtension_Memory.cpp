@@ -1,4 +1,10 @@
 #include "LuaExtension_Memory.h"
+#include <algorithm>
+
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+#define TRIPLE_QUOTES(...) #__VA_ARGS__
+
 
 namespace DebugLogV2{
 
@@ -86,8 +92,8 @@ namespace DebugLogV2{
 		lua_pushstring06(L, "QueryProtect"); lua_pushcfunction06(L, Memory_QueryProtect); 	lua_settable06(L, -3);
 
 		lua_pushstring06(L, "GetPTR"); lua_pushcfunction06(L, Memory__GetPTR); 	lua_settable06(L, -3);
-		lua_pushstring06(L, "GetClassName"); lua_pushcfunction06(L, Memory__GetClassName); 	lua_settable06(L, -3);
-
+		lua_pushstring06(L, "GetRTTI"); lua_pushcfunction06(L, Memory__GetRTTI); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "HOOK"); lua_pushcfunction06(L, Memory_HOOK); 	lua_settable06(L, -3);
 		
 
 
@@ -96,10 +102,38 @@ namespace DebugLogV2{
 		lua_register06(L,"Memory",Memory__NEW);
 
 
+		luaL_newmetatable06(L, "HOOKCMeta");
+		lua_pushstring06(L,"__index"); lua_pushvalue(L,-2); lua_settable06(L,-3); // __index = MemoryMeta
+		lua_pushstring06(L,"lua_function"); lua_pushlightuserdata(L,(void*)0); lua_settable06(L,-3); // __index = MemoryMeta
+		lua_pushstring06(L,"__gc"); lua_pushcfunction06(L,Memory_HOOK_OBJECT_GC); lua_settable06(L,-3); // __index = MemoryMeta
+		lua_pop(L,1);
+
+
+		lua_dostring06(L,TRIPLE_QUOTES(
+			RTTI_META = {
+				signature = 0,
+				offset = 0,
+				cdOffset = 0,
+				name = "Empty"
+			}
+			function tostringu(str)
+				return string.gsub(tostring(str),"userdata:","")
+			end
+			function RTTI_META:__tostring()
+				return string.format("RTTI OBJECT : [sig: %s ,offs:%s,cdoffs:%s, %s]", tostringu(self.signature), tostringu(self.offset), tostringu(self.cdOffset), self.name)
+			end
+			function RTTI(signature,offset,cdoffset,name)
+				local self = setmetatable({}, RTTI_META)
+				self.signature = signature
+				self.offset = offset
+				self.cdOffset = cdOffset
+				self.name = name
+				return self
+			end
+
+		));
+
 	
-		
-
-
 
 
 
@@ -574,7 +608,42 @@ namespace DebugLogV2{
 				Memory__CreateMetatable(L,*(unsigned int*)(ptr + move),0);
 				break;
 			case 4:
-				lua_pushstring06(L,"");
+				{
+					
+					struct TypeDescriptor {
+						DWORD pVFTable;
+						DWORD spare;
+						char name[];      
+						const char* Name(){
+							return (const char*)(&name);
+						};
+					};
+					struct RTTICompleteObjectLocator{
+						DWORD signature;
+						DWORD offset;
+						DWORD cdOffset;
+						std::type_info* typeDesc;
+						void* hierarchyDesc;
+					};
+
+
+					int vft = *(unsigned int*)(ptr);
+					RTTICompleteObjectLocator * vft_rtti = *(RTTICompleteObjectLocator **)(vft -4);
+					const char* return_string = "NULL";
+					if (vft && vft_rtti) return_string = vft_rtti->typeDesc->name();
+
+
+
+					lua_getglobal06(L,"RTTI");
+					lua_pushlightuserdata(L,(void*)vft_rtti->signature);
+					lua_pushlightuserdata(L,(void*)vft_rtti->offset);
+					lua_pushlightuserdata(L,(void*)vft_rtti->cdOffset);
+					lua_pushstring06(L,vft_rtti->typeDesc->name());
+					lua_pcall06(L,4,1,0);
+
+		
+				
+				}
 				break;
 			case 5:
 				lua_getglobal06(L,"Vector");
@@ -621,7 +690,7 @@ namespace DebugLogV2{
 		return Memory__GET(L,5);
 	}
 
-	extern "C" int Memory__GetClassName(lua_State* L)
+	extern "C" int Memory__GetRTTI(lua_State* L)
 	{
 		return Memory__GET(L,4);
 	}
@@ -989,6 +1058,8 @@ namespace DebugLogV2{
 		return 1;
 	}
 
+
+
 	extern "C" Memory_GetDWORD(lua_State* L){
 
 		int args = lua_gettop(L);
@@ -1189,8 +1260,95 @@ namespace DebugLogV2{
 		return 0;
 	}
 
+	unsigned int MEM_GetNumber(lua_State* L, int arg) {
+		unsigned int return_value = 0;
+
+		if (lua_isnumber(L, arg)) {
+			return_value = (unsigned int)lua_tonumber(L, arg); // C
+		} else if (lua_isuserdata(L, arg)) {
+			return_value = (unsigned int)(size_t)lua_touserdata(L, arg); // Cast to unsigned int
+		} else if (lua_isstring(L, arg)) {
+			const char* str = lua_tostring(L, arg);
+			char* endptr;
+			return_value = strtoul(str, &endptr, 16); // Base 16 for hex
+			if (*endptr != '\0' && *endptr != ' ') { 
+				luaL_error(L, "Invalid hex string: '%s'", str);
+				return 0; 
+			}
+			if (errno == ERANGE)
+			{
+				luaL_error(L,"Hex string '%s' is out of unsigned integer range.",str);
+				return return_value; //Will not reach here
+			}
+		} else {
+			// Handle invalid argument type
+			luaL_error(L, "Argument %d must be a number, userdata, or hex string.", arg);
+			return return_value;
+		}
+
+		return return_value;
+	}
+
+
+	//just shell
+	HOOKV3EX(0,void*,LuaHookReturnVoid,(void*,void*,void*,void*,void*,void*,void*,double,double,double,double,double,double,double,double,double),(r3,r4,r5,r6,r7,r8,r9,fp1,fp2,fp3,fp4,fp5,fp6,fp7,fp8,fp9),void* r3,void* r4,void* r5,void* r6,void* r7,void* r8,void* r9,double fp1,double fp2,double fp3,double fp4,double fp5,double fp6,double fp7,double fp8,double fp9){
+		return (void*)(0);
+	}
+
+
+	struct HOOK_OBJECT{
+		int func_ref;
+		void* addres_to;
+		HookNew* ref_hook;
+	};
+
+
+	extern "C" int Memory_HOOK_OBJECT_NEW(lua_State* L,void* addres_to,int func_arg,HookNew* ref_hgook)
+	{
+		HOOK_OBJECT* hook = (HOOK_OBJECT*)lua_newuserdata06(L,4);
+		luaL_getmetatable06(L, "HOOKCMeta");
+		lua_setmetatable06(L,-2);
+
+		hook->func_ref = func_arg;
+		hook->addres_to = addres_to;
+		hook->ref_hook = ref_hgook;
+
+
+		return 1;
+	}
+
+
+	extern "C" Memory_HOOK_OBJECT_GC(lua_State* L)
+	{
+		
+		HOOK_OBJECT* data = (HOOK_OBJECT*)lua_touserdata06(L,1);
+		std::vector<HookNew*>* vec =  &(*HookNew::SaveBuffer)[data->addres_to];
+		std::vector<HookNew*>::iterator it = std::find(vec->begin(),vec->end(),data->ref_hook);
+		(*HookNew::SaveBuffer)[data->addres_to].erase(it);
+	
+		return 0;
+	}
+
+	extern "C" Memory_HOOK(lua_State* L)
+	{
+
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		void* addr_to =  (void*)lua_touserdata(L,-1);
+		int run_pos = lua_tonumber(L,2);
+		bool block = lua_toboolean(L,3);
+		
+
+		lua_pushvalue06(L,4);
+		int lua_func = luaL_ref06(L,LUA_REGISTRYINDEX);
+
+
+		HookNew* hook =  HookNew::CreateHook((void*)LuaHookReturnVoid,(void*)LuaHookReturnVoidMAP,addr_to,1,lua_func,L,run_pos,block,11);
+		Memory_HOOK_OBJECT_NEW(L,addr_to,lua_func,hook); 
 
 
 
+		return 1;
+	}
 
 }

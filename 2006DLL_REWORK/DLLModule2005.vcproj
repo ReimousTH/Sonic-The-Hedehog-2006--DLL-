@@ -304,7 +304,6 @@
 			/>
 			<Tool
 				Name="VCCLX360CompilerTool"
-				AdditionalOptions=""
 				Optimization="3"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -598,6 +597,14 @@
 				<File
 					RelativePath=".\Patch\LuaExtension\LuaExtension_Memory.h"
 					>
+					<FileConfiguration
+						Name="Release|Xbox 360"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine=""
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\Patch\LuaExtension\LuaExtension_OpenState.cpp"
