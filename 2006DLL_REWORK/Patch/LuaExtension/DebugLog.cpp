@@ -59,6 +59,7 @@ namespace DebugLogV2{
 
 
 		VectorRLIB_GlobalInstall(LS);
+		XMMATRIX_GlobalInstall(LS);
 		MainDisplayTask_GlobalInstall(LS);
 		GameImp_GlobalInstall(LS);
 		MessageReceiver_GlobalInstall(LS);

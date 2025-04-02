@@ -308,7 +308,7 @@
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="2"
-				AdditionalIncludeDirectories="..\;..\2006DLL_REWORK;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Lua\src&quot;;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Marathon&quot;;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Boost&quot;;..\ATG_LIB"
+				AdditionalIncludeDirectories="..\;..\2006DLL_REWORK;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Lua\src&quot;;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Marathon&quot;;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Boost&quot;;..\ATG_LIB;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\&quot;"
 				PreprocessorDefinitions="_RELEASE;_XBOX;XBOX;_XENON;_WIN32;BOOST_DISABLE_THREADS"
 				StringPooling="true"
 				ExceptionHandling="1"
@@ -339,8 +339,8 @@
 				AdditionalLibraryDirectories="&quot;..\Havok\lib\win32_net_9-0\release_multithreaded&quot;"
 				ModuleDefinitionFile="DllModule.def"
 				GenerateDebugInformation="true"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
+				OptimizeReferences="1"
+				EnableCOMDATFolding="1"
 				SetChecksum="true"
 			/>
 			<Tool
@@ -348,7 +348,7 @@
 			/>
 			<Tool
 				Name="VCX360ImageTool"
-				OutputFileName="$(OutDir)\Test.xex"
+				OutputFileName="$(OutDir)\Core.xex"
 				ProjectDefaults=""
 				AdditionalSections=""
 			/>
@@ -652,6 +652,14 @@
 				</File>
 				<File
 					RelativePath=".\Patch\LuaExtension\LuaExtension_Vector.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_XMMATRIX.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_XMMATRIX.h"
 					>
 				</File>
 				<File

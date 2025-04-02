@@ -19,15 +19,17 @@
 
 
 #include <Sox/ResourceManager.h>
-#include <Sox/ExFileSystem.h>
+#include <Sox/FileSystemXenon.h>
 #include <System/Singleton.h>
 #include <System/CreateStatic.h>
 #include <Player/IPostureControl.h>
+#include <Sox/FileLoaderARC.h>
 
 
 #include <Heap.h>
 #include <SpanverseHeap.h>
 #include <Player/IPostureControl.h>
+#include <boost/function.hpp>
 
 struct FPair{
 	const char* Name;
@@ -150,7 +152,7 @@ void __fastcall sub_82200538(Sonicteam::Player::IPostureControl* _this, double a
 		);
 
 
-	//_this->RootFrame.get()->FrameSetTransformMatrix2(transformationMatrix);
+	_this->RootFrame.get()->FrameSetTransformMatrix2(transformationMatrix);
 
 
 	
@@ -269,6 +271,43 @@ HOOKV3(0x821F1E30,void*,PostureCommon,(Sonicteam::Player::IPostureControl*,doubl
 
 
 
+HOOKV3(0x82582648,REF_TYPE(Sonicteam::SoX::IResource),sub_82582380,(REF_TYPE(Sonicteam::SoX::IResource)&,Sonicteam::SoX::IResourceMgr*,std::string&,char*,int,int),
+	   (ret,mgr,str,out,flag1,flag2),
+	   REF_TYPE(Sonicteam::SoX::IResource)& ret,Sonicteam::SoX::IResourceMgr* mgr, std::string& str,char* out,int flag1,int flag2){
+		   
+		   if (*(int*)0x82D3B264 = 0){
+				*(int*)0x82D3B264 = BranchTo(0x82581F00,int);
+		   }
+
+		   Sonicteam::SoX::ResourceManager* rmgr =  &SSINGLETON(Sonicteam::SoX::ResourceManager)::getInstance();
+
+		   //create
+		   if (mgr->MgrType == 0 && rmgr->ManagerResouceMgr.size() == 0){
+			   Sonicteam::SoX::HoldMGR holdmgr;
+			   holdmgr.Unk0 = 0;
+			   holdmgr.Unk4 = 0;
+			   holdmgr.Mgr = mgr;
+			   holdmgr.Flag01 = 1;
+			   holdmgr.Flag02 = 0;
+			   rmgr->ManagerResouceMgr[rmgr->ManagerResouceMgr.size()] = holdmgr;
+
+		   }
+		   else if ( rmgr->ManagerResouceMgr.find(mgr->MgrType) == rmgr->ManagerResouceMgr.end()){
+			   Sonicteam::SoX::HoldMGR holdmgr;
+			   holdmgr.Unk0 = 0;
+			   holdmgr.Unk4 = 0;
+			   holdmgr.Mgr = mgr;
+			   holdmgr.Flag01 = 1;
+			   holdmgr.Flag02 = 0;
+			   rmgr->ManagerResouceMgr[rmgr->ManagerResouceMgr.size()] = holdmgr;
+		   }
+
+
+
+
+
+	   return ret;
+}
 
 
 void STH2006DLLMain()
@@ -310,25 +349,65 @@ void STH2006DLLMain()
 
 
 
-
-	SSINGLETON(Sonicteam::SoX::ResourceManager)::getInstance((void*)0x82D3B224); //ResourceManager
-	SSINGLETON(Sonicteam::SoX::PerformanceFrequency)::getInstance((void*)0x82D3B209);
-	SSINGLETON(Sonicteam::SoX::ExFileSystem)::getInstance((void*)0x82D37088); 
-	SSINGLETON(Sonicteam::SpanverseHeap)::getInstance((void*)0x82D3C620); 
-
-
-
-	BranchTo(0x825383D8,int); //INIT HEAP Early
-	HookNew::SaveBuffer = new std::map<void*, std::vector<HookNew*>>();
 	HookNew::IsEmulated();
 	HookV2::IsNotEmulatedHardWare =  HookV2::CheckIsNotEmulatedHardWare();
 
 
+	/*
+	WRITE_DWORD(0x82537B04,0x60000000);
+	WRITE_DWORD(0x82537B0C,0x60000000);
+	WRITE_DWORD(0x82537B10,0x60000000);
+	WRITE_DWORD(0x82537B18,0x60000000);
+	WRITE_DWORD(0x82537B1C,0x60000000);
+	WRITE_DWORD(0x82537B30,0x60000000);
+	WRITE_DWORD(0x82537B34,0x60000000);
+	WRITE_DWORD(0x82537B3C,0x60000000);
+	WRITE_DWORD(0x82537B28,0x60000000);
+	*/
+	
+
+	//_onexitend   _onexitbegin
+	*(unsigned int*)0x82D5E890 = 0xFFFFFFFF;
+	*(unsigned int*)0x82D5E894 = 0xFFFFFFFF;
+	BranchTo(0x825383D8,int); //INIT HEAP Early  XapiInitProcess
+	int rout = BranchTo(0x82538230 ,int,1); //XapiCallThreadNotifyRoutines
+	int XapiPAL50Incompatible = BranchTo(0x82537910,int,rout); //XapiPAL50Incompatible
+	BranchTo(0x826E2B38,int); // _mtinit
+	BranchTo(0x825381B8,int); // _rtinit
+	BranchTo(0x825380D8,int,1); // _cinit
 
 
-	WRITE_DWORD(0x82009050,sub_82200538);
+
+
+	//Declare :} Force easy use in-game singleton from DLL (next just SSINGLETON_INSTANCE pretty easy :))
+
+
+	
+
+
+	//Sonicteam::SoX::FileLoaderARC* ARC = &Sonicteam::SoX::FileLoaderARC::getInstance();
+	//boost::function<void*(void)> test;
+
+	//ARC->LoadFile(std::string("asdg"),test);
+	SSINGLETON(Sonicteam::SoX::FileLoaderARC)::getInstance((void**)0x82D3C184,(void*)0x8262A3E8); //FileLoaderARC
+	SSINGLETON(Sonicteam::SoX::ArcHandleMgr)::getInstance((void**)0x82D36710,(void*)0x82163D20); //
+	SSINGLETON(Sonicteam::SoX::ResourceManager)::getInstance((void**)0x82D3B264,(void*)0x82581F00); //ResourceManager
+	SSINGLETON(Sonicteam::SoX::PerformanceFrequency)::getInstance((void*)0x82D3B209);
+	SSINGLETON(Sonicteam::SoX::FileSystemXenon)::getInstance((void*)0x82D37088); 
+	SSINGLETON(Sonicteam::SpanverseHeap)::getInstance((void*)0x82D3C620); 
+	HookNew::SaveBuffer = new std::map<void*, std::vector<HookNew*>>();
+	
+
+
+
+
+	//WRITE_DWORD(0x82009050,sub_82200538);
+	
+
+
 	FileSystemNew::GlobalInstall();
 	FileSystemNew::AddArc("Resources.arc",2,0);
+
 	
 	
 	
@@ -338,8 +417,8 @@ void STH2006DLLMain()
 	//WRITE_DWORD(0x82050978,0x825E7B30);
 	//WRITE_DWORD(0x8205097C,0x825E7C10);
 
-	reticle::GlobalInstall();
-	INSTALL_HOOKV3EX(PostureCommon,-1,1,11);
+//	reticle::GlobalInstall();
+//	INSTALL_HOOKV3EX(PostureCommon,-1,1,11);
 
 
 
@@ -362,7 +441,7 @@ void STH2006DLLMain()
 
 	
 	if (HookNew::IsEmulated()){ //  because i cant show Messages To Xbox360 , why tho?
-		wlog << "DLL [" << __DATE__ << " ; " << __TIME__ << "]" << " Patch List ";
+		wlog << "<<Core.exe>> [" << __DATE__ << " ; " << __TIME__ << "]" << " Patch List ";
 		XOVERLAPPED overlap;
 		overlap.hEvent = CreateEvent(0,false,false,0);
 		PushXenonMessage(wlog.str().c_str(),log.str().c_str(),&overlap);

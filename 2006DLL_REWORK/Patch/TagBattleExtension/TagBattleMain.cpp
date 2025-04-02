@@ -996,13 +996,17 @@ extern "C" int RenderNeParticlePost_GetNumCHR(lua_State* L){
 void TagBattleMain::GlobalInstall()
 {
 
+
+
 	
 //	ExFileSystem::PushArc("DLL\\cache_3P.arc");
 //	ExFileSystem::PushArc_pkg("DLL\\scripts_4P.arc");
 //	ExFileSystem::PushArc("DLL\\sprites_4P.arc");
 //	ExFileSystem::PushArc("DLL\\sprite_online.arc");
 
-	
+	FileSystemNew::AddArc("Resources_cache_3P.arc",2,0);
+	FileSystemNew::AddArc("Resources_scripts_4P.arc",2,0);
+	FileSystemNew::AddArc("Resources_sprites_4P.arc",2,0);
 
 
 	
@@ -1021,6 +1025,6 @@ void TagBattleMain::GlobalInstall()
 //	impl->GamePropLibary->KingdomvalleyProp->str1 = "";
 
 	GlobalInstall_InBattle();
-	GlobalInstall_ONLINE();
+	//GlobalInstall_ONLINE();
 
 }

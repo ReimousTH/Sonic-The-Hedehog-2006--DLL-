@@ -30,6 +30,7 @@ extern "C" {
 #include "LuaExtension_OpenState.h"
 #include "LuaExtension_PlayerRework.h"
 #include "LuaExtension_Vector.h"
+#include "LuaExtension_XMMATRIX.h"
 #include "LuaExtension_StateIMashine.h"
 #include "LuaExtension_StateMachine2.h"
 #include "LuaExtension_LoadReAttachArc.h"

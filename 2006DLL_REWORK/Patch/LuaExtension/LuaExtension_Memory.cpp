@@ -75,12 +75,14 @@ namespace DebugLogV2{
 		lua_pushstring06(L, "GetPointer"); lua_pushcfunction06(L, Memory__GetPointer); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "GetDWORD"); lua_pushcfunction06(L, Memory__GetDWORD); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "GetVector"); lua_pushcfunction06(L, Memory__GetVector); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "GetMatrix"); lua_pushcfunction06(L, Memory__GetXMMATRIX); 	lua_settable06(L, -3);
 
 		lua_pushstring06(L, "SetDWORD"); lua_pushcfunction06(L, Memory__SetDWORD); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "SetFLOAT"); lua_pushcfunction06(L, Memory__SetFLOAT); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "SetBYTE"); lua_pushcfunction06(L, Memory__SetBYTE); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "SetPointer"); lua_pushcfunction06(L, Memory__SetPointer); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "SetVector"); lua_pushcfunction06(L, Memory__SetVector); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "SetMatrix"); lua_pushcfunction06(L, Memory__SetXMMATRIX); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "SetString"); lua_pushcfunction06(L, Memory__SetString); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "IsValidPTR"); lua_pushcfunction06(L, Memory__IsValidPTR); 	lua_settable06(L, -3);
 
@@ -511,6 +513,12 @@ namespace DebugLogV2{
 			case 6:
 				strcpy((char*)(ptr + move),string_param);
 				break;
+			case 7:
+				{
+					XMMATRIX* matrix = (XMMATRIX*)(ptr + move);
+					*matrix = XM_GetMatrix(L,arg_value_num);
+				}
+				break;
 			}
 
 	
@@ -550,6 +558,11 @@ namespace DebugLogV2{
 	extern "C" Memory__SetString(lua_State* L){
 		return Memory__SET(L,6);
 	}
+	extern "C" Memory__SetXMMATRIX(lua_State* L){
+		return Memory__SET(L,7);	
+	}
+
+
 
 
 
@@ -610,42 +623,60 @@ namespace DebugLogV2{
 			case 4:
 				{
 					
-					struct TypeDescriptor {
-						DWORD pVFTable;
-						DWORD spare;
-						char name[];      
-						const char* Name(){
-							return (const char*)(&name);
-						};
+				
+					struct RTTIClassHierarchyBase{
+						std::type_info* typeDesc;
+						size_t bcount;
+						DWORD moffset;
+						DWORD vftOffset;
+						DWORD vftwOffset;
+						DWORD attributes;
+					};
+					struct RTTIClassHierarchy{
+						DWORD signature;
+						DWORD attributes;
+						size_t acount;
+						RTTIClassHierarchyBase*** aclass;
 					};
 					struct RTTICompleteObjectLocator{
 						DWORD signature;
 						DWORD offset;
 						DWORD cdOffset;
 						std::type_info* typeDesc;
-						void* hierarchyDesc;
+						RTTIClassHierarchy* hierarchyDesc;
 					};
+					if (ptr != 0 & *(unsigned int*)(ptr) > 0x82000000){
+						int vft = *(unsigned int*)(ptr);
+						RTTICompleteObjectLocator * vft_rtti = *(RTTICompleteObjectLocator **)(vft -4);
+						const char* return_string = "NULL";
+						if (vft && vft_rtti) return_string = vft_rtti->typeDesc->name();
+						lua_getglobal06(L,"RTTI");
+						lua_pushlightuserdata(L,(void*)vft_rtti->signature);
+						lua_pushlightuserdata(L,(void*)vft_rtti->offset);
+						lua_pushlightuserdata(L,(void*)vft_rtti->cdOffset);
+						lua_pushstring06(L,vft_rtti->typeDesc->name());
+						RTTIClassHierarchyBase* t = (*vft_rtti->hierarchyDesc->aclass)[0];
+						
 
+						lua_pcall06(L,4,1,0);
+					}
+					else{
+						lua_getglobal06(L,"RTTI");
+						lua_pushlightuserdata(L,(void*)0);
+						lua_pushlightuserdata(L,(void*)0);
+						lua_pushlightuserdata(L,(void*)0);
+						lua_pushstring06(L,"NO VFT");
+						lua_pcall06(L,4,1,0);
+					}
 
-					int vft = *(unsigned int*)(ptr);
-					RTTICompleteObjectLocator * vft_rtti = *(RTTICompleteObjectLocator **)(vft -4);
-					const char* return_string = "NULL";
-					if (vft && vft_rtti) return_string = vft_rtti->typeDesc->name();
-
-
-
-					lua_getglobal06(L,"RTTI");
-					lua_pushlightuserdata(L,(void*)vft_rtti->signature);
-					lua_pushlightuserdata(L,(void*)vft_rtti->offset);
-					lua_pushlightuserdata(L,(void*)vft_rtti->cdOffset);
-					lua_pushstring06(L,vft_rtti->typeDesc->name());
-					lua_pcall06(L,4,1,0);
+			
 
 		
 				
 				}
 				break;
 			case 5:
+				{
 				lua_getglobal06(L,"Vector");
 				XMVECTOR* vec = (XMVECTOR*)(ptr + move);
 				lua_pushnumber(L,vec->x);
@@ -653,8 +684,13 @@ namespace DebugLogV2{
 				lua_pushnumber(L,vec->z);
 				lua_pushnumber(L,vec->w);
 				lua_pcall06(L,4,1,0);
+				}
 				break;
-
+			case 7:
+				{
+					XMMATRIX_CREATEMETATABLE(L,*(XMMATRIX*)(ptr + move));
+				}
+				break;
 			}
 	
 
@@ -689,6 +725,13 @@ namespace DebugLogV2{
 	{
 		return Memory__GET(L,5);
 	}
+
+
+	extern "C" int Memory__GetXMMATRIX(lua_State* L)
+	{
+		return Memory__GET(L,7);
+	}
+
 
 	extern "C" int Memory__GetRTTI(lua_State* L)
 	{
@@ -1325,6 +1368,10 @@ namespace DebugLogV2{
 		std::vector<HookNew*>* vec =  &(*HookNew::SaveBuffer)[data->addres_to];
 		std::vector<HookNew*>::iterator it = std::find(vec->begin(),vec->end(),data->ref_hook);
 		(*HookNew::SaveBuffer)[data->addres_to].erase(it);
+		
+
+		free(data->ref_hook);
+		lua_unref(L,data->func_ref);
 	
 		return 0;
 	}
@@ -1336,15 +1383,18 @@ namespace DebugLogV2{
 		lua_gettable(L,1);
 		void* addr_to =  (void*)lua_touserdata(L,-1);
 		int run_pos = lua_tonumber(L,2);
-		bool block = lua_toboolean(L,3);
+		int regi = lua_tonumber(L,3);
+		bool block = lua_toboolean(L,4);
 		
-
-		lua_pushvalue06(L,4);
+		
+		lua_pushvalue06(L,5);
 		int lua_func = luaL_ref06(L,LUA_REGISTRYINDEX);
 
-
-		HookNew* hook =  HookNew::CreateHook((void*)LuaHookReturnVoid,(void*)LuaHookReturnVoidMAP,addr_to,1,lua_func,L,run_pos,block,11);
+		HookNew* hook =  	HookNew::CreateHook(LuaHookReturnVoid,LuaHookReturnVoidMAP,addr_to,1,lua_func,L,run_pos,block,regi);
 		Memory_HOOK_OBJECT_NEW(L,addr_to,lua_func,hook); 
+
+
+	
 
 
 

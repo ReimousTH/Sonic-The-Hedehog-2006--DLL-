@@ -1075,7 +1075,7 @@ int __fastcall MainModeOnMessageRecieved(Sonicteam::SoX::MessageReceiver* _this,
 	a1 = a1 -0x20;
 	int extra_flag = *(int *)(a1 + 0x50) ;
 
-	switch ( msg->MessageID )
+	switch ( msg->GetValueAt<int>(0) )
 	{
 	case 0x1C001:
 		std::stringstream ss;
@@ -1097,10 +1097,10 @@ int __fastcall GameImpOnMessageRecieved(Sonicteam::SoX::MessageReceiver* _this,S
 	int extra_flag = *(int *)(a1 + 0x50) ;
 
 	std::stringstream ss;
-	ss << "[MainMode][MessageReceiver]" << msg->MessageID << "-" << (msg->GetValueAt<int>(0));
+	ss << "[MainMode][MessageReceiver]" << msg->GetValueAt<int>(0) << "-" << (msg->GetValueAt<int>(4));
 	DebugLogV2::PrintNextFixed(ss.str());
 
-	switch ( msg->MessageID )
+	switch ( msg->GetValueAt<int>(0) )
 	{
 	case 0x1C001:
 
@@ -1766,8 +1766,8 @@ int __fastcall ObjectEvents(int a1, Sonicteam::SoX::Message* msg){
     int result = BranchTo(0x82197598,int,a1,msg);
 
 
-	if (_socket.IsWorks() && (msg->GetValueAt<int>(0) - 0x20) == GetLocalPlayer()){
-		if (msg->MessageID == 0x13010 && result){
+	if (_socket.IsWorks() && (msg->GetValueAt<int>(4) - 0x20) == GetLocalPlayer()){
+		if (msg->GetValueAt<int>(0) == 0x13010 && result){
 	
 			
 		}
@@ -1782,11 +1782,11 @@ int __fastcall GameIMPMessageReciever(int a1, Sonicteam::SoX::Message* a2){
 
 
 
-	if (a2->MessageID != 122884 && a2->MessageID != 86089){
+	if (a2->GetValueAt<int>(0) != 122884 && a2->GetValueAt<int>(0) != 86089){
 
 		std::stringstream test; 
-		if (GameIMP_MESSAGES.find(a2->MessageID) == GameIMP_MESSAGES.end()){
-			test << "[GameImp][Message] " << std::hex << a2->MessageID;
+		if (GameIMP_MESSAGES.find(a2->GetValueAt<int>(0)) == GameIMP_MESSAGES.end()){
+			test << "[GameImp][Message] " << std::hex << a2->GetValueAt<int>(0);
 		//	DebugLogV2::log.push_back(test.str());
 		//	DebugLogV2::PrintNextFixed(test.str());
 		}
@@ -1805,23 +1805,23 @@ int __fastcall GameIMPMessageReciever(int a1, Sonicteam::SoX::Message* a2){
 
 	if (_socket.IsWorks() && (_socket.IsClient() || _socket.IsServer())){
 
-		if (a2->MessageID == 0x15009){
-			if ( BranchTo(0x82167CA0,int,a1,a2->GetValueAt<int>(0)) == 0){
+		if (a2->GetValueAt<int>(0) == 0x15009){
+			if ( BranchTo(0x82167CA0,int,a1,a2->GetValueAt<int>(4)) == 0){
 					SMDATA_PPL_CHANGE_RINGS _data3;
 					_data3.sender_xuid = _socket.GetXUID(0);
-					_data3.RingsCount =   a2->GetValueAt<int>(4);	
+					_data3.RingsCount =   a2->GetValueAt<int>(8);	
 					SocketMessage msg3  =  DEFINE_SOCKET_MESSAGE_FROM_CONST_DATA(_data3);
 					_socket.SendUDPMessageToSRCL(&msg3);
 					Players_DATA[_socket.GetXUID(0)].RingsCount = a2->GetValueAt<int>(4);	
 				}
 		}
 
-		if (a2->MessageID == 0x15016){
+		if (a2->GetValueAt<int>(0) == 0x15016){
 			//ShowXenonMessage(L"MSG","T");
 
 		}
 		//StartObjInfo
-		if (a2->MessageID == 0x1500A && *(int*)((int)a2 + 0x30) == 0){
+		if (a2->GetValueAt<int>(0) == 0x1500A && *(int*)((int)a2 + 0x30) == 0){
 
 			const char* plr_lua =  *(const char**)((int)a2 + 0x34);
 	//	ShowXenonMessage(L"MSG",plr_lua);

@@ -30,6 +30,8 @@ extern "C" {
 #include <Sox/Misc/LinkSoxNode.h>
 #include <Hook/HookNew.h>
 
+#include "LuaExtension_XMMATRIX.h"
+
 
 #define _DWORD DWORD
 #define _BYTE BYTE
@@ -71,12 +73,14 @@ namespace DebugLogV2 {
 	extern "C" Memory__SetPointer(lua_State* L);
 	extern "C" Memory__SetVector(lua_State* L);
 	extern "C" Memory__SetString(lua_State* L);
+	extern "C" int Memory__SetXMMATRIX(lua_State* L);
 
 	extern "C" int Memory__GetDWORD(lua_State* L);
 	extern "C" int Memory__GetFLOAT(lua_State* L);
 	extern "C" int Memory__GetBYTE(lua_State* L);
 	extern "C" int Memory__GetPointer(lua_State* L);
 	extern "C" int Memory__GetVector(lua_State* L);
+	extern "C" int Memory__GetXMMATRIX(lua_State* L);
 
 	extern "C" int Memory__GetPTR(lua_State* L);
 

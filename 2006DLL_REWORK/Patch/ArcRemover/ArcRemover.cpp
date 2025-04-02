@@ -1,5 +1,9 @@
 #include "ArcRemover.h"
 
+#include <vector>
+#include <string>
+#include <Sox/RefCountObject.h>
+#include <Sox/IResourceMgr.h>
 namespace ArcRemover{
 
 
@@ -119,14 +123,93 @@ namespace ArcRemover{
 		return res;
 	}
 
+	int __fastcall FileSystemIsExistsSpecificFiles(int self, std::vector<std::string>* out, std::string *InputString, std::string *FileEndFormat){
+
+		// Check if directory exists
+		DWORD dirAttributes = GetFileAttributesA(InputString->c_str());
+		if (dirAttributes == -1 || 
+			!(dirAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				return 0;  
+		}
+
+
+		std::string searchPath = *InputString;
+		searchPath += '\\';
+	
+		std::string extension = *FileEndFormat;
+
+		searchPath += "*." + extension;
+
+		WIN32_FIND_DATAA findData;
+		HANDLE hFind = FindFirstFileA(searchPath.c_str(), &findData);
+
+		if (hFind == INVALID_HANDLE_VALUE) {
+			return 0;  
+		}
+
+		do {
+			if (!(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
+				!(findData.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)) {
+					out->push_back(findData.cFileName);
+			}
+		} while (FindNextFileA(hFind, &findData));
+
+		FindClose(hFind);
+		return out->empty() ? 0 : 1;  
+	}
+
+	int __fastcall FileSystemIsFileExist(int self, std::string *InputFileName){
+
+		DWORD fileAttributes = GetFileAttributesA(InputFileName->c_str());
+		return (fileAttributes != -1 ) ? 1 : 0;
+	}
+
+
+	HOOKV3(0x82583528,void*,ArcHandle,(REF_TYPE(Sonicteam::SoX::RefCountObject)&),(a1),REF_TYPE(Sonicteam::SoX::RefCountObject)& a1){
+
+
+		Sonicteam::SoX::IResourceMgr* mgr = *(Sonicteam::SoX::IResourceMgr**)(0x82D36710);
+		if (!mgr){
+			*(Sonicteam::SoX::IResourceMgr**)(0x82D36710)= BranchTo(0x82163D20,Sonicteam::SoX::IResourceMgr*);
+			mgr = *(Sonicteam::SoX::IResourceMgr**)(0x82D36710);
+		}
+
+		*(DWORD*)&a1.param = 0;
+
+		/*
+		Sonicteam::SoX::IResourceMgrParam param =  Sonicteam::SoX::IResourceMgrParam(0,0);
+		Sonicteam::SoX::IResource* res=  mgr->GetMgrResource(param);
+		a1.param = res;
+		res->AddReference();
+		*/
+
+		return (void*)&a1;
+
+	};
+
 
 	void GlobalInstall()
 	{
 
+		INSTALL_HOOKV3EX(ArcHandle,-1,true,9);
+		
+		WRITE_DWORD(0x825EB2BC,0x60000000);
+		WRITE_DWORD(0x825834F4,0x60000000);
 
+
+		WRITE_DWORD(0x825834EC ,0x60000000);
+		WRITE_DWORD(0x825834EC ,0x60000000);
+
+
+		WRITE_DWORD(0x82048398,FileSystemIsExistsSpecificFiles);
+		WRITE_DWORD(0x8204839C,FileSystemIsFileExist);
+
+
+		WRITE_DWORD(0x82582C10,0x4E800020);
+		WRITE_DWORD(0x828B30EC,0x60000000);
 		WRITE_DWORD(0x828B30FC,0x48000010);
 		INSTALL_HOOK(sub_82582648);
-		WRITE_DWORD(0x8204839C,sub_825BE438);
+
 
 
 	}

@@ -3,7 +3,7 @@
 #include "TagBattleMain_InBattle.h"
 #include "Online/TagBattleOnline.h"
 
-
+#include <Patch/FileSystemNew/FileSystemNew.h>
 
 #include <Patch/LuaExtension/MessagesUtil.h>
 #include <string>

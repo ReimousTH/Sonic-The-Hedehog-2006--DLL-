@@ -52,20 +52,10 @@ namespace CompleteGauge{
 			Sonicteam::Prop::Scene* mgr =  gameimp->GameProp[0].get();
 
 			std::string Viser;
+
 		
 
 	
-			std::map<quick>* _map_ = (std::map<quick>*)&(Sonicteam::SoX::ResourceManager::MarathonInstance->ResourceRegistryHandle);
-
-			for (std::map<quick>::iterator it =_map_->begin(); it != _map_->end(); ++it) {
-
-				for (std::map<std::string, void*>::iterator jt =it->second.begin(); jt != it->second.end(); ++jt) {
-
-					std::stringstream str;   str << std::hex << it->first  << " : "  << std::hex << jt->first << " : " << std::hex  << &jt->second;
-					Viser.append(str.str());
-					Viser.append("\n");
-				}	
-			}
 			PushXenonMessage(L"Test",Viser.c_str());
 			
 		}

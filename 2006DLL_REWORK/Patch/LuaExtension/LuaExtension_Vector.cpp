@@ -26,14 +26,27 @@ namespace DebugLogV2{
 			elseif key == "w" then return t[4]
 			else return rawget(t, key)
 				end
+				end,
+				__newindex = function(t, key, value)
+				if key == "x" then
+					rawset(t, 1, value)
+					elseif key == "y" then
+					rawset(t, 2, value)
+					elseif key == "z" then
+					rawset(t, 3, value)
+					elseif key == "w" then
+					rawset(t, 4, value)
+				else
+				rawset(t, key, value)
+				end
 				end
 	}
 	function Vector(x, y, z, w)
 		local self = setmetatable({}, VectorMeta)
-		self[1] = x
-		self[2] = y
-		self[3] = z
-		self[4] = w
+		self[1] = x or 0
+		self[2] = y or 0
+		self[3] = z or 0
+		self[4] = w or 0
 		return self
 		end
 
@@ -61,7 +74,7 @@ namespace DebugLogV2{
 		return string.format("X:%.2f ,Y:%.2f, Z:%.2f, W:%.2f", self[1], self[2], self[3], self[4])
 		end
 
-		);
+	);
 
 	int VectorRLIB_GlobalInstall(lua_State* L)
 	{

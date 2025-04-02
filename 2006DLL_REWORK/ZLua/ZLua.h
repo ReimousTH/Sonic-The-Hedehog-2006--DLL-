@@ -8,7 +8,7 @@ extern "C" {
 #include "lauxlib.h"
 }
 
-
+#include <Hook/HookNew.h>
 #include <Core/Debug.h>
 #include <Hook/HookBase.h>
 #include <xtl.h>
@@ -16,6 +16,8 @@ extern "C" {
 #include <sstream>
 #include <algorithm>
 #include <string>   
+
+#include <Patch/LuaExtension/DebugLog.h>
 
 
 class ZLua

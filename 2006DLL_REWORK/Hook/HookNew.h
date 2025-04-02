@@ -73,8 +73,8 @@
 // SPR - Special purpose register.
 // UIMM/SIMM - Unsigned/signed immediate.
 //
-#define POWERPC_ADDI(rD, rA, SIMM)  (UINT32)( POWERPC_OPCODE_ADDI | ( rD << POWERPC_BIT32( 10 ) ) | ( rA << POWERPC_BIT32( 15 ) ) | SIMM )
-#define POWERPC_ADDIS(rD, rA, SIMM) (UINT32)( POWERPC_OPCODE_ADDIS | ( rD << POWERPC_BIT32( 10 ) ) | ( rA << POWERPC_BIT32( 15 ) ) | SIMM )
+#define POWERPC_ADDI(rD, rA, SIMM)  (UINT32)( POWERPC_OPCODE_ADDI | ( rD << POWERPC_BIT32( 10 ) ) | ( rA << POWERPC_BIT32( 15 ) ) | SIMM & 0xFFFF )
+#define POWERPC_ADDIS(rD, rA, SIMM) (UINT32)( POWERPC_OPCODE_ADDIS | ( rD << POWERPC_BIT32( 10 ) ) | ( rA << POWERPC_BIT32( 15 ) ) | SIMM &0xFFFF )
 #define POWERPC_LIS(rD, SIMM)       POWERPC_ADDIS( rD, 0, SIMM ) // Mnemonic for addis %rD, 0, SIMM
 #define POWERPC_LWZ(rS, DS, rA)      (UINT32)( POWERPC_OPCODE_LWZ | ( rS << POWERPC_BIT32( 10 ) ) | ( rA << POWERPC_BIT32( 15 ) ) | ( (INT16)DS & 0xFFFF ) )
 
@@ -125,6 +125,7 @@ extern "C" {
 class HookNew {
 public:
 	static std::map<void*, std::vector<HookNew*>>* SaveBuffer; 
+	static std::map<void*, std::vector<HookNew*>>* SaveBufferVFT; 
 	static int SavedBufferSIZE;
 
 	lua_State* L;
@@ -138,6 +139,9 @@ public:
 
 	// Function to create a hook
 	static HookNew* CreateHook(void* Target, void* TargetMap, void* Original,char fp13,int fp13_number,lua_State* fp13_state,char RunPosition,bool block,int register_choose);
+	
+	static HookNew CreateVFTHook(void* TargetFunc);;
+	
 	static void memcpy(void * _Dst,const void * _Src,size_t _Size);
 	static bool IsEmulated();
 	static bool UseEmulatedAddress;
@@ -171,77 +175,62 @@ extern "C" void CallLuaFunc();
 #define HOOKV3EXMAP_SHELL(addressTo, return_type, HookFuncName, call_args,args_name,lua_arg_call,...)
 
 
+#define HOOKV3EXMAP_LUA \
+	__asm{mr r3,r3x};\
+	__asm{mr r4,r4x};\
+	__asm{mr r5,r5x};\
+	__asm{mr r6,r6x};\
+	__asm{mr r7,r7x};\
+	__asm{mr r8,r8x};\
+	__asm{mr r9,r9x};\
+	__asm{mr r10,r10x};\
+	__asm{fmr fp1,fp1x};\
+	__asm{fmr fp2,fp2x};\
+	__asm{bl CallLuaFunc};\
 
 #define HOOKV3EXMAP(addressTo, return_type, HookFuncName, call_args,args_name,...) \
 	return_type HookFuncName##MAP(__VA_ARGS__) { \
-		\
-		DWORD r3x,r4x,r5x,r6x,r7x,r8x,r9x,r10x;\
-		float fp1x,fp2x,fp3x,fp4x,fp5x,fp6x,fp7x,fp8x,fp9x;\
-		__asm{mr r3x,r3};\
-		__asm{mr r4x,r4};\
-		__asm{mr r5x,r5};\
-		__asm{mr r6x,r6};\
-		__asm{mr r7x,r7};\
-		__asm{mr r8x,r8};\
-		__asm{mr r9x,r9};\
-		__asm{mr r10x,r10};\
-		__asm{fmr fp1x,fp1};\
-		__asm{fmr fp2x,fp2};\
-		__asm{fmr fp3x,fp3};\
-		__asm{fmr fp4x,fp4};\
-		__asm{fmr fp5x,fp5};\
-		__asm{fmr fp6x,fp6};\
-		__asm{fmr fp7x,fp7};\
-		__asm{fmr fp8x,fp8};\
-		__asm{fmr fp9x,fp9};\
 		void* addressTo2 = (void*)addressTo;\
-		if ( (void*)addressTo == (void*)0 ){\
-			float f1 = 0.0f;\
-			__asm{fmr f1,fp13};\
-			addressTo2= (void*)*(DWORD*)&f1;\
-		}\
 		return_type return_value = (return_type)0; \
 		if (HookNew::SaveBuffer && HookNew::SaveBuffer->find((void*)addressTo2) != HookNew::SaveBuffer->end()){\
 		\
-		bool block = false; \
-		for (std::vector<HookNew*>::iterator it =(*HookNew::SaveBuffer)[(void*)addressTo2].begin() ; it != (*HookNew::SaveBuffer)[(void*)addressTo2].end(); ++it) { \
-		if ((*it)->RunPosition == -1){\
-			block |= (*it)->Block;\
-			if ((*it)->lua_function != 0)\
-			{\
-				void* t = (*it);\
-				float addrfloat = *(float*)&t; \
-				__asm{fmr fp13,addrfloat};\
-				__asm{mr r3,r3x};\
-				__asm{mr r4,r4x};\
-				__asm{mr r5,r5x};\
-				__asm{mr r6,r6x};\
-				__asm{mr r7,r7x};\
-				__asm{mr r8,r8x};\
-				__asm{mr r9,r9x};\
-				__asm{mr r10,r10x};\
-				__asm{bl CallLuaFunc};\
+			bool block = false; \
+			for (std::vector<HookNew*>::iterator it =(*HookNew::SaveBuffer)[(void*)addressTo2].begin() ; it != (*HookNew::SaveBuffer)[(void*)addressTo2].end(); ++it) { \
+			if ((*it)->RunPosition == -1){\
+				block |= (*it)->Block;\
+				if ((*it)->lua_function != 0 && (*it)->L != 0)\
+				{\
+				}\
+				else{\
+					void* tar = (*it)->TargetFunc; \
+					return_value = ((return_type (__fastcall *)call_args)tar)args_name; \
+				}\
 			}\
-			else{\
-				void* tar = (*it)->TargetFunc; \
-				return_value = ((return_type (__fastcall *)call_args)tar)args_name; \
 			}\
-		}\
-		}\
-		void* jump_to = (*HookNew::SaveBuffer)[(void*)addressTo2][0]->OriginalFunc; \
-		if (!block)  return_value =  ((return_type (__fastcall *)call_args)(jump_to))args_name; \
-		\
-		for (std::vector<HookNew*>::iterator it =(*HookNew::SaveBuffer)[(void*)addressTo2].begin() ; it != (*HookNew::SaveBuffer)[(void*)addressTo2].end(); ++it) { \
-		if ((*it)->RunPosition == 1){\
-		void* tar = (*it)->TargetFunc; \
-		return_value = ((return_type (__fastcall *)call_args)tar)args_name; \
-		}\
-		}\
-		return return_value; \
-		\
+			void* jump_to = (*HookNew::SaveBuffer)[(void*)addressTo2][0]->OriginalFunc; \
+			if (!block && jump_to )  return_value =  ((return_type (__fastcall *)call_args)(jump_to))args_name; \
+			\
+			for (std::vector<HookNew*>::iterator it =(*HookNew::SaveBuffer)[(void*)addressTo2].begin() ; it != (*HookNew::SaveBuffer)[(void*)addressTo2].end(); ++it) { \
+			if ((*it)->RunPosition == 1){\
+				if ((*it)->lua_function != 0 && (*it)->L != 0)\
+				{\
+				}\
+				else{\
+					void* tar = (*it)->TargetFunc; \
+					return_value = ((return_type (__fastcall *)call_args)tar)args_name; \
+				}\
+			}\
+			}\
+			return return_value; \
+				\
 		}\
 		return return_value ;\
 	}\
+
+
+
+
+
 
 
 #define HOOKV3EX(addressTo, return_type, HookFuncName, call_args,args_name,...) \
