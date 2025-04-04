@@ -651,10 +651,7 @@ int __fastcall MainMenuTask_UI(Sonicteam::MainMenuTask *a1,float delta){
 					}
 					plr->CurrentController = a1->GetCurrentDoc()->GetRealControllerID(i);
 			
-			
-
-
-
+	
 
 					BranchTo(0x824FD460,int,a1,"main_deside");
 				}

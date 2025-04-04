@@ -7,6 +7,8 @@
 #include <System/Singleton.h>
 #include <System/CreateStatic.h>
 
+#include <Sox/FileSystemARC.h>
+
 namespace DebugLogV2{
 
 
@@ -159,6 +161,46 @@ namespace DebugLogV2{
 		*/
 		return 1;
 	}
+
+	extern "C" GetDirectoryARC(lua_State* L){
+
+		Sonicteam::SoX::FileSystemArc* arc =  &Sonicteam::SoX::FileSystemArc::getInstance();
+		int count = lua_gettop(L);
+		const char* arg1 = lua_tostring(L,1); //path
+		const char* arg2 = lua_tostring(L,2); //ext
+		std::vector<std::string> out;
+
+		arc->FSDirectoryGetFiles(out,std::string(arg1),std::string(arg2));
+		lua_newtable06(L);
+
+		size_t count2 = 1;
+		for (std::vector<std::string>::iterator it = out.begin();it!=out.end();it++){
+
+			lua_pushstring06(L,it->c_str());
+			lua_rawseti06(L,-2,count2++);
+		}
+		out.clear();
+		return 1;
+	}
+
+	extern "C" GetPathARC(lua_State* L){
+
+
+		Sonicteam::SoX::FileSystemArc* arc =  &Sonicteam::SoX::FileSystemArc::getInstance();
+		const char* arg1 = lua_tostring(L,1); //path
+		size_t index2 = lua_tonumber(L,2); //ext
+		lua_pushstring06(L,arc->FSGetPath(std::string(arg1),index2).c_str());
+		return 1;
+	}
+
+	extern "C" PathExistARC(lua_State* L){
+
+
+		Sonicteam::SoX::FileSystemArc* arc =  &Sonicteam::SoX::FileSystemArc::getInstance();
+		const char* arg1 = lua_tostring(L,1); //path
+		lua_pushboolean(L,arc->FSPathExist(std::string(arg1)));
+		return 1;
+	}
 	
 	void GlobalInstall__LoadReAttachArc(lua_State* L)
 	{
@@ -171,6 +213,12 @@ namespace DebugLogV2{
 		lua_register06(L,"UnloadArc",UnloadArc); 
 		lua_register06(L,"AttachArc",AttachArc);
 		lua_register06(L,"DetachArc",DetachArc);
+
+
+		lua_register06(L,"GetDirectoryARC",GetDirectoryARC);
+		lua_register06(L,"GetPathARC",GetPathARC);
+		lua_register06(L,"PathExistARC",PathExistARC);
+
 
 
 		lua_register06(L,"LoadResource",LoadResource);

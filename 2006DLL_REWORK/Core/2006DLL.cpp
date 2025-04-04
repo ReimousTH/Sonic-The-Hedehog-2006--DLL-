@@ -24,7 +24,7 @@
 #include <System/CreateStatic.h>
 #include <Player/IPostureControl.h>
 #include <Sox/FileLoaderARC.h>
-
+#include <Sox/FileSystemARC.h>
 
 #include <Heap.h>
 #include <SpanverseHeap.h>
@@ -389,6 +389,8 @@ void STH2006DLLMain()
 	//boost::function<void*(void)> test;
 
 	//ARC->LoadFile(std::string("asdg"),test);
+
+	SSINGLETON(Sonicteam::SoX::FileSystemArc)::getInstance((void**)0X82D3B284,(void*)0x825828F8);
 	SSINGLETON(Sonicteam::SoX::FileLoaderARC)::getInstance((void**)0x82D3C184,(void*)0x8262A3E8); //FileLoaderARC
 	SSINGLETON(Sonicteam::SoX::ArcHandleMgr)::getInstance((void**)0x82D36710,(void*)0x82163D20); //
 	SSINGLETON(Sonicteam::SoX::ResourceManager)::getInstance((void**)0x82D3B264,(void*)0x82581F00); //ResourceManager
@@ -407,8 +409,6 @@ void STH2006DLLMain()
 
 	FileSystemNew::GlobalInstall();
 	FileSystemNew::AddArc("Resources.arc",2,0);
-
-	
 	
 	
 	

@@ -6,11 +6,26 @@
 #include <set>
 #include "AtgInput.h"
 
+#include <GameImp.h>
 
 using namespace TagBattleMain;
 
 int GetPPL(){
-	return GoalActors.size();
+
+	Sonicteam::DocMarathonImp* impl = 	*(Sonicteam::DocMarathonImp**)(*(UINT32*)0x82D3B348 + 0x180);
+	Sonicteam::GameImp* gameimp = *(Sonicteam::GameImp**)(impl->DocCurrentMode + 0x6C);
+
+
+	int maxp = *(int*)(impl->DocGetGameRuleContext() + 0xC);
+	int cmaxp = 0;
+
+
+	for (int i = 0;i<maxp &&  gameimp->PlayerGameplayerData[i].ActorID != -1;i++){
+		if (std::find(GoalActors.begin(), GoalActors.end(), gameimp->PlayerGameplayerData[i].ActorID) != GoalActors.end()) {
+			cmaxp++;
+		}
+	}
+	return cmaxp; //real players count 
 }
 int IncrementPlayer(int ActorID){
 
@@ -86,10 +101,8 @@ int __fastcall GoalRing_TriggerTouch(int a1, double a2){
 					Mashine->ChangeMashineState(0x16);
 				}
 
-
 				if (IncrementPlayer(*i) >= ppls){
 				
-	
 					goto NORMAL;
 				}
 
