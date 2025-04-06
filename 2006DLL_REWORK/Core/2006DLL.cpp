@@ -394,7 +394,10 @@ void STH2006DLLMain()
 	SSINGLETON(Sonicteam::SoX::FileLoaderARC)::getInstance((void**)0x82D3C184,(void*)0x8262A3E8); //FileLoaderARC
 	SSINGLETON(Sonicteam::SoX::ArcHandleMgr)::getInstance((void**)0x82D36710,(void*)0x82163D20); //
 	SSINGLETON(Sonicteam::SoX::ResourceManager)::getInstance((void**)0x82D3B264,(void*)0x82581F00); //ResourceManager
-	SSINGLETON(Sonicteam::SoX::PerformanceFrequency)::getInstance((void*)0x82D3B209);
+
+
+	SSINGLETON(Sonicteam::SoX::PerformanceFrequency)::getInstance((void**)0x82D3B210,(void*)0x82581C88);
+
 	SSINGLETON(Sonicteam::SoX::FileSystemXenon)::getInstance((void*)0x82D37088); 
 	SSINGLETON(Sonicteam::SpanverseHeap)::getInstance((void*)0x82D3C620); 
 	HookNew::SaveBuffer = new std::map<void*, std::vector<HookNew*>>();
