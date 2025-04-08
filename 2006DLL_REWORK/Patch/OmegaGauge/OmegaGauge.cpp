@@ -139,17 +139,7 @@ namespace OmegaGauge{
 				if (_this->CSDObject.get()->FCProject){
 
 
-					for (std::map<const char*,Chao::CSD::RCObject<Chao::CSD::CScene>*,STD_MAP_CONST_CHAR_PTR_COMPARATOR>::iterator it = _this->CSDObject.get()->FCProject->CProjectScene.begin();it != _this->CSDObject.get()->FCProject->CProjectScene.end();it++){
-
-						if (it->second && it->second->get()){
-							int v = (int)it->second->get();
-							if (*(int*)v == 0x82037090){
-								*(float*)(v + 0x84) = 75.0;
-							}
-
-
-						}
-					}
+				
 
 				}
 	

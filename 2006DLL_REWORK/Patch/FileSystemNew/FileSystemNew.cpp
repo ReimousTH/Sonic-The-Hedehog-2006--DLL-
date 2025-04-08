@@ -23,6 +23,9 @@
 #define MOD_DIR "game:\\mods\\"
 
 
+#include <AtgInput.h>
+#include <GameImp.h>
+
 
 
 //Custom Task, accurrate to 06
@@ -50,6 +53,51 @@ public:
 	virtual void OnTaskUpdate(float)
 	{
 
+		ATG::GAMEPAD* input = ATG::Input::GetMergedInput(0);
+
+
+		Sonicteam::DocMarathonImp* impl = 	*(Sonicteam::DocMarathonImp**)(*(UINT32*)0x82D3B348 + 0x180);
+		Sonicteam::GameImp* gameimp = *(Sonicteam::GameImp** )(impl->DocCurrentMode + 0x6C);
+		if (gameimp){
+
+
+			if ((input->wLastButtons & XINPUT_GAMEPAD_Y) != 0){
+			//	PushXenonMessage(L"MSG","YES");
+				size_t task =  (size_t)(gameimp->GamePlayerDisplayTask[0].ThisObject);
+				size_t hud_main = *(size_t*)(task + 0x4C);
+				Sonicteam::CsdObject* csd = *(Sonicteam::CsdObject**)(hud_main + 0x54);
+				Chao::CSD::CProject* cproj =  csd->FCProject;
+				const char* name =  cproj->CProjectScene.begin()->first;
+				Chao::CSD::CScene* scene  =  (cproj->CProjectScene.begin()->second.get()->get());
+				size_t index =  scene->CObjectRaw->GetMotionIndexFromName("DefaultAnim");
+
+			//	PushXenonMessage(L"MSG",(size_t)scene->CObjectRaw);
+			//	PushXenonMessage(L"MSG",(size_t)scene->CObjectRaw->_Motion.count);
+			//	PushXenonMessage(L"MSG",(const char*)scene->CObjectRaw->_Motion.NameTable.values[0].first.get());
+
+
+				/*
+				for (int i = 0;i<static_cast<size_t>(scene->CObjectRaw->_Motion.count);i++){
+
+					Chao::IndexValueName* ivn =  &scene->CObjectRaw->_Motion.NameTable.values[i];
+					if (strcmp(ivn->first.get(),"DefaultAnim") == 0){
+						PushXenonMessage(L"MSG",ivn->first.get());
+						PushXenonMessage(L"MSG",ivn->second.get());
+					}
+				//	PushXenonMessage(L"MSG",ivn->first.get());
+				}
+				*/
+
+			
+
+	//			PushXenonMessage(L"MSG",name);
+	//			PushXenonMessage(L"MSG",index);
+	
+
+			}
+
+		}
+		
 
 
 	//	PushXenonMessage(L"Task","T");

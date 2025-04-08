@@ -1,0 +1,20 @@
+#ifndef LUAEXTMISC
+#define LUAEXTMISC
+
+extern "C" {
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+}
+
+#include <xtl.h>
+#include "LuaExtension_Memory.h"
+
+
+
+namespace Misc {
+	extern "C" size_t GetNumber(lua_State* L,int argument);
+
+}
+
+#endif

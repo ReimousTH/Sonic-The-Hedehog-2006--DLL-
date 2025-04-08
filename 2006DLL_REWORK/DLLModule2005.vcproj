@@ -339,8 +339,8 @@
 				AdditionalLibraryDirectories="&quot;..\Havok\lib\win32_net_9-0\release_multithreaded&quot;"
 				ModuleDefinitionFile="DllModule.def"
 				GenerateDebugInformation="true"
-				OptimizeReferences="1"
-				EnableCOMDATFolding="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
 				SetChecksum="true"
 			/>
 			<Tool
@@ -567,6 +567,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_CSD.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_CSD.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Patch\LuaExtension\LuaExtension_IO.cpp"
 					>
 				</File>
@@ -605,6 +613,14 @@
 							CommandLine=""
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_Misc.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_Misc.h"
+					>
 				</File>
 				<File
 					RelativePath=".\Patch\LuaExtension\LuaExtension_OpenState.cpp"

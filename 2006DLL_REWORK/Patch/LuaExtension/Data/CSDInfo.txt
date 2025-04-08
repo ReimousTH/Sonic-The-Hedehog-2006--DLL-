@@ -1,0 +1,34 @@
+-> (return)
+// (comment)
+
+
+Class:
+	Name(MetaName,Base Class):
+		Methods(arguments): (Class:Method)
+
+
+
+
+Class :
+	CsdObject(CsdObjectMeta,Memory):
+		GetCProject() -> CProject
+	CProject(CProjectMeta,Memory):
+		GetCScene(SceneName) -> CScene
+	CScene(CSceneMeta,Memory):
+		GetMotionIndex() -> number
+		GetMotionRepeatFlag() -> number // 0 - Single, 1 - Loop, 2 - Reverse, 3 - Destroy at MotionEnd
+		GetKeyFrame() -> number
+		GetKeyFrameRate() -> number
+		GetKeyFrameStart() -> number
+		GetKeyFrameEnd() -> number
+		IsMotionEnd() -> boolean
+		SetMotion(MotionName) -> void
+		SetMotionIndex(index) -> void //unused
+		SetMotionRepeatMode(RepeatMode) -> void // 0 - Single, 1 - Loop, 2 - Reverse, 3 - Destroy at MotionEnd // if from Single mode at MotioEnd you set to Loop mode, it nulls animation (hide)
+		SetKeyFrame(Frame) -> void
+		SetKeyFrameRate(Rate) -> void
+		SetKeyFrameStart(Frame) -> void
+		SetKeyFrameEnd(Frame) -> void
+		
+
+		

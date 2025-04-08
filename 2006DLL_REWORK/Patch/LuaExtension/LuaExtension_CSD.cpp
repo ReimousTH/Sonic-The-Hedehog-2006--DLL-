@@ -1,0 +1,359 @@
+#include "LuaExtension_CSD.h"
+
+#define CSD_META_STR "CsdObjectMeta"
+#define CSD_META_CONSTRUCT_FUNC_NAME "CsdObject"
+
+
+#define CPROJECT_META_STR "CProjectMeta"
+#define CPROJECT_META_CONSTRUCT_FUNC_NAME "CProject"
+
+
+#define CSCENE_META_STR "CSceneMeta"
+#define CSCENE_META_CONSTRUCT_FUNC_NAME "CScene"
+
+
+#include <CsdObject.h>
+
+
+namespace DebugLogV2{
+
+
+
+
+	extern "C" CSD__CREATEMETATABLE(lua_State* L,void* arg1){
+
+		lua_getglobal06(L, "Memory");
+		lua_pushlightuserdata(L, arg1);
+		lua_pcall06(L, 1, 1, 0);
+
+		luaL_getmetatable06(L, CSD_META_STR);
+		lua_setmetatable06(L, -2);
+
+
+		return 1;
+	}
+
+	extern "C" CSD__NEW(lua_State* L){
+		return CSD__CREATEMETATABLE(L,(void*)Misc::GetNumber(L,1));
+	}
+
+
+	extern "C" CSD__GETCPROJECT(lua_State*L){
+
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Sonicteam::CsdObject* csd_obj = 	(Sonicteam::CsdObject*)Misc::GetNumber(L,-1);
+		return CPROJECT__CREATEMETATABLE(L,(void*)csd_obj->FCProject);
+	}
+
+
+	extern "C" CPROJECT__CREATEMETATABLE(lua_State* L,void* arg1){
+
+		lua_getglobal06(L, "Memory");
+		lua_pushlightuserdata(L, arg1);
+		lua_pcall06(L, 1, 1, 0);
+
+		luaL_getmetatable06(L, CPROJECT_META_STR);
+		lua_setmetatable06(L, -2);
+
+
+		return 1;
+	}
+
+	extern "C" CPROJECT__NEW(lua_State* L){
+		return CSD__CREATEMETATABLE(L,(void*)Misc::GetNumber(L,1));
+	}
+
+
+	extern "C" CPROJECT__GETCSCENE(lua_State*L){
+
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CProject* CProject = 	(Chao::CSD::CProject*)Misc::GetNumber(L,-1);
+
+
+
+		const char* SceneName = lua_tostring(L,2);
+		std::map<const char*,RCOBJREF(Chao::CSD::CScene),STD_MAP_CONST_CHAR_PTR_COMPARATOR>::iterator it =  CProject->CProjectScene.find(SceneName);
+		if (it != CProject->CProjectScene.end()){
+
+			Chao::CSD::RCObject<Chao::CSD::CScene>* rc =  it->second.get();
+			Chao::CSD::CScene* cscene = rc->get();
+			return CSCENE__CREATEMETATABLE(L,(void*)cscene);
+		}
+		else{ 
+			RCOBJREF(Chao::CSD::CScene) _CScene;
+			((void (__fastcall *)(RCOBJREF(Chao::CSD::CScene)*,Chao::CSD::CProject*,const char*,const char*,size_t))0x825CEB58)(&_CScene,CProject,SceneName,"",0);		
+			
+			//CProject->CProjectScene[_CScene.get()->get()->CSName] = _CScene;
+			
+			return CSCENE__CREATEMETATABLE(L,(void*)_CScene.get()->get());
+		}
+
+
+		return CSCENE__CREATEMETATABLE(L,(void*)0);
+	}
+
+
+
+
+
+	extern "C" CSCENE__CREATEMETATABLE(lua_State* L,void* arg1){
+
+		lua_getglobal06(L, "Memory");
+		lua_pushlightuserdata(L, arg1);
+		lua_pcall06(L, 1, 1, 0);
+
+		luaL_getmetatable06(L, CSCENE_META_STR);
+		lua_setmetatable06(L, -2);
+
+
+		return 1;
+	}
+
+	extern "C" CSCENE__NEW(lua_State* L){
+		return CSCENE__CREATEMETATABLE(L,(void*)Misc::GetNumber(L,1));
+	}
+
+
+
+
+
+	extern "C" CSCENE_UpdateMotionFlag(lua_State* L){
+
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+
+		CScene->MotionRepeatMode = 0;
+		CScene->CCSFlag3 = 0;
+
+		return 0;
+	}
+
+
+
+	extern "C" CSCENE_IsMotionEnd(lua_State* L){
+
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+		lua_pushboolean(L,CScene->IsMotionEnd);
+		return 1;
+	}
+
+
+	extern "C" CSCENE_SetMotionRepeatMode(lua_State* L){
+
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+		CScene->MotionRepeatMode = lua_tonumber06(L,2);
+		return 0;
+	}
+
+	extern "C" CSCENE_GetMotionRepeatMode(lua_State* L){
+
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+		lua_pushnumber(L,CScene->MotionRepeatMode);
+		return 0;
+	}
+
+
+	extern "C" CSCENE_GetMotionIndex(lua_State* L){
+
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+		
+		return 1;
+	}
+
+
+	extern "C" CSCENE_SetMotion(lua_State* L){
+
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+
+		CScene->IsMotionEnd = 1;
+		BranchTo(0x825CA448,int,CScene,(size_t)lua_tostring(L,2));
+		CScene->CKeyFramePre = 0;
+		CScene->CKeyFramePost = 0;
+		CScene->CKeyFrameRate = 1.0;
+		CScene->IsMotionEnd = 0;
+		CScene->MotionRepeatMode = 0;
+		CScene->CCSFlag3 = 0;
+
+
+		return 0;
+	}
+
+	extern "C" CSCENE_SetMotionIndex(lua_State* L){
+
+
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+		BranchTo(0x825CA368,int,CScene,(size_t)lua_tonumber06(L,2));
+		return 0;
+	}
+
+
+
+	extern "C" CSCENE_GetKeyFrame(lua_State* L){
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+		lua_pushnumber(L,	CScene->CKeyFramePost);
+		return 1;
+	}
+
+	extern "C" CSCENE_SetKeyFrame(lua_State* L){
+
+
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+
+		CScene->CKeyFramePre = lua_tonumber06(L,2);
+		CScene->CKeyFramePost = lua_tonumber06(L,2);
+		return 0;
+	}
+
+
+	extern "C" CSCENE_GetKeyFrameRate(lua_State* L){
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+		lua_pushnumber(L,	CScene->CKeyFrameRate);
+		return 1;
+	}
+
+
+	extern "C" CSCENE_SetKeyFrameRate(lua_State* L){
+
+
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+		CScene->CKeyFrameRate = lua_tonumber06(L,2);
+		return 0;
+	}
+
+	extern "C" CSCENE_GetKeyFrameStart(lua_State* L){
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+		lua_pushnumber(L,	CScene->CFrameStart);
+		return 1;
+	}
+
+
+	extern "C" CSCENE_SetKeyFrameStart(lua_State* L){
+
+
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+		CScene->CFrameStart = lua_tonumber06(L,2);
+		return 0;
+	}
+
+	extern "C" CSCENE_GetKeyFrameEnd(lua_State* L){
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+		lua_pushnumber(L,	CScene->CFrameEnd);
+		return 1;
+	}
+
+	extern "C" CSCENE_SetKeyFrameEnd(lua_State* L){
+
+
+		lua_pushstring(L,"ptr");
+		lua_gettable(L,1);
+		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
+		CScene->CFrameEnd = lua_tonumber06(L,2);
+		return 0;
+	}
+
+
+
+
+
+
+	
+
+	int CSD_GlobalInstall(lua_State* L)
+	{
+		if(L == 0) return 0;
+
+
+
+
+
+		lua_register06(L, CSD_META_CONSTRUCT_FUNC_NAME, CSD__NEW);
+		luaL_newmetatable06(L, CSD_META_STR);
+		lua_pushstring06(L,"__index"); lua_pushvalue(L,-2); lua_settable06(L,-3); 
+		lua_newtable06(L);lua_pushstring06(L, "__index");luaL_getmetatable06(L, "MemoryMeta");lua_settable06(L, -3); lua_setmetatable06(L, -2); //setmetatable(PlayerMeta, { __index = MemoryMeta })
+		lua_pushstring06(L, "GetCProject"); lua_pushcfunction06(L, CSD__GETCPROJECT); 	lua_settable06(L, -3);
+		lua_pop(L,1);
+
+
+
+		lua_register06(L, CPROJECT_META_CONSTRUCT_FUNC_NAME, CPROJECT__NEW);
+		luaL_newmetatable06(L, CPROJECT_META_STR);
+		lua_pushstring06(L,"__index"); lua_pushvalue(L,-2); lua_settable06(L,-3); 
+		lua_newtable06(L);lua_pushstring06(L, "__index");luaL_getmetatable06(L, "MemoryMeta");lua_settable06(L, -3); lua_setmetatable06(L, -2); //setmetatable(PlayerMeta, { __index = MemoryMeta })
+		lua_pushstring06(L, "GetCScene"); lua_pushcfunction06(L, CPROJECT__GETCSCENE); 	lua_settable06(L, -3);
+		lua_pop(L,1);
+
+
+
+		lua_register06(L, CSCENE_META_CONSTRUCT_FUNC_NAME, CSCENE__NEW);
+		luaL_newmetatable06(L, CSCENE_META_STR);
+		lua_pushstring06(L,"__index"); lua_pushvalue(L,-2); lua_settable06(L,-3); 
+		lua_newtable06(L);lua_pushstring06(L, "__index");luaL_getmetatable06(L, "MemoryMeta");lua_settable06(L, -3); lua_setmetatable06(L, -2); //setmetatable(PlayerMeta, { __index = MemoryMeta })
+		
+	
+
+
+		lua_pushstring06(L, "GetMotionIndex"); lua_pushcfunction06(L, CSCENE_GetMotionIndex); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "GetMotionRepeatFlag"); lua_pushcfunction06(L, CSCENE_GetMotionRepeatMode); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "GetKeyFrame"); lua_pushcfunction06(L, CSCENE_GetKeyFrame); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "GetKeyFrameRate"); lua_pushcfunction06(L, CSCENE_GetKeyFrameRate); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "GetKeyFrameStart"); lua_pushcfunction06(L, CSCENE_GetKeyFrameStart); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "GetKeyFrameEnd"); lua_pushcfunction06(L, CSCENE_GetKeyFrameEnd); 	lua_settable06(L, -3);
+
+
+
+
+
+		lua_pushstring06(L, "UpdateMotionFlag"); lua_pushcfunction06(L, CSCENE_UpdateMotionFlag); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "IsMotionEnd"); lua_pushcfunction06(L, CSCENE_IsMotionEnd); 	lua_settable06(L, -3);
+
+	
+
+
+		
+		lua_pushstring06(L, "SetMotion"); lua_pushcfunction06(L, CSCENE_SetMotion); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "SetMotionIndex"); lua_pushcfunction06(L, CSCENE_SetMotionIndex); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "SetMotionRepeatMode"); lua_pushcfunction06(L, CSCENE_SetMotionRepeatMode); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "SetKeyFrame"); lua_pushcfunction06(L, CSCENE_SetKeyFrame); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "SetKeyFrameRate"); lua_pushcfunction06(L, CSCENE_SetKeyFrameRate); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "SetKeyFrameStart"); lua_pushcfunction06(L, CSCENE_SetKeyFrameStart); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "SetKeyFrameEnd"); lua_pushcfunction06(L, CSCENE_SetKeyFrameEnd); 	lua_settable06(L, -3);
+		lua_pop(L,1);
+
+
+
+
+
+
+		return 0;
+	}
+
+}
