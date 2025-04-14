@@ -10,3 +10,5 @@
 *.xex
 2006DLL_REWORK/Release
 bin
+Resources
+Tools/

@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VisualStudioToolFile
+	Name="XPR &amp; More Rules"
+	Version="8.00"
+	>
+	<Rules>
+		<CustomBuildRule
+			Name="XPR_BUILD_01"
+			DisplayName="XPR Files"
+			CommandLine="bundler &quot;$(InputPath)&quot; -o &quot;$(OutDir)\Media\Fonts\$(InputName).xpr&quot;"
+			Outputs="$(OutDir)\Media\Fonts\$(InputName).xpr"
+			FileExtensions="*.rdf"
+			ExecutionDescription="Executing tool..."
+			SupportsFileBatching="true"
+			>
+			<Properties>
+			</Properties>
+		</CustomBuildRule>
+		<CustomBuildRule
+			Name="DirectX(Shader Compiler)"
+			DisplayName="DirectX(Shader Compiler)"
+			CommandLine="fxc /Tfxl_3_0 /XZi /XFd&quot;$(OutDir)\FXL_$(InputName).updb&quot; /Fo&quot;$(OutDir)\Media\Effects\$(InputName).fxobj&quot; &quot;$(InputPath)&quot;"
+			Outputs="$(OutDir)\Media\Effects\$(InputName).fxobj"
+			FileExtensions="*.fx"
+			ExecutionDescription="Build FXLite Effect $(InputPath)"
+			>
+			<Properties>
+			</Properties>
+		</CustomBuildRule>
+		<CustomBuildRule
+			Name="GenerateArcFiles"
+			DisplayName="Generate .arc Files"
+			CommandLine="&quot;D:\Games\X360\SONIC THE HEDGEHOG (XBOX 360)\DLL_NEW\Sonic-The-Hedehog-2006--DLL-\Tools\Marathon.CLI.exe&quot; &quot;$(InputPath)&quot;"
+			Outputs="&quot;$(InputName).arc&quot;"
+			AdditionalDependencies="&quot;D:\Games\X360\SONIC THE HEDGEHOG (XBOX 360)\DLL_NEW\Sonic-The-Hedehog-2006--DLL-\Tools&quot;"
+			FileExtensions="*.txt;*.xml"
+			>
+			<Properties>
+			</Properties>
+		</CustomBuildRule>
+	</Rules>
+</VisualStudioToolFile>

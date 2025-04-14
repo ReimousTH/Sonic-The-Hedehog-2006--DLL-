@@ -14,6 +14,7 @@ extern "C" {
 
 namespace Misc {
 	extern "C" size_t GetNumber(lua_State* L,int argument);
+	extern "C" XMVECTOR GetVector(lua_State*L, int argument);
 
 }
 

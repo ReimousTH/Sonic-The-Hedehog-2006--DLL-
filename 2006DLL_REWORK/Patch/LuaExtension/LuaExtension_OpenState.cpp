@@ -137,7 +137,8 @@ namespace DebugLogV2{
 				}
 			}
 
-			if (!ProcessStateLuaEX(machine2,NextState.get(),context,_this->PreState,LEOS_StateOnStartPre,LEOS_StateOnAnyNo,0)){
+			//fIST was PostState changed to PostState 
+			if (!ProcessStateLuaEX(machine2,NextState.get(),context,_this->PostState,LEOS_StateOnStartPre,LEOS_StateOnAnyNo,0)){
 				if (!ProcessStateLuaEX(machine2,NextState.get(),context,_this->PostState,LEOS_StateOnStartPre,LEOS_StateOnAny,0)){
 					if (!ProcessStateLuaEX(machine2,NextState.get(),context,_this->PostState,LEOS_StateOnStartNo,LEOS_StateOnStartNo,0)){
 						if (!ProcessStateLuaEX(machine2,NextState.get(),context,_this->PostState,LEOS_StateOnStartPre,LEOS_StateOnStartPre,0)){

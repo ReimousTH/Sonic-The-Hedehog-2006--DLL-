@@ -2,6 +2,25 @@
 
 using namespace Misc;
 
+
+extern "C" XMVECTOR Misc::GetVector(lua_State*L, int argument){
+	XMVECTOR vector1 = {0,0,0,1};
+	if (lua_istable(L,argument))
+		for (int i = 1; i <= 4; ++i) {
+			lua_rawgeti06(L, argument, i); // Get value at index i
+
+			if (lua_isnumber(L, -1)) {
+				float value = lua_tonumber(L, -1);
+				vector1.v[i-1] = value;
+			}
+
+			// Pop the value from the stack
+			lua_pop(L, 1);
+		}
+		return vector1;
+}
+
+
 extern "C" size_t Misc::GetNumber(lua_State* L,int argument)
 {
 

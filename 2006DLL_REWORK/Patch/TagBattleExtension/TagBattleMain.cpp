@@ -907,8 +907,8 @@ int __fastcall MainMenuTask_UI(Sonicteam::MainMenuTask *a1,float delta){
 			
 			a1->GetCurrentDoc()->DocLoadScene(battle_missions[a1->MMTuint0xDC]);
 			a1->GetCurrentDoc()->DocSet0x55C54(0x21);
-			a1->GetCurrentDoc()->DocCurrentApplication->ApplicationConsoleMessages(0xC,0,6);
-			a1->GetCurrentDoc()->DocCurrentApplication->ApplicationConsoleMessages(0xB,0,0);
+			a1->GetCurrentDoc()->DocCurrentApplication->HandleMessage(0xC,0,6);
+			a1->GetCurrentDoc()->DocCurrentApplication->HandleMessage(0xB,0,0);
 			a1->MMCurrentCase = 0x3F;
 
 

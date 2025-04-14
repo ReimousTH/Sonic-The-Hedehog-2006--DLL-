@@ -13,6 +13,9 @@
 		/>
 	</Platforms>
 	<ToolFiles>
+		<ToolFile
+			RelativePath="..\Rules\Core_EXE_RULES.rules"
+		/>
 	</ToolFiles>
 	<Configurations>
 		<Configuration
@@ -28,7 +31,16 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="DirectX(Shader Compiler)"
+			/>
+			<Tool
+				Name="XPR_BUILD_01"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="GenerateArcFiles"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -112,7 +124,16 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="DirectX(Shader Compiler)"
+			/>
+			<Tool
+				Name="XPR_BUILD_01"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="GenerateArcFiles"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -202,7 +223,16 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="DirectX(Shader Compiler)"
+			/>
+			<Tool
+				Name="XPR_BUILD_01"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="GenerateArcFiles"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -291,7 +321,16 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="DirectX(Shader Compiler)"
+			/>
+			<Tool
+				Name="XPR_BUILD_01"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="GenerateArcFiles"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -333,14 +372,14 @@
 			/>
 			<Tool
 				Name="VCX360LinkerTool"
-				AdditionalOptions="/ignore:4089 /dll /entry:&quot;_DllMainCRTStartup&quot; /include:&quot;XboxKrnlBuildNumber&quot;"
+				AdditionalOptions="/ignore:4089 /dll /entry:&quot;_DllMainCRTStartup&quot; /include:&quot;XboxKrnlBuildNumber&quot; /FORCE:MULTIPLE"
 				AdditionalDependencies="d3d9.lib d3dx9.lib xgraphics.lib xapilib.lib xaudio.lib x3daudio.lib xboxkrnl.lib xbdm.lib libcmt.lib xnet.lib"
 				OutputFile="$(OutDir)/$(ProjectName).dll"
 				AdditionalLibraryDirectories="&quot;..\Havok\lib\win32_net_9-0\release_multithreaded&quot;"
 				ModuleDefinitionFile="DllModule.def"
 				GenerateDebugInformation="true"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
+				OptimizeReferences="1"
+				EnableCOMDATFolding="1"
 				SetChecksum="true"
 			/>
 			<Tool
@@ -381,7 +420,16 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="DirectX(Shader Compiler)"
+			/>
+			<Tool
+				Name="XPR_BUILD_01"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="GenerateArcFiles"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -690,6 +738,10 @@
 			<Filter
 				Name="Common"
 				>
+				<File
+					RelativePath=".\Patch\Common\XEXALLOCATORS.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\Patch\Common\XEXALLOCATORS.H"
 					>
@@ -1012,6 +1064,26 @@
 						/>
 					</FileConfiguration>
 				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Resources"
+			>
+			<File
+				RelativePath="..\Resources\Fonts\Arial_16.rdf"
+				>
+			</File>
+			<File
+				RelativePath="..\Resources\Fonts\FOT-NewRodin ProN EB_16.rdf"
+				>
+			</File>
+			<File
+				RelativePath="..\Resources\effects\SimpleShaders.fx"
+				>
+			</File>
+			<Filter
+				Name="Textures"
+				>
 			</Filter>
 		</Filter>
 		<File

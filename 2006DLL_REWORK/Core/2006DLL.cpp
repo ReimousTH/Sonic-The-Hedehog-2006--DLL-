@@ -25,6 +25,7 @@
 #include <Player/IPostureControl.h>
 #include <Sox/FileLoaderARC.h>
 #include <Sox/FileSystemARC.h>
+#include <Sox/ApplicationXenon.h>
 
 #include <Heap.h>
 #include <SpanverseHeap.h>
@@ -310,6 +311,14 @@ HOOKV3(0x82582648,REF_TYPE(Sonicteam::SoX::IResource),sub_82582380,(REF_TYPE(Son
 }
 
 
+/*
+HOOKV3(0x825B1870,void*,PostureCommon,(Sonicteam::Player::IPostureControl*,double),(_this,delta), Sonicteam::Player::IPostureControl* _this, double delta){
+
+
+}
+*/
+
+
 void STH2006DLLMain()
 {
 	
@@ -390,6 +399,10 @@ void STH2006DLLMain()
 
 	//ARC->LoadFile(std::string("asdg"),test);
 
+
+
+
+
 	SSINGLETON(Sonicteam::SoX::FileSystemArc)::getInstance((void**)0X82D3B284,(void*)0x825828F8);
 	SSINGLETON(Sonicteam::SoX::FileLoaderARC)::getInstance((void**)0x82D3C184,(void*)0x8262A3E8); //FileLoaderARC
 	SSINGLETON(Sonicteam::SoX::ArcHandleMgr)::getInstance((void**)0x82D36710,(void*)0x82163D20); //
@@ -403,6 +416,7 @@ void STH2006DLLMain()
 	HookNew::SaveBuffer = new std::map<void*, std::vector<HookNew*>>();
 	
 
+	//new Sonicteam::SoX::ApplicationXenon();
 
 
 
@@ -425,13 +439,17 @@ void STH2006DLLMain()
 
 
 
+
 	ZLua lua_file = ZLua("game:\\common\\DLL.lua");
 	std::stringstream log;
 	std::wstringstream wlog;
 
 
 	lua_file.DoFile(true);
-	DebugLogV2::ThreadLog = lua_file.GetGlobalBool("ThreadLog");
+	//DebugLogV2::ThreadLog = lua_file.GetGlobalBool("ThreadLog");
+	DebugLogV2::ThreadLog = false; //temp
+
+
 	for (int i = 0;i<sizeof(functions)/sizeof(FPair);i++){
 		if (lua_file.GetGlobalBool(functions[i].Name) == true){
 			functions[i].Function();

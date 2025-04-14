@@ -1,22 +1,43 @@
 #ifndef XEXALLOCATORS
 #define XEXALLOCATORS
 
+
+
 #include <xtl.h>
 
 
-void*& XapiProcessHeap = *(void**)0x82D57540; // Address to EXE's heap
+extern void*& XapiProcessHeap;
 
 
 
 
 
+
+extern WINBASEAPI HLOCAL WINAPI LocalAlloc(IN UINT uFlags,IN SIZE_T uBytes );
+
+/*
+extern WINBASEAPI HLOCAL WINAPI LocalReAlloc(IN HLOCAL hMem, IN SIZE_T uBytes,IN UINT uFlags);
+*/
+
+
+extern HLOCAL __stdcall LocalFree(HLOCAL hMem);
+
+
+
+
+
+
+
+//Regular
 inline void* operator new(size_t size) {
+
 	if (XapiProcessHeap) {
 		// Use the EXE's heap if available
 		return ((void* (__fastcall *)(size_t))0x82186158)(size);
 	} else {
 		return HeapAlloc(GetProcessHeap(), 0, size);
 	}
+
 }
 
 inline void operator delete(void* ptr) {
@@ -60,22 +81,7 @@ inline void   __cdecl free(__inout_opt void * _Memory){
 
 //not sure
 
-void * __cdecl realloc(void* ptr, size_t size){
-
-	HANDLE handle = GetProcessHeap();
-	if (XapiProcessHeap) handle = XapiProcessHeap;
-
-	if (!ptr)
-		return malloc(size);
-	if (!size) {
-		free(ptr);
-		return 0;
-	}
-
-	if (size < 0xFFFFF000)
-		return HeapReAlloc(handle, 0, ptr, size);
-	return 0;
-}
+extern void * __cdecl realloc(void* ptr, size_t size);
 
 /*
 void * __cdecl _recalloc(__in_opt void * _Memory, __in size_t _Count, __in size_t _Size);
