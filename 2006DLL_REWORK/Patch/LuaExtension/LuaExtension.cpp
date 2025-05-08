@@ -57,8 +57,14 @@ namespace DebugLogV2{
 
 	int DebugLabel_delete(lua_State* L)
 	{
+#ifdef ALTERNATIVE_UTIL_MSG
+		DMSG_UI* obj  = *(DMSG_UI**)lua_touserdata(L, 1);
+		obj->Release();
+#else
+	BranchTo(0x8262BA68,int,*reinterpret_cast<int**>(lua_touserdata(L, 1)),1); //Destroy from mem
+#endif
 
-		BranchTo(0x8262BA68,int,*reinterpret_cast<int**>(lua_touserdata(L, 1)),1); //Destroy from mem
+	
 
 		return 0;
 	}
@@ -611,7 +617,6 @@ namespace DebugLogV2{
 		Sonicteam::Prop::Instance* InstnceProp = new Sonicteam::Prop::Instance(PropScenePTR,ObjData,REF_TYPE(Sonicteam::Prop::Class)(RefObjectTypePropClass));
 		Sonicteam::Prop::EntityHandle* EntityHandle = new Sonicteam::Prop::EntityHandle(PropScenePTR,LastIndex);
 		EntityHandle->PropInstance = REF_TYPE(Sonicteam::Prop::Instance)(InstnceProp);
-
 		Sonicteam::Prop::ActorCreatorCreationData buffer = Sonicteam::Prop::ActorCreatorCreationData(REF_TYPE(Sonicteam::Prop::Instance)(InstnceProp),REF_TYPE(Sonicteam::Prop::EntityHandle)(EntityHandle),0,std::string(InstnceProp->InstanceClass.get()->ClassPropData->ClassName));
 		
 		
@@ -1664,13 +1669,15 @@ namespace DebugLogV2{
 
 	extern "C" int PrintNextFixed(std::string msg){
 		
+		
+#ifdef ALTERNATIVE_UTIL_MSG
+		AddMessage(msg);
+#else
+
 		int length = msg.length() + 1;
 		wchar_t* wcharPtr = new wchar_t[length];
 		std::memset(wcharPtr, 0, length * sizeof(wchar_t));
 		std::mbstowcs(wcharPtr, msg.c_str(), length);
-
-
-
 		int MCount = DebugMessages.size();
 		if (MCount > 5){
 			MCount--;
@@ -1687,10 +1694,15 @@ namespace DebugLogV2{
 				cc++;
 			}
 		}
-
 		DebugMessages.push_back( SpawnMessage(wcharPtr,(MCount * 28)));
+
+#endif
+
+
+
 		return 0;
 	}
+
 	extern "C" int PrintNext(lua_State* L){
 
 		int n = lua_gettop(L);  /* number of arguments */
@@ -1713,6 +1725,7 @@ namespace DebugLogV2{
 			std::mbstowcs(wcharPtr, msg.c_str(), length);
 
 
+			/*
 			int MCount = DebugMessages.size();
 			if (MCount > 2){
 				MCount--;
@@ -1731,6 +1744,8 @@ namespace DebugLogV2{
 			}
 
 			DebugMessages.push_back( SpawnMessage(wcharPtr,(MCount * 28)));
+			*/
+			AddMessage(msg);
 	
 			//if (i>1) fputs("\t", stdout);
 			//fputs(s, stdout);
@@ -2210,6 +2225,9 @@ namespace DebugLogV2{
 
 		Sonicteam::DocMarathonImp* impl = 	*(Sonicteam::DocMarathonImp**)(*(UINT32*)0x82D3B348 + 0x180);
 		UINT32 vft =  *(UINT32*)impl->DocCurrentMode;
+
+
+
 
 		int PTRX = 0;
 		UINT32 gameimp  = 0;

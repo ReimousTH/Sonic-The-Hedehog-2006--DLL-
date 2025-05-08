@@ -58,14 +58,15 @@ namespace DebugLogV2{
 				break;
 			}
 		}
-
-
 		bool result = false;
+
+		/* put to buffer somewhere
+		
 		if (ResourceManager->ResourceRegistryHandle[index].find(ArcHandle->ResourceStr3) == ResourceManager->ResourceRegistryHandle[index].end()){
 			ResourceManager->ResourceRegistryHandle[index][ArcHandle->ResourceStr3] =  REF_TYPE(Sonicteam::SoX::IResource)(ArcHandle);
 			result = true;
 		}
-
+		*/
 
 
 		lua_pushboolean(L,result);

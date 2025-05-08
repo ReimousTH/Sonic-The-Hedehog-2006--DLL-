@@ -1,10 +1,12 @@
+#pragma once
 #ifndef XEXALLOCATORS
 #define XEXALLOCATORS
 
 
 
-#include <xtl.h>
 
+#include <xtl.h>
+#undef realloc
 
 extern void*& XapiProcessHeap;
 
@@ -68,7 +70,7 @@ inline void * __cdecl malloc(__in size_t _Size){
 
 }
 
-inline void   __cdecl free(__inout_opt void * _Memory){
+inline void __cdecl free(__inout_opt void * _Memory){
 	if (XapiProcessHeap) {
 		((void* (__fastcall *)(void*))0x826DFFE8)(_Memory);
 	}

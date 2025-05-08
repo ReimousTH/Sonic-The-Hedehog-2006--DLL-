@@ -74,6 +74,7 @@ namespace DebugLogV2{
 		IO_GlobalInstall(LS);
 		CSD_GlobalInstall(LS);
 
+		GlobalInstall_ObjectIO(LS);
 	
 		return sub_825DB498H(LS);
 	}

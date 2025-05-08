@@ -311,12 +311,124 @@ HOOKV3(0x82582648,REF_TYPE(Sonicteam::SoX::IResource),sub_82582380,(REF_TYPE(Son
 }
 
 
-/*
-HOOKV3(0x825B1870,void*,PostureCommon,(Sonicteam::Player::IPostureControl*,double),(_this,delta), Sonicteam::Player::IPostureControl* _this, double delta){
 
 
+
+struct sig{
+	size_t _1;
+	size_t _2;
+};
+HOOKV3(0x82279CA8,size_t,sub_0x82279CA8,(size_t),(self),size_t self){
+
+
+	std::vector<sig>* ls = (std::vector<sig>*)(self + 0x98);
+	std::vector<sig>* ls2 = (std::vector<sig>*)(self + 0x88);
+	std::vector<size_t>* ls3 = (std::vector<size_t>*)(self + 0xC0);
+	std::vector<size_t>* ls4 = (std::vector<size_t>*)(self + 0xD0);
+	std::vector<size_t>* ls5 = (std::vector<size_t>*)(self + 0xE0);
+	std::vector<size_t>* ls6 = (std::vector<size_t>*)(self + 0xF0);
+
+	std::vector<size_t>* ls7 = (std::vector<size_t>*)(self + 0x110);
+
+	std::vector<size_t>* ls8 = (std::vector<size_t>*)(self + 0x130);
+	std::vector<size_t>* ls9 = (std::vector<size_t>*)(self + 0x140);
+	
+	
+	boost::shared_ptr<size_t>* a8 = (boost::shared_ptr<size_t>*)(self + 0xA8); //
+	boost::shared_ptr<size_t>* b8 = (boost::shared_ptr<size_t>*)(self + 0xb8);
+	boost::shared_ptr<size_t>* b0 = (boost::shared_ptr<size_t>*)(self + 0xb0);
+
+	Sonicteam::SoX::RefCountObject* _obj = *(Sonicteam::SoX::RefCountObject**)(self + 0x100);
+	Sonicteam::SoX::RefCountObject* _obj1 = *(Sonicteam::SoX::RefCountObject**)(self + 0x104);
+	Sonicteam::SoX::RefCountObject* _obj2 = *(Sonicteam::SoX::RefCountObject**)(self + 0x120);
+	Sonicteam::SoX::RefCountObject* _obj3 = *(Sonicteam::SoX::RefCountObject**)(self + 0x124);
+	Sonicteam::SoX::RefCountObject* _obj4 = *(Sonicteam::SoX::RefCountObject**)(self + 0x150);
+	Sonicteam::SoX::RefCountObject* _obj5 = *(Sonicteam::SoX::RefCountObject**)(self + 0x154);
+	Sonicteam::SoX::RefCountObject* _obj6 = *(Sonicteam::SoX::RefCountObject**)(self + 0x164);
+
+	Sonicteam::SoX::RefCountObject* _obj7 = *(Sonicteam::SoX::RefCountObject**)(self + 0x80);
+	Sonicteam::SoX::RefCountObject* _obj8 = *(Sonicteam::SoX::RefCountObject**)(self + 0x84);
+
+
+
+
+
+	if (_obj3 != 0){
+
+		PushBreakPoint(__FILE__,__LINE__,"_obj3 %x",_obj3);
+	}
+
+
+
+	if (_obj4 != 0){
+
+		PushBreakPoint(__FILE__,__LINE__,"_obj4 %x",_obj4);
+	}
+
+	if (_obj5 != 0){
+
+		PushBreakPoint(__FILE__,__LINE__,"_obj5 %x",_obj5);
+	}
+
+
+
+
+	
+
+
+
+	if (ls8->size() > 0){
+		size_t _arr = (size_t)&*ls8->begin();
+		if (_arr != 0) PushBreakPoint(__FILE__,__LINE__,"ls8 %x ",ls8->begin());
+	}
+	if (ls9->size() > 0){
+		size_t _arr = (size_t)&*ls9->begin();
+		if (_arr != 0) PushBreakPoint(__FILE__,__LINE__,"ls9 %x ",ls9->begin());
+	}
+
+
+	
+	
+	return self;
+};
+
+
+
+
+HOOKV3(0x8221ECD0,void*,sub_8221ECD0,(int,int,int),(a1,a2,a3),int a1, int a2,int a3){
+
+
+	Sonicteam::Player::State::Machine2* _machine = (Sonicteam::Player::State::Machine2*)(a1 );
+
+
+	
+	//std::deque<void*>* _deq = reinterpret_cast<std::deque<void*>*>(&_machine->Unk0x5C);
+
+//	std::deque<boost::shared_ptr<void*>>* _deq1 = (std::deque<boost::shared_ptr<void*>>*)(&_machine->field0xC);
+
+	/*
+	for (std::deque<void*>::iterator it = _deq->begin(); it != _deq->end(); ++it) {
+		PushBreakPoint(__FILE__, __LINE__, "%x", *it);
+	}*/
+
+//	for (std::deque<boost::shared_ptr<void*>>::iterator it = _deq1->begin(); it != _deq1->end(); ++it) {
+//		//PushBreakPoint(__FILE__, __LINE__, "%x", it->get());
+//	}
+
+
+
+	return (void*)a1;
+};
+
+
+int __fastcall sub_8221EAF0(int a1, char a2)
+{
+
+	
+	return BranchTo(0x8221ECD0,int,a1, a2);
 }
-*/
+
+
 
 
 void STH2006DLLMain()
@@ -388,6 +500,8 @@ void STH2006DLLMain()
 
 
 
+
+
 	//Declare :} Force easy use in-game singleton from DLL (next just SSINGLETON_INSTANCE pretty easy :))
 
 
@@ -428,6 +542,10 @@ void STH2006DLLMain()
 	FileSystemNew::AddArc("Resources.arc",2,0);
 	
 	
+
+	INSTALL_HOOKV3EX(sub_0x82279CA8,-1,false,11);
+	INSTALL_HOOKV3EX(sub_8221ECD0,-1,false,9);
+	
 	
 
 	//INSTALL_HOOKV3EX(HeapFix,1,false);
@@ -437,6 +555,8 @@ void STH2006DLLMain()
 //	reticle::GlobalInstall();
 //	INSTALL_HOOKV3EX(PostureCommon,-1,1,11);
 
+
+	WRITE_DWORD(0x8200BB08,sub_8221EAF0);
 
 
 

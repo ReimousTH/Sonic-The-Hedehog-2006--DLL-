@@ -77,6 +77,9 @@ namespace DebugLogV2{
 		lua_pushstring06(L, "GetVector"); lua_pushcfunction06(L, Memory__GetVector); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "GetMatrix"); lua_pushcfunction06(L, Memory__GetXMMATRIX); 	lua_settable06(L, -3);
 
+		lua_pushstring06(L, "GetString"); lua_pushcfunction06(L, Memory__GetSTRING); 	lua_settable06(L, -3);
+		lua_pushstring06(L, "GetStringPTR"); lua_pushcfunction06(L, Memory__GetSTRINGPTR); 	lua_settable06(L, -3);
+
 		lua_pushstring06(L, "SetDWORD"); lua_pushcfunction06(L, Memory__SetDWORD); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "SetFLOAT"); lua_pushcfunction06(L, Memory__SetFLOAT); 	lua_settable06(L, -3);
 		lua_pushstring06(L, "SetBYTE"); lua_pushcfunction06(L, Memory__SetBYTE); 	lua_settable06(L, -3);
@@ -691,6 +694,16 @@ namespace DebugLogV2{
 					XMMATRIX_CREATEMETATABLE(L,*(XMMATRIX*)(ptr + move));
 				}
 				break;
+			case 8:
+				{
+					lua_pushstring06(L,(const char*)(ptr + move));
+				}
+				break;
+			case 9:
+				{
+					lua_pushstring06(L,*(const char**)(ptr + move));
+				}
+				break;
 			}
 	
 
@@ -704,6 +717,17 @@ namespace DebugLogV2{
 		return Memory__GET(L,0);
 
 	}
+
+	extern "C" int Memory__GetSTRINGPTR(lua_State* L)
+	{
+		return Memory__GET(L,9);
+	}
+
+	extern "C" int Memory__GetSTRING(lua_State* L)
+	{
+		return Memory__GET(L,8);
+	}
+
 	extern "C" int Memory__GetFLOAT(lua_State* L){
 
 		return Memory__GET(L,1);

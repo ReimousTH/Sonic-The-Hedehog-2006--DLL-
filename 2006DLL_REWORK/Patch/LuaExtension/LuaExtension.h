@@ -36,6 +36,7 @@ extern "C" {
 #include "LuaExtension_LoadReAttachArc.h"
 #include "LuaExtension_CSD.h"
 #include "LuaExtension_IO.h"
+#include "LuaExtension_ObjectIO.h"
 
 #include "LuaSystem.h"
 

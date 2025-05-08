@@ -76,6 +76,8 @@ namespace DebugLogV2 {
 	extern "C" int Memory__SetXMMATRIX(lua_State* L);
 
 	extern "C" int Memory__GetDWORD(lua_State* L);
+	extern "C" int Memory__GetSTRINGPTR(lua_State* L);
+	extern "C" int Memory__GetSTRING(lua_State* L);
 	extern "C" int Memory__GetFLOAT(lua_State* L);
 	extern "C" int Memory__GetBYTE(lua_State* L);
 	extern "C" int Memory__GetPointer(lua_State* L);
@@ -83,7 +85,6 @@ namespace DebugLogV2 {
 	extern "C" int Memory__GetXMMATRIX(lua_State* L);
 
 	extern "C" int Memory__GetPTR(lua_State* L);
-
 	extern "C" int Memory__GetRTTI(lua_State* L);
 
 	extern "C" int Memory__IsValidPTR(lua_State* L);

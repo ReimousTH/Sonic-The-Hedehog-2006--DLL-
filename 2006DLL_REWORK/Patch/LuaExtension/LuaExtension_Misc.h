@@ -11,8 +11,12 @@ extern "C" {
 #include "LuaExtension_Memory.h"
 
 
+#include <GameImp.h>
+
 
 namespace Misc {
+
+	Sonicteam::GameImp* GetGameIMP();
 	extern "C" size_t GetNumber(lua_State* L,int argument);
 	extern "C" XMVECTOR GetVector(lua_State*L, int argument);
 

@@ -1,43 +1,92 @@
 #include "MessagesUtil.h"
+#include <Core/Debug.h>
 
 
 
 namespace DebugLogV2{
 
+int DebugLogV2::ThreadLog = false;
 
-	UINT32 SpawnMessageBase(float pos_x,float pos_y,const wchar_t* MSG,const char* PMSG,int FontIndex,int ColorFlag){
-		Sonicteam::DocMarathonImp* doc = *(Sonicteam::DocMarathonImp**)(*(UINT32*)0x82D3B348 + 0x180);
-		UINT32 Resouce = doc->DocGetUnkGameResources();
-		// 8 * (index + 3)
-		//2 bold (little bigger 0)
-		//1 bold, but bigger
-		//0 --common
-		//Font
-	
-		UINT32 RequiredResouce = (8*(FontIndex+3)) + Resouce;
 
-		//wchar_t or i
-		//i dunno text-size???// 
-		//Z-Inddex ???
-		//MSG
-		//MSG-Picture 
-		//picture(button_a),picture(button_b)
-		//picture(button_b) 
-		UINT32 TextEntity = BranchTo(0x8262DC60,UINT32,malloc06(0x110),RequiredResouce,MSG,PMSG,128);
-		BranchTo(0x8262AF00,int,TextEntity,20.0); //unk
-		XMVECTOR* pos = (XMVECTOR*)(TextEntity + 0x30);
-		pos->x = pos_x;
-		pos->y = pos_y;
-		*(_BYTE *)(TextEntity + 0xDD) = 1; //reset
-		//ARGB(Alpha,Red,Green,Blue)
-		BranchTo(0x8262B288,int,TextEntity,&ColorFlag);
-		BranchTo(0x8262B008,int,TextEntity);
-		return TextEntity;
-	}
+#ifdef ALTERNATIVE_UTIL_MSG
+
+UINT32 SpawnMessageBase(float pos_x,float pos_y,const wchar_t* MSG,const char* PMSG,int FontIndex,int ColorFlag){
+	DMSG_UI* obj = new DMSG_UI();
+	obj->SetPosXY(pos_x,pos_y);
+	obj->SetColor(ColorFlag);
+	_Message_UI_[obj] = 1;
+	return (UINT32)obj;
+}
+void DebugLogV2::ChangeMessagePosition(UINT32 TextEntity,float x,float y)
+{
+	DMSG_UI* obj = (DMSG_UI*)TextEntity;
+	obj->SetPosXY(x,y);
+}
+
+void DebugLogV2::ChangeMessagePositionY(UINT32 TextEntity,float y)
+{
+	DMSG_UI* obj = (DMSG_UI*)TextEntity;
+	obj->SetPosY(y);
+}
+
+void DebugLogV2::EditMessage(UINT32 TextEntity,const wchar_t* msg)
+{
+	DMSG_UI* obj = (DMSG_UI*)TextEntity;
+	obj->SetMSG(std::wstring(msg));
+}
+
+void DebugLogV2::EditMessageColor(UINT32 TextEntity,char Alpha,char Red,char Green,char Blue)
+{
+	UINT flag = ((Alpha << 24) |(Red << 16) | (Green << 8) |  Blue );
+	DMSG_UI* obj = (DMSG_UI*)TextEntity;
+	obj->SetColor(flag);
 
 }
 
-int DebugLogV2::ThreadLog = false;
+void DebugLogV2::EditMessage(UINT32 TextEntity,const wchar_t* msg,const char* pmsg)
+{
+	DMSG_UI* obj = (DMSG_UI*)TextEntity;
+	obj->SetMSG(std::wstring(msg));
+}
+
+
+
+
+#else 
+
+
+UINT32 SpawnMessageBase(float pos_x,float pos_y,const wchar_t* MSG,const char* PMSG,int FontIndex,int ColorFlag){
+
+
+	Sonicteam::DocMarathonImp* doc = *(Sonicteam::DocMarathonImp**)(*(UINT32*)0x82D3B348 + 0x180);
+	UINT32 Resouce = doc->DocGetUnkGameResources();
+	// 8 * (index + 3)
+	//2 bold (little bigger 0)
+	//1 bold, but bigger
+	//0 --common
+	//Font
+
+	UINT32 RequiredResouce = (8*(FontIndex+3)) + Resouce;
+
+	//wchar_t or i
+	//i dunno text-size???// 
+	//Z-Inddex ???
+	//MSG
+	//MSG-Picture 
+	//picture(button_a),picture(button_b)
+	//picture(button_b) 
+	UINT32 TextEntity = BranchTo(0x8262DC60,UINT32,malloc06(0x110),RequiredResouce,MSG,PMSG,128);
+	BranchTo(0x8262AF00,int,TextEntity,20.0); //unk
+	XMVECTOR* pos = (XMVECTOR*)(TextEntity + 0x30);
+	pos->x = pos_x;
+	pos->y = pos_y;
+	*(_BYTE *)(TextEntity + 0xDD) = 1; //reset
+	//ARGB(Alpha,Red,Green,Blue)
+	BranchTo(0x8262B288,int,TextEntity,&ColorFlag);
+	BranchTo(0x8262B008,int,TextEntity);
+	return TextEntity;
+}
+
 
 void DebugLogV2::ChangeMessagePosition(UINT32 TextEntity,float x,float y)
 {
@@ -85,6 +134,12 @@ void DebugLogV2::EditMessage(UINT32 TextEntity,const wchar_t* msg,const char* pm
 }
 
 
+#endif
+
+
+
+
+
 
 
 
@@ -92,8 +147,6 @@ UINT32 DebugLogV2::SpawnMessage(const wchar_t* msg,float pos_x,float pos_y)
 {
 	return  SpawnMessageBase(pos_x,pos_y,msg,0,0,0xFFFFFFFF); 
 }
-
-
 
 
 
@@ -109,7 +162,7 @@ UINT32 DebugLogV2::SpawnMessage(const wchar_t* msg,float pos_y)
 }
 
 
-
+}
 
 
 
@@ -203,7 +256,13 @@ static int luaB_print (lua_State *L) {
 		if (s == NULL)
 			return luaL_error(L, "`tostring' must return a string to `print'");
 
+		#ifdef ALTERNATIVE_UTIL_MSG
+			AddMessage(std::string(s));
+		#else
 		DebugLogV2::log.push_back(std::string(s));
+		#endif
+
+
 
 		//if (i>1) fputs("\t", stdout);
 		//fputs(s, stdout);
@@ -213,6 +272,10 @@ static int luaB_print (lua_State *L) {
 	return 0;
 }
 
+
+
+
+
 static int Printf (lua_State *L) {
 
 	int n = lua_gettop(L);  /* number of arguments */
@@ -220,6 +283,17 @@ static int Printf (lua_State *L) {
 	for (i=1; i<=n; i++) {
 		const char *s;
 
+#ifdef ALTERNATIVE_UTIL_MSG
+
+		if (lua_isstring(L,i)){
+			s = lua_tostring(L, i);  /* get result */
+			AddMessage(std::string(s));
+		}
+		else{
+			AddMessage(std::string("PrintF Failed"));
+		}
+
+#else
 		if (lua_isstring(L,i)){
 			s = lua_tostring(L, i);  /* get result */
 			DebugLogV2::log.push_back(std::string(s));
@@ -228,6 +302,7 @@ static int Printf (lua_State *L) {
 			s = lua_tostring(L, -1);  /* get result */
 			DebugLogV2::log.push_back(std::string("[PrintF]FailedMessage"));
 		}
+#endif
 	
 
 	}
@@ -253,7 +328,7 @@ extern "C" ShowDebugLog(lua_State* LS){
 	HANDLE hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	 m_Overlapped.hEvent = hEvent;
 
-	 XShowMessageBoxUI(0,L"DebugLog V2.0",DebugLogV2::ConcatenateStrings(DebugLogV2::log).c_str(),1,g_pwstrButtonsX_INL,1,XMB_ALERTICON,&result,&m_Overlapped);
+	XShowMessageBoxUI(0,L"DebugLog V2.0",DebugLogV2::ConcatenateStrings(DebugLogV2::log).c_str(),1,g_pwstrButtonsX_INL,1,XMB_ALERTICON,&result,&m_Overlapped);
 	DWORD waitResult = WaitForSingleObject(hEvent, INFINITE);
 	CloseHandle(hEvent);
 

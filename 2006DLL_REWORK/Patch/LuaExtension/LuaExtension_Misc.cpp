@@ -21,6 +21,12 @@ extern "C" XMVECTOR Misc::GetVector(lua_State*L, int argument){
 }
 
 
+Sonicteam::GameImp* Misc::GetGameIMP()
+{
+	Sonicteam::DocMarathonImp* impl = 	*(Sonicteam::DocMarathonImp**)(*(UINT32*)0x82D3B348 + 0x180);
+	return *(Sonicteam::GameImp**)(impl->DocCurrentMode + 0x6C);
+}
+
 extern "C" size_t Misc::GetNumber(lua_State* L,int argument)
 {
 

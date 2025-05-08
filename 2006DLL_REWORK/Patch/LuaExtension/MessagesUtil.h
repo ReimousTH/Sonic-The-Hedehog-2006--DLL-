@@ -1,5 +1,9 @@
 #pragma once
 
+
+#define ALTERNATIVE_UTIL_MSG
+
+
 extern "C" {
 #include <lua.h>
 #include <lualib.h>
