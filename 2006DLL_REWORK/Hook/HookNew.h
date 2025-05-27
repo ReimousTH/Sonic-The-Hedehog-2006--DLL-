@@ -239,10 +239,18 @@ extern "C" void CallLuaFunc();
 	return_type HookFuncName(__VA_ARGS__) \
 
 
+#define HOOKV3EX_EXTERN_C(addressTo, return_type, HookFuncName, call_args,args_name,...) \
+	void* HookFuncName##addressto = (void*)addressTo; \
+	HOOKV3EXMAP(addressTo,return_type,HookFuncName,call_args,args_name,__VA_ARGS__); \
+	extern "C" return_type HookFuncName(__VA_ARGS__) \
+
 
 
 
 #define HOOKV3(addressTo, return_type, HookFuncName, call_args,args_name,...) HOOKV3EX(addressTo,return_type,HookFuncName,call_args,args_name,__VA_ARGS__)
+#define HOOKV3_EXTERN_C(addressTo, return_type, HookFuncName, call_args,args_name,...) HOOKV3EX_EXTERN_C(addressTo,return_type,HookFuncName,call_args,args_name,__VA_ARGS__)
+
+
 #define INSTALL_HOOKV3(HookFuncName) \
 	HookNew::CreateHook(HookFuncName,HookFuncName##MAP,HookFuncName##addressto,0,0,0,-1,false,12)
 

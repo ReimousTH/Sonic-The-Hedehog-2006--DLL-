@@ -28,7 +28,9 @@ Class :
 		SetKeyFrame(Frame) -> void
 		SetKeyFrameRate(Rate) -> void
 		SetKeyFrameStart(Frame) -> void
-		SetKeyFrameEnd(Frame) -> void
+		SetKeyFrameEnd(Frame) -> void\
+	CNode(CSceneMetaMeta,Memory):
+	
 		
 
 		

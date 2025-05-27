@@ -42,7 +42,6 @@
 #include <xaudio.h>
 #include <xmedia.h>
 #include <AtgSimpleShaders.h>
-
 #include <Sox/ApplicationXenon.h>
 
 
@@ -50,17 +49,10 @@
 //EXTRA
 
 static LARGE_INTEGER APP_START_FRAME;
-
-
 static LARGE_INTEGER FIRST_SCALE;
-static LARGE_INTEGER LAST_SCALE;
-size_t FPS_CAP = -1;
-static float _mod_selector = 0.0;
+//static LARGE_INTEGER LAST_SCALE;
 
-static double scrollOffset = 0;
-static double scroll_acc_min = 1.0;
-static double scroll_acc = 0;
-static size_t LastMSG;
+static float _mod_selector = 0.0;
 
 
 const int lineHeight = 20;
@@ -71,18 +63,19 @@ const int screenWidth = 1280;
 const int screenHeight = 720;
 
 
-//Change-Default Later
-static bool DebugLogV4HUD = true;  //(_cntlzw(DebugLogV4HUD) & 0x20) != 0; !DebugLogV4HUD (not operation weird)
-static bool userScrolled = false;
-static bool HideXNCP = false;
-static bool showlog = true;
-static bool showuimsg = false;
-static bool BreakPoint = true;
 
 
 // Declare the function pointer
 REF_TYPE(Sonicteam::SoX::IResource) (*ArcHandle)(std::string, int, int) = (REF_TYPE(Sonicteam::SoX::IResource) (*)(std::string, int, int))0x82583528;
+
+
+volatile void (*sub_825B0988)(void*) = (volatile void (*)(void*))0x825B0988;
+volatile void (*sub_825B0AC0)(void*) = (volatile void (*)(void*))0x825B0AC0;
+
+
+
 std::map<std::string,Sonicteam::SoX::ArcHandle*> DLL_ARCS;	
+std::map<std::string,Sonicteam::SoX::ArcHandle*> DLL_ARCS_NATIVE;	
 static std::vector<std::string> DLL_ARCS_FOLDER; //cache_later
 static std::vector<std::string> files; //cache_later
 
@@ -310,7 +303,7 @@ class Button{
 	bool Toggle;
 	bool Focus;
 
-	bool* ToggleEx;
+	 bool* ToggleEx;
 
 
 	public:
@@ -327,12 +320,13 @@ class Button{
 	}
 
 
-	Button(const char* Name,DWORD FX,DWORD FY,DWORD _color,bool* Toggle){
+	Button(const char* Name,DWORD FX,DWORD FY,DWORD _color, bool* Toggle){
 		SetName(Name);
 		SetPos(FX,FY);
 		SetColor(_color);
 		ToggleEx = Toggle;
 	}
+
 
 
 	
@@ -529,16 +523,16 @@ public:
 		_sx = 0;
 		_sy = 0;
 		
-		_btn_map[0][0] = new Button("DebugLogV4HUD",0,0,D3DCOLOR_ARGB(255,255,0,0),&DebugLogV4HUD);
+		_btn_map[0][0] = new Button("DebugLogV4HUD",0,0,D3DCOLOR_ARGB(255,255,0,0),&DebugOptions::GetDebugLogV4HUD());
 
 
-		_btn_map[0][1] = new Button("userScrolled",300,0,D3DCOLOR_ARGB(255,255,0,0),&userScrolled);
-		_btn_map[0][2] = new Button("HideXNCP",600,0,D3DCOLOR_ARGB(255,255,0,0),&HideXNCP);
-		_btn_map[0][3] = new Button("showlog",900,0,D3DCOLOR_ARGB(255,255,0,0),&showlog);
+		_btn_map[0][1] = new Button("userScrolled",300,0,D3DCOLOR_ARGB(255,255,0,0),&DebugOptions::GetuserScrolled());
+		_btn_map[0][2] = new Button("HideXNCP",600,0,D3DCOLOR_ARGB(255,255,0,0),&DebugOptions::GetHideXNCP());
+		_btn_map[0][3] = new Button("showlog",900,0,D3DCOLOR_ARGB(255,255,0,0),&DebugOptions::Getshowlog());
 
 		//next-row
-		_btn_map[1][0] = new Button("showuimsg",0,100,D3DCOLOR_ARGB(255,255,0,0),&showuimsg);
-		_btn_map[1][1] = new Button("BreakPoint",300,100,D3DCOLOR_ARGB(255,255,0,0),&BreakPoint);
+		_btn_map[1][0] = new Button("showuimsg",0,100,D3DCOLOR_ARGB(255,255,0,0),&DebugOptions::Getshowuimsg());
+		_btn_map[1][1] = new Button("BreakPoint",300,100,D3DCOLOR_ARGB(255,255,0,0),&DebugOptions::GetBreakPoint());
 
 
 
@@ -1106,6 +1100,7 @@ class ModScene:public IScene{
 		index_max = _directory.size();
 		_selected = std::vector<bool>(index_max);
 
+		this->UnLoadArcs();
 		ProcessLoadFromDrive();
 
 		return true;
@@ -1146,8 +1141,19 @@ HOOKV3(0x82160B98,void*,CreateMarathonState,(Sonicteam::DocMarathonImp*,void*),(
 	xenon->FileSystemFolder.push_back(std::string("game:\\"));
 
 
-	app.SetScene(new ModScene());
-	app.Run();
+
+	if (DebugOptions::GetEnableDevStuff()){
+		size_t ApplicationXenon = *(size_t*)0x82D3B348;
+		app.InitializeDevice(*(D3DDevice**)(ApplicationXenon + 0x24));;
+		app.RenderOBJInit();
+
+	}
+	if (DebugOptions::GetAlwaysRunModLoaderAtStartup()){
+		app.SetScene(new ModScene());
+		app.Run();
+	}
+
+	
 
 
 
@@ -1170,7 +1176,7 @@ HOOKV3(0x82160B98,void*,CreateMarathonState,(Sonicteam::DocMarathonImp*,void*),(
 
 		if (FileSystem->FSPathExist(arc_full_path)){
 			_this->ArcVector1.push_back(ArcHandle(it->first,it->second.flag,it->second.SaveInMemory)); //-1 IF NOT 1 resource is being loaded but ??? something else happend and it destroy object depsite i can find csdobject in memory
-			DLL_ARCS[arc_full_path] = (Sonicteam::SoX::ArcHandle*)(_this->ArcVector1.rbegin())->get();
+			DLL_ARCS_NATIVE[arc_full_path] = (Sonicteam::SoX::ArcHandle*)(_this->ArcVector1.rbegin())->get();
 
 		}
 		else{
@@ -1197,6 +1203,29 @@ HOOKV3(0x82160B98,void*,CreateMarathonState,(Sonicteam::DocMarathonImp*,void*),(
 
 	return (void*)_this;
 }
+
+
+
+bool SearchChunkEX_NATIVE(Sonicteam::SoX::FileHandleARC* handlearc,Sonicteam::SoX::ArcHandleMgr* mgr,std::string& search_path,Sonicteam::SoX::ArcHandleSearchResource& search_chunk){
+
+
+
+	for (std::map<std::string,Sonicteam::SoX::ArcHandle*>::iterator it = DLL_ARCS_NATIVE.begin();it!= DLL_ARCS_NATIVE.end();it++){
+
+		Sonicteam::SoX::ArcHandle* ahandle =  it->second;
+		size_t find_index = -1;
+		std::string fpath =  Sonicteam::SoX::FileHandleARC::GetARCChunkPath(mgr,search_path);	
+		find_index = Sonicteam::SoX::FileHandleARC::SearchChunkEntryE1(&ahandle->_ArcFile,fpath.c_str());
+		if (find_index != -1){
+			Sonicteam::SoX::ArcFileChunkF chunkf = ahandle->_ArcFile.ChunkArray[find_index];
+			search_chunk.GetFromChunkFHandle(chunkf,ahandle);
+			return true;
+		}	
+
+	};
+	return false;	
+}
+
 
 
 bool SearchChunkEX(Sonicteam::SoX::FileHandleARC* handlearc,Sonicteam::SoX::ArcHandleMgr* mgr,std::string& search_path,Sonicteam::SoX::ArcHandleSearchResource& search_chunk){
@@ -1295,17 +1324,23 @@ char LoadHandleARC(Sonicteam::SoX::FileHandleARC* t){
 		Sonicteam::SoX::ArcHandleSearchResource chunkf;
 
 
+		//No Arc System
 		if (SearchExternalFile(t->filepath,ext_path)){
 			BranchTo(0X828B2B18,int,t,&ext_path); // Old File Loading
 		}
-
-		if (SearchExternalArcFolder(t->filepath,ext_path)){
+		//No Arc System, But ARCS like folder
+		else if (SearchExternalArcFolder(t->filepath,ext_path)){
 			BranchTo(0X828B2B18,int,t,&ext_path); // Old File Loading
 		}
-
+		//Load File from DLL ARC 
+		else if (SearchChunkEX_NATIVE(t,mgr,t->filepath,chunkf)){
+			BranchTo(0x828B2BF8,int,t,&chunkf); // LoadFileFromArc
+		}
+		//Load File From DLL ARC Mod
 		else if (SearchChunkEX(t,mgr,t->filepath,chunkf)){
 			BranchTo(0x828B2BF8,int,t,&chunkf); // LoadFileFromArc
 		}
+		//Original Behaviour
 		else if (t->SearchChunk(mgr,t->filepath,chunkf)){
 			BranchTo(0x828B2BF8,int,t,&chunkf); // LoadFileFromArc
 		}
@@ -1397,19 +1432,32 @@ bool __fastcall FileSystemIsFileExist(Sonicteam::SoX::FileSystemArc* _this, std:
 	path = path.substr(6); //remvoe game://
 
 
+
+	for (std::vector<std::string>::iterator it = DLL_ARCS_FOLDER.begin();it!= DLL_ARCS_FOLDER.end();it++){
+		std::string mod_file = *it + std::string("\\")+ path;
+		if (xenon->FSPathExist(mod_file)){
+			//AddMessage("DLL_ARCS_FOLDER, %s",mod_file.c_str());
+			return true;
+		}
+	}
+
 	for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); ++it) {
 		std::string mod_dir = std::string(MOD_DIR) + *it + std::string("\\");
 		std::string file_find = mod_dir + path;
 
 		if (xenon->FSPathExist(file_find)){
-			//PushXenonMessage(L"MSG",file_find.c_str());
+			//AddMessage("files, %s",file_find.c_str());
 			return true;
 		}
 
 	}
 
 
-	return BranchTo(0x825BE438 ,int,_this,&path);
+
+	bool result = BranchTo(0x825BE438 ,int,_this,&path);
+	//if (result) AddMessage("0x825BE438, %s",path.c_str());
+
+	return result;
 }
 
 
@@ -1423,18 +1471,32 @@ bool __fastcall FileSystemDirExist(Sonicteam::SoX::FileSystemArc* _this,std::vec
 
 	bool result = 0;
 
+
+	for (std::vector<std::string>::iterator it = DLL_ARCS_FOLDER.begin();it!= DLL_ARCS_FOLDER.end();it++){
+		std::string mod_file = *it + std::string("\\")+ path;
+		if (xenon->FSDirectoryGetFiles(files_dir,mod_file,extf)){
+			//AddMessage("FileSystemDirExist(DLL_ARCS_FOLDER), %s",mod_file.c_str());
+			result |= true;
+		}
+	}
+
+
+
 	for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); ++it) {
 		std::string mod_dir = std::string(MOD_DIR) + *it + std::string("\\");
 		std::string file_find = mod_dir + path;
 
-		if (xenon->FSDirectoryGetFiles(files_dir,pathf,extf)){
+		if (xenon->FSDirectoryGetFiles(files_dir,file_find,extf)){
+			//AddMessage("FileSystemDirExist(files), %s",file_find.c_str());
 			result |= true;
 		}
 
 	}
 
-	bool result_2 =  BranchTo(0x825BE3F0 ,bool,_this,&files_dir,&pathf,&extf);
 
+
+	bool result_2 =  BranchTo(0x825BE3F0 ,bool,_this,&files_dir,&pathf,&extf);
+	//AddMessage("[DLL] %s,.%s:%d",pathf.c_str(),extf.c_str() ,files_dir.size());
 
 	result |= result_2;
 	return result;
@@ -1444,47 +1506,70 @@ bool __fastcall FileSystemDirExist(Sonicteam::SoX::FileSystemArc* _this,std::vec
 
 
 
+
+
 class APP_NEW:public Sonicteam::SoX::ApplicationXenon{
 
 public:
 
 
-	void PrecisionFrameCap_Xenon(int targetFPS) {
-		static LARGE_INTEGER lastFrame = {0};
-		LARGE_INTEGER frequency;
-		QueryPerformanceFrequency(&frequency);
-		const LONGLONG targetDelta = frequency.QuadPart / targetFPS;
 
+	void PrecisionFrameCap_Xenon(LARGE_INTEGER StartFrame,int targetFPS) {
 
-		LARGE_INTEGER currentFrame;
-		do {
-			QueryPerformanceCounter(&currentFrame);
+		if (targetFPS == -1) return;
+		LARGE_INTEGER frequency, currentTime;
+		QueryPerformanceFrequency(&frequency);  // ticks per second
+		QueryPerformanceCounter(&currentTime);  // current ticks
 
-			// Yield every 1000 cycles to prevent CPU hogging
-			static int cycleCounter = 0;
-			if(++cycleCounter % 1000 == 0) {
-				SwitchToThread(); // Xenon-friendly yield
+		// Calculate elapsed time in seconds
+		double elapsedSeconds = double(currentTime.QuadPart - StartFrame.QuadPart) / frequency.QuadPart;
+
+		// Calculate target frame duration in seconds
+		double targetFrameDuration = 1.0 / targetFPS;
+
+		if (elapsedSeconds < targetFrameDuration) {
+			// Calculate how many milliseconds to sleep
+			DWORD sleepMilliseconds = DWORD((targetFrameDuration - elapsedSeconds) * 1000);
+
+			// Sleep for the remaining time to cap the frame rate
+			if (sleepMilliseconds > 0) {
+				Sleep(sleepMilliseconds);
 			}
-
-		} while((currentFrame.QuadPart - APP_START_FRAME.QuadPart) < targetDelta);
-
-		APP_START_FRAME = currentFrame;
+			// Optional: busy wait for more precise timing (less CPU friendly)
+			// This can be added if you want sub-millisecond precision
+			// but usually Sleep is enough for typical frame caps.
+		}
 	}
 
 
 
+
+	
 	void D3DRenderFrameAndSwapBuffersEX()
 	{
-		
+
+
 		_D3DDevice->SetShaderGPRAllocation(0,0,0);
-		_D3DDevice->SynchronizeToPresentationInterval(); //uncap FPS may cause issue on console
+		_D3DDevice->SynchronizeToPresentationInterval(); //uncap FPS may cause issue on console (uncync from 60 )
 		_D3DDevice->Resolve(0,0,FrontBufferTexture,0,0,0,0,0.0,0,0);
 		_D3DDevice->Swap(FrontBufferTexture,0);
-	//	PrecisionFrameCap_Xenon(60);
 
 	}
 
+	
+	
+	
+
 	void _Run(){
+
+
+		//FUCKS r22 register
+		volatile int r22_dummy;
+		__asm{
+			mr r22_dummy,r22
+			mr r22,r22_dummy
+		}
+
 		LARGE_INTEGER unk0x58;
 		LARGE_INTEGER unk0x60;
 		LARGE_INTEGER unk0x68;
@@ -1496,10 +1581,12 @@ public:
 		for (;!IsDisabled;){
 
 
+
 			Sonicteam::SoX::PerformanceFrequency::QPerfomanceCounter(&unk0x60);
 			APP_START_FRAME.QuadPart = unk0x60.QuadPart;
-			BranchTo(0x825B0988,int,this);
-			BranchTo(0x825B0AC0,int,this);
+
+			sub_825B0988(this);
+			sub_825B0AC0(this);
 
 			DWORD _lock1 =  this->Lock1;
 			if (this->NotifyTargetSignInState == 1){
@@ -1517,14 +1604,18 @@ public:
 			unk0x58.QuadPart = unk0x68.QuadPart;
 			unk0x70 = Sonicteam::SoX::PerformanceFrequency::PerfomanceScaleEX(&unk0x68_unk0x58_calc);
 			double delta = ((double)unk0x70.QuadPart * 0.000001);
+			
+
 			ATG::GAMEPAD* gc = ATG::Input::GetMergedInput(0);
+
+			
 			if (gc->wLastButtons & XINPUT_GAMEPAD_BACK){
 				_mod_selector+= delta;
 
 
-				if (DebugLogV4HUD){
-					if (gc->fY2 <= -0.1){
-						userScrolled = false;
+				if (DebugOptions::GetDebugLogV4HUD()){
+					if (gc->fY2 <= -0.25){
+						DebugOptions::SetuserScrolled( false );
 					}	
 
 					if (gc->wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN){
@@ -1536,14 +1627,14 @@ public:
 			else{
 				_mod_selector = 0.0;
 
-				if (gc->fY2 != 0){
-					scroll_acc += (scroll_acc_min + delta);
-					userScrolled = true;
+				if (abs(gc->fY2) > 0.25){
+					DebugOptions::Setscroll_acc( DebugOptions::Getscroll_acc()  + (DebugOptions::Getscroll_acc_min() + delta));
+					DebugOptions::SetuserScrolled( true );
 				}
 				else{
-					scroll_acc = (scroll_acc_min + delta);
+					DebugOptions::Setscroll_acc (DebugOptions::Getscroll_acc_min() + delta);
 				}
-				scrollOffset += gc->fY2 * (delta * scroll_acc );
+				DebugOptions::SetscrollOffset(DebugOptions::GetscrollOffset() + gc->fY2 * (delta * DebugOptions::Getscroll_acc() ));
 
 
 			}
@@ -1551,19 +1642,19 @@ public:
 				_mod_selector = 0.0;
 
 				if (gc->wLastButtons & XINPUT_GAMEPAD_Y){
-					DebugLogV4HUD = !DebugLogV4HUD;
+					DebugOptions::SetDebugLogV4HUD( !DebugOptions::GetDebugLogV4HUD() );
 				}
 				else if (gc->wLastButtons & XINPUT_GAMEPAD_B){
-					HideXNCP = !HideXNCP;
+					DebugOptions::SetHideXNCP ( !DebugOptions::GetHideXNCP() ); //i'll think about it
 				}
-				
+			
 				else if (gc->bRightTrigger){
-					showlog = !showlog;
+					DebugOptions::Setshowlog( !DebugOptions::Getshowlog() );
 				}
 				else if (gc->bLastLeftTrigger){
-					showuimsg = !showuimsg;
+					DebugOptions::Setshowuimsg(!DebugOptions::Getshowuimsg());
 				}
-				else if (gc->wLastButtons & XINPUT_GAMEPAD_X){
+				else if (gc->wLastButtons & XINPUT_GAMEPAD_X && DebugOptions::GetEnableDevStuff()){
 					app.SetScene(new OptionScene());
 					app.Run();
 				}
@@ -1578,8 +1669,25 @@ public:
 			
 
 			FIRST_SCALE.QuadPart = unk0x70.QuadPart;
-			ProcessDoc(	((double)unk0x70.QuadPart * 0.000001));
+			double delta2 = ((double)unk0x70.QuadPart * 0.000001);
 
+			if (FPS_CAP != -1){
+
+				float* flt_82000B88 = (float*)0x92000B88;
+				float* flt_8200CEAC = (float*)0x9200CEAC;
+				float* flt_82018EE4 = (float*)0x92018EE4;
+				float* flt_82019A98 = (float*)0x92019A98;
+				float* flt_82B3ECC0 = (float*)0x92B3ECC0; ///
+		
+				*flt_82000B88 = 1.0/(float)FPS_CAP;
+				//*flt_8200CEAC = 1.0/(float)FPS_CAP;
+				//*flt_82018EE4 = 1.0/(float)FPS_CAP;
+				//*flt_82019A98 = 1.0/(float)FPS_CAP;
+				//*flt_82B3ECC0 = 1.0/(float)FPS_CAP;
+
+
+			}
+			ProcessDoc(delta2);
 			Sonicteam::SoX::PerformanceFrequency::QPerfomanceCounter(&unk0x90);
 			LARGE_INTEGER unk0x90_unk0x60_calc; unk0x90_unk0x60_calc.QuadPart =  unk0x90.QuadPart - unk0x60.QuadPart;
 			LARGE_INTEGER end_scale =  Sonicteam::SoX::PerformanceFrequency::PerfomanceScaleEX(&unk0x90_unk0x60_calc);
@@ -1590,14 +1698,19 @@ public:
 			LARGE_INTEGER last_scale =  Sonicteam::SoX::PerformanceFrequency::PerfomanceScaleEX(&unk0x98_unk0x60_calc);
 			this->PerfScalePost.QuadPart = last_scale.QuadPart;
 
+
+			PrecisionFrameCap_Xenon(unk0x60,FPS_CAP);
+
 			
 
 		}
 	}
+
 };
 
 
-HOOKV3(0x825B1870,void*,APPRUN,(APP_NEW*),(_this), APP_NEW* _this){
+
+HOOKV3_EXTERN_C(0x825B1870,void*,APPRUN,(APP_NEW*),(_this), APP_NEW* _this){
 
 	_this->_Run();
 	return (_this);
@@ -1613,20 +1726,19 @@ float FileSystemNew::lerp(float a, float b, float t)
 
 
 
-void APP_NEW_RENDER(APP_NEW* _this){
+extern "C" void APP_NEW_RENDER(APP_NEW* _this){
 
 	double delta = (double)FIRST_SCALE.QuadPart * 0.000001;
 	double end_delta = (double)_this->PerfScalePost.QuadPart * 0.000001;
-
 	unsigned __int64 freq =   Sonicteam::SoX::PerformanceFrequency::getInstanceQuick().LastFrequency.QuadPart;
 
 
 
 
-	if (DebugLogV4HUD){
+	if (DebugOptions::GetDebugLogV4HUD() && DebugOptions::GetEnableDevStuff()){
 
 
-		if (showuimsg){
+		if (DebugOptions::Getshowuimsg()){
 
 			ModSelectAPP::m_font_2.Begin();
 			for (std::map<DMSG_UI*,size_t>::iterator it = _Message_UI_.begin();it != _Message_UI_.end();it++){
@@ -1647,7 +1759,7 @@ void APP_NEW_RENDER(APP_NEW* _this){
 		double _max_line_pre_scroll = _max_line  - (0.65*viewportHeight);
 
 
-		wsprintfW(_out_message,  L"FPS: %03d, PhysMem: %d\\%d, VirtualMem: %d\\%d,  PageMem: %d\\%d, scroll : %f\\%f   ",(int)(1.0/delta),statex.dwAvailPhys /1024,statex.dwTotalPhys/1024,statex.dwAvailVirtual/1024,statex.dwTotalVirtual/1024,statex.dwAvailPageFile/1024,statex.dwTotalPageFile/1024,-scrollOffset,_max_line_pre_scroll);
+		wsprintfW(_out_message,  L"FPS: %03d, PhysMem: %d\\%d, VirtualMem: %d\\%d,  PageMem: %d\\%d, scroll : %f\\%f   ",(int)(1.0/delta),statex.dwAvailPhys /1024,statex.dwTotalPhys/1024,statex.dwAvailVirtual/1024,statex.dwTotalVirtual/1024,statex.dwAvailPageFile/1024,statex.dwTotalPageFile/1024,-DebugOptions::GetscrollOffset(),_max_line_pre_scroll);
 
 		ModSelectAPP::m_font_2.Begin();
 		ModSelectAPP::m_font_2.DrawText(0,50,0xFF00FFFF,_out_message,ATGFONT_RIGHT);
@@ -1657,24 +1769,30 @@ void APP_NEW_RENDER(APP_NEW* _this){
 
 
 
-		if (!userScrolled) {
-			scrollOffset = FileSystemNew::lerp(scrollOffset, -_max_line_pre_scroll ,delta);
+		if (!DebugOptions::GetuserScrolled()) {
+			DebugOptions::SetscrollOffset(  FileSystemNew::lerp(DebugOptions::GetscrollOffset(), -_max_line_pre_scroll ,delta) );
 
 		}
-		if (showlog){
+		if (DebugOptions::Getshowlog()){
 			ModSelectAPP::m_font_2.Begin();
-			int y_position = viewportTop + scrollOffset;
-			for (std::vector<DMSG>::iterator msg = _Message_.begin();msg!= _Message_.end();msg++) {
-				std::wstring msg_raw(msg->_m.begin(), msg->_m.end());
-				wchar_t _msg_dbg_[1024];
-				wsprintfW(_msg_dbg_, L"%s | %d", msg_raw.c_str(), msg->_c);
-				if (y_position + lineHeight > viewportTop && y_position < viewportBottom) {
+			int y_position = viewportTop + DebugOptions::GetscrollOffset();
 
-					msg->Lerp(delta);
-					ModSelectAPP::m_font_2.DrawText(5, y_position, msg->color, _msg_dbg_, ATGFONT_LEFT);
-				
-				}
-				y_position += lineHeight;
+			// Calculate first and last visible message indices
+			int firstVisible = std::max(0, static_cast<int>((viewportTop - y_position) / lineHeight));
+			int lastVisible = std::min(static_cast<int>(_Message_.size()) - 1, firstVisible + static_cast<int>((viewportBottom - viewportTop) / lineHeight));
+
+
+			// Only process visible messages
+			for (int i = firstVisible; i <= lastVisible && i < _Message_.size(); ++i) {
+				DMSG& msg = _Message_[i];
+				const float currentY = y_position + (i * lineHeight);
+
+				std::wstring msg_raw(msg._m.begin(), msg._m.end());
+				wchar_t _msg_dbg_[1024];
+				wsprintfW(_msg_dbg_, L"%s | %d", msg_raw.c_str(), msg._c);
+
+				msg.Lerp(delta);
+				ModSelectAPP::m_font_2.DrawText(5, currentY, msg.color, _msg_dbg_, ATGFONT_LEFT);
 			}
 			ModSelectAPP::m_font_2.End();
 
@@ -1687,9 +1805,6 @@ void APP_NEW_RENDER(APP_NEW* _this){
 		ModSelectAPP::m_font_2.DrawText(0,670,D3DCOLOR_ARGB(255,255,255,255),L"Development Build(SOJ)",ATGFONT_RIGHT);
 		ModSelectAPP::m_font_2.End();
 
-
-
-
 	}
 
 
@@ -1698,10 +1813,9 @@ void APP_NEW_RENDER(APP_NEW* _this){
 }
 
 
-
 int __fastcall CPlatformDrawCache1(int a1, int a2, __int64 a3)
 {
-	if (!HideXNCP){
+	if (!DebugOptions::GetHideXNCP()){
 		BranchTo(0x826315C8,int,a1,a2,a3);
 	}
 	return 0;
@@ -1727,14 +1841,44 @@ void __fastcall EngineDocOnUpdate(Sonicteam::DocMarathonImp *_doc, double a2){
 }
 
 
+int GetRefreshRateFromDevice(IDirect3DDevice9* pDevice)
+{
+	if (!pDevice) return 0;
+
+	D3DDISPLAYMODE displayMode;
+	if (FAILED(pDevice->GetDisplayMode(0, &displayMode))) // 0 = first monitor
+		return 0;
+
+	return displayMode.RefreshRate;
+}
+
 void FileSystemNew::GlobalInstall()
 {
 
-	AddMessage(std::string("test01"));
 
+	if (FPS_CAP != -1) {
 
+		DWORD interval = D3DPRESENT_INTERVAL_ONE;
 
-	WRITE_DWORD(0x8204DD78 ,CPlatformDrawCache1);
+		DWORD monitorRefreshRate = 60;
+	
+
+		if (FPS_CAP >= monitorRefreshRate) {
+			interval = D3DPRESENT_INTERVAL_ONE; // Cap at 60 FPS
+		}
+		else if (FPS_CAP <= monitorRefreshRate / 4) {
+			interval = D3DPRESENT_INTERVAL_FOUR; // Minimum interval (15 FPS)
+		}
+		else {
+			interval = D3DPRESENT_INTERVAL_THREE;
+		}
+
+		
+		AddMessage("[DLL] monitorRefreshRate : %d, inverval : %d ",monitorRefreshRate,interval);
+		WRITE_DWORD(0x825B1C84, 0x38800000 | interval);
+	}
+
+	
 
 
 //	WRITE_DWORD(0x82000950,EngineDocOnUpdate);
@@ -1742,17 +1886,25 @@ void FileSystemNew::GlobalInstall()
 //	WRITE_DWORD(0x825EA738,0x48000024);
 
 	//	WRITE_DWORD(0x825EA65C,0x60000000);	
-	WRITE_DWORD(0x8204D970,APP_NEW_RENDER);
 
-	INSTALL_HOOKV3EX(APPRUN,-1,true,12);
+
+	
+	WRITE_DWORD(0x8204DD78 ,CPlatformDrawCache1);
+	WRITE_DWORD(0x8204D970,APP_NEW_RENDER);
+	
+
+
+
+	
+	INSTALL_HOOKV3EX(APPRUN,-1,true,9);
 
 	//Use Auto Buffer because i cant create mine :C
 	WRITE_DWORD(0x825B1C90,0x60000000);
 	WRITE_DWORD(0x825B1C9C,0x60000000);
 
 	WRITE_DWORD(0x82080424,LoadHandleARC);
-	INSTALL_HOOKV3EX(CreateMarathonState,1,false,12);
-	INSTALL_HOOKV3EX(ATGXMAFILEOpen,-1,true,12);
+	INSTALL_HOOKV3EX(CreateMarathonState,1,false,9);
+	INSTALL_HOOKV3EX(ATGXMAFILEOpen,-1,true,9);
 	WRITE_DWORD(0x8206313C,WMVCreateFile);
 	WRITE_DWORD(0x8204839C,FileSystemIsFileExist);
 	WRITE_DWORD(0x82048398,FileSystemDirExist);

@@ -25,8 +25,11 @@ BOOL APIENTRY DllMain( HANDLE hModule,
                        LPVOID lpReserved
                      )
 {
+	XLoadLibrary("",10);
     switch (ul_reason_for_call)
     {
+
+
     case DLL_PROCESS_ATTACH:
 		STH2006DLLMain();
         break;

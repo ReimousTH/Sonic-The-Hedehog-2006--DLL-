@@ -46,10 +46,12 @@ namespace DebugLogV2{
 
 	int MemoryLIB_GlobalInstall(lua_State* L)
 	{
+
+
+		lua_register06(L,"GetDLLVersion",EXTRA_GetDLLVersion);
+
+
 		luaL_openlib06(L,"memory",MEM,0);
-
-
-
 
 		luaL_newmetatable06(L, "MemoryMeta");
 		lua_pushstring06(L,"__index"); lua_pushvalue(L,-2); lua_settable06(L,-3); // __index = MemoryMeta
@@ -145,6 +147,28 @@ namespace DebugLogV2{
 
 
 		return 0;
+	}
+
+	extern "C" int EXTRA_GetDLLVersion(lua_State* L){
+		
+
+		int year, month, day;
+		char month_str[4];
+		sscanf(__DATE__, "%3s %d %d", month_str, &day, &year);
+
+		// Convert month abbreviation to number (1-12)
+		const char *months[] = {"Jan","Feb","Mar","Apr","May","Jun",
+								"Jul","Aug","Sep","Oct","Nov","Dec"};
+		for (int i = 0; i < 12; i++) {
+			if (strncmp(month_str, months[i], 3) == 0) {
+				month = i + 1;
+				break;
+			}
+		}
+		
+		int numeric_date = year * 10000 + month * 100 + day;  // e.g., 20240527
+		lua_pushnumber(L, numeric_date);  // Push as number
+		return 1 ;
 	}
 
 	extern "C" Memory__CreateMetatableFields(lua_State* L,int value,int move){

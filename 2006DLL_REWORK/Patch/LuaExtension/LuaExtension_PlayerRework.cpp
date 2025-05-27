@@ -3,6 +3,7 @@
 #define PLIB_NAME_META "PlayerMeta"
 #define PLIB_NAME "Player"
 
+#include <Player/State/Machine2.h>
 
 namespace DebugLogV2{
 
@@ -47,6 +48,7 @@ namespace DebugLogV2{
 		lua_pushstring06(LS, "GetActorID");lua_pushcfunction06(LS, PlayerR__GetActorID);lua_settable06(LS, -3); // Equivalent to table["GetActorID"] = PlayerR__GetActorID
 		lua_pushstring06(LS, "GetStateID");lua_pushcfunction06(LS, PlayerR__GetStateID);lua_settable06(LS, -3); // Equivalent to table["GetStateID"] = PlayerR__GetStateID
 		lua_pushstring06(LS, "SetStateID");lua_pushcfunction06(LS, PlayerR__SetStateID);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
+		lua_pushstring06(LS, "SetStateIDF");lua_pushcfunction06(LS, PlayerR__SetStateIDForce);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
 		lua_pushstring06(LS, "GetMachine2");lua_pushcfunction06(LS, PlayerR__GetMachine2);lua_settable06(LS, -3); // Equivalent to table["SetStateID"] = PlayerR__SetStateID
 
 
@@ -620,6 +622,40 @@ namespace DebugLogV2{
 	extern "C" int PlayerR__SetStateID(lua_State* L)
 	{
 
+
+		int args = lua_gettop(L)-1;
+		lua_pushstring06(L,"ptr");
+		lua_gettable(L,1);
+		int OBJPlayer = (int)lua_touserdata(L,-1);
+		int StateID = lua_tonumber(L,2);
+
+		int way = 0;
+		if (args >= 3) way = lua_tonumber(L,3);
+
+
+		if (OBJPlayer ){
+			Sonicteam::Player::State::IMachine* Mashine = *(Sonicteam::Player::State::IMachine**)(OBJPlayer + 0xE4);
+
+			switch (way){
+				case 0:
+					Mashine->ChangeMashineState(StateID);
+					break;
+				case 1:
+					Mashine->AlternativeChangeMashineState(StateID);
+					break;
+				case 2:
+					Mashine->CompleteChangeMashineState(StateID);
+					break;
+			}
+
+		}
+	
+
+		return 0;
+	}
+
+	extern "C" int PlayerR__SetStateIDForce(lua_State* L)
+	{
 		lua_pushstring06(L,"ptr");
 		lua_gettable(L,1);
 		int OBJPlayer = (int)lua_touserdata(L,-1);
@@ -627,10 +663,13 @@ namespace DebugLogV2{
 
 		if (OBJPlayer ){
 			Sonicteam::Player::State::IMachine* Mashine = *(Sonicteam::Player::State::IMachine**)(OBJPlayer + 0xE4);
-			Mashine->CompleteChangeMashineState(StateID);
-
+			Sonicteam::Player::State::Machine2* m2 = static_cast<Sonicteam::Player::State::Machine2*>(Mashine);
+			m2->PreState = StateID; // force WAY INTO
+			if (m2->PostState != m2->PreState){
+				m2->MashineStateFlag1 = 0;
+				m2->MashineStateFlag2 = 0;
+			}
 		}
-	
 
 		return 0;
 	}

@@ -538,13 +538,11 @@ void STH2006DLLMain()
 	
 
 
-	FileSystemNew::GlobalInstall();
-	FileSystemNew::AddArc("Resources.arc",2,0);
-	
+
 	
 
-	INSTALL_HOOKV3EX(sub_0x82279CA8,-1,false,11);
-	INSTALL_HOOKV3EX(sub_8221ECD0,-1,false,9);
+//	INSTALL_HOOKV3EX(sub_0x82279CA8,-1,false,11);
+//	INSTALL_HOOKV3EX(sub_8221ECD0,-1,false,9);
 	
 	
 
@@ -556,7 +554,7 @@ void STH2006DLLMain()
 //	INSTALL_HOOKV3EX(PostureCommon,-1,1,11);
 
 
-	WRITE_DWORD(0x8200BB08,sub_8221EAF0);
+//	WRITE_DWORD(0x8200BB08,sub_8221EAF0);
 
 
 
@@ -570,12 +568,25 @@ void STH2006DLLMain()
 	DebugLogV2::ThreadLog = false; //temp
 
 
+	FPS_CAP = lua_file.GetGlobalInt("FPS_CAP",-1);
+
+
+	DebugOptions::SetEnableDevStuff ( lua_file.GetGlobalBool("IsEnableDevStuff") );
+	DebugOptions::SetAlwaysRunModLoaderAtStartup ( lua_file.GetGlobalBool("IsForceModLoaderStartup") );
+
+
+
+	FileSystemNew::GlobalInstall();
+	FileSystemNew::AddArc("Resources.arc",2,0);
+
+
 	for (int i = 0;i<sizeof(functions)/sizeof(FPair);i++){
 		if (lua_file.GetGlobalBool(functions[i].Name) == true){
 			functions[i].Function();
 			log << functions[i].Name << "\n";
 		}
 	}
+
 	
 
 

@@ -224,6 +224,19 @@ extern "C" bool ZLua::GetGlobalBool(const char* string){
 }
 
 
+int ZLua::GetGlobalInt(const char* string, int defaultt)
+{
+	int _return = 0;
+	lua_getglobal(this->L, string);
+	if (lua_isnumber(this->L, -1)) {
+		_return = lua_tonumber(this->L, -1);  // Added missing '=' here
+	}
+	else {
+		_return = defaultt;
+	}
+	lua_pop(this->L, 1);
+	return _return;
+}
 void ZLua::DoFile(bool ignore){
 
 	locked = true;
@@ -259,3 +272,5 @@ void ZLua::DoFile(bool ignore){
 void ZLua::CallFunction(){
 
 }
+
+

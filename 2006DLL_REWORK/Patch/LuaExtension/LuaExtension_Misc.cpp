@@ -56,8 +56,6 @@ extern "C" size_t Misc::GetNumber(lua_State* L,int argument)
 				}
 				lua_pop(L,1); //MemoryMeta
 				//other
-
-
 				lua_pop(L,1); //lua_getmetatable
 
 			}

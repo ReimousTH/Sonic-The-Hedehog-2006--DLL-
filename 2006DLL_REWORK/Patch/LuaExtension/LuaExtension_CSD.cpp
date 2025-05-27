@@ -291,7 +291,7 @@ namespace DebugLogV2{
 		lua_pushstring(L,"ptr");
 		lua_gettable(L,1);
 		Chao::CSD::CScene* CScene = (Chao::CSD::CScene*)Misc::GetNumber(L,-1);
-		lua_pushnumber(L,	CScene->MotionKeyFrameRate);
+		lua_pushnumber(L,CScene->MotionKeyFrameRate);
 		return 1;
 	}
 
@@ -382,6 +382,10 @@ namespace DebugLogV2{
 		lua_pushstring(L,"ptr");
 		lua_gettable(L,1);
 		Chao::CSD::CNode* CNode = (Chao::CSD::CNode*)Misc::GetNumber(L,-1);
+		size_t CNode2C8 = *(size_t*)((size_t)(CNode->unk0x2C) + 8);
+		float index = *(float*)((size_t)(CNode2C8) + 0x40);
+		int findex = index / 0x2710;
+		lua_pushnumber(L,findex);
 		return 1; // ?
 	}
 

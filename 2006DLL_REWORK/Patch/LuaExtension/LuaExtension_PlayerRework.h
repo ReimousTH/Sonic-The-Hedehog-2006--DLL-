@@ -74,6 +74,7 @@ namespace DebugLogV2 {
 
 	extern "C" int PlayerR__GetStateID(lua_State* L);
 	extern "C" int PlayerR__SetStateID(lua_State* L);
+	extern "C" int PlayerR__SetStateIDForce(lua_State* L);
 
 
 	extern "C" int PlayerR__GetMachine2(lua_State* L);

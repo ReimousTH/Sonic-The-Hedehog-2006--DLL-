@@ -36,7 +36,8 @@ public:
 
 	const char* ZLua::GetGlobalString(const char* string);
 	bool GetGlobalBool(const char* string);
-	int ZLua::GetGlobalInt(const char* string);
+	int GetGlobalInt(const char* string,int defaultt =0);
+
 
 	static void UseBaseLibsEx(lua_State* L);
 

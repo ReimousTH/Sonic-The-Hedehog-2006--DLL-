@@ -17,6 +17,83 @@ struct DMSG;
 
 extern std::map<DMSG_UI*,size_t> _Message_UI_;
 extern std::vector<DMSG> _Message_;
+extern size_t FPS_CAP;
+
+class DebugOptions{
+private: //prevent r22, causing null ptr 
+	static bool AlwaysRunModLoaderAtStartup;
+	static bool EnableDevStuff;
+	static bool DebugLogV4HUD;  //(_cntlzw(DebugLogV4HUD) & 0x20) != 0; !DebugLogV4HUD (not operation weird)
+	static bool userScrolled;
+	static bool HideXNCP;
+	static bool showlog;
+	static bool showuimsg;
+	static bool BreakPoint;
+
+
+	//extra
+
+
+
+	static double scrollOffset;
+	static double scroll_acc_min;
+	static double scroll_acc;
+
+
+
+public:
+	static bool& GetAlwaysRunModLoaderAtStartup();
+	static void SetAlwaysRunModLoaderAtStartup(bool value);
+
+	static bool& GetEnableDevStuff();
+	static void SetEnableDevStuff(bool value);
+
+	static bool& GetDebugLogV4HUD();
+	static void SetDebugLogV4HUD(bool value);
+
+
+	
+	static bool& GetuserScrolled();
+	static void SetuserScrolled(bool value);
+
+	static bool& GetHideXNCP();
+	static void SetHideXNCP(bool value);
+
+
+	static bool& Getshowlog();
+	static void Setshowlog(bool value);
+
+	static bool& Getshowuimsg();
+	static void Setshowuimsg(bool value);
+
+	static bool& GetBreakPoint();
+	static void SetBreakPoint(bool value);
+
+
+	
+	static double& GetscrollOffset();
+	static void SetscrollOffset(double value);
+
+
+	static double& Getscroll_acc_min();
+	static void Setscroll_acc_min(double value);
+
+	static double& Getscroll_acc();
+	static void Setscroll_acc(double value);
+
+
+
+
+
+
+
+
+};
+
+
+//Change-Default Later
+
+
 
 
 

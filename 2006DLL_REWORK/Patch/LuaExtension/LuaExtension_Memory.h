@@ -51,6 +51,8 @@ namespace DebugLogV2 {
 
 
 
+	extern "C" int EXTRA_GetDLLVersion(lua_State* L);
+
 	extern "C" Memory__NEW(lua_State* L);
 
 

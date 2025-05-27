@@ -1,5 +1,5 @@
 #include "LuaExtension_OpenState.h"
-
+#include <Core/Debug.h>
 
 #define  LEOS_StateOnValue(v1,v2) (v1 << 4 | v2)
 
@@ -192,6 +192,19 @@ namespace DebugLogV2{
 		 return 1;
 	}
 
+
+	BOOL __fastcall ChangeState(int a1, int a2){
+		
+		DWORD LR;
+		__asm{
+			mr LR,r12 
+		}
+
+
+		AddMessage("ChangeState to %d from ::%x",a2,LR);
+
+		return BranchTo(0x8221DF20,int,a1,a2);
+	}
 	int OpenState_GlobalInstall(lua_State* L)
 	{
 
@@ -213,6 +226,9 @@ namespace DebugLogV2{
 		//	WRITE_DWORD(0x8238FD88,0x60000000);
 
 			WRITE_DWORD(0x8219C994,0x3860007C);  //li        r3, 0x7C # 'x' # a1 for statemachine2
+//			WRITE_DWORD(0x8200BAE4,ChangeState);  //li        r3, 0x7C # 'x' # a1 for statemachine2
+
+
 			return 0;
 		}
 

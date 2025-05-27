@@ -346,7 +346,7 @@
 				Optimization="3"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="2"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="..\;..\2006DLL_REWORK;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Lua\src&quot;;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Marathon&quot;;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\Boost&quot;;..\ATG_LIB;&quot;..\Sonic-The-Hedgehog-2006-Marathon-Library\&quot;"
 				PreprocessorDefinitions="_RELEASE;_XBOX;XBOX;_XENON;_WIN32;BOOST_DISABLE_THREADS"
 				StringPooling="true"
@@ -380,8 +380,8 @@
 				IgnoreDefaultLibraryNames="/NODEFAULTLIB:libcmt.lib"
 				ModuleDefinitionFile="DllModule.def"
 				GenerateDebugInformation="true"
-				OptimizeReferences="1"
-				EnableCOMDATFolding="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
 				SetChecksum="true"
 			/>
 			<Tool
