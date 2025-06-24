@@ -517,7 +517,7 @@ namespace DebugLogV2{
 		///
 
 
-		Sonicteam::Prop::Scene* PropScenePTR = gameimp->GameProp[PlacementIndex].get();
+		Sonicteam::Prop::Scene* PropScenePTR = gameimp->GamePropScene[PlacementIndex].get();
 		int LastIndex = PropScenePTR->ScenePropInstance.size();
 		char bufferX[512];
 		sprintf(bufferX,"%s%d",OBJ_ID,LastIndex); //dashpanel 101
@@ -656,6 +656,8 @@ namespace DebugLogV2{
 		
 
 		Sonicteam::Prop::Manager* PropManger = PropScenePTR->PropManager;
+
+		
 		Sonicteam::Prop::ActorCreators* ActorCreatorsVar =  PropManger->ActorCreators.lock().get();
 		Sonicteam::Actor* obj_actor =  ActorCreatorsVar->ActorCreator[std::string(OBJ_ID)]->CreateActor(ActorCreatorsVar->NamedActor,&ActorCreatorsVar->GameImp,&buffer);
 	

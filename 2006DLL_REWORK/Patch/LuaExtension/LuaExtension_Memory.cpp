@@ -1442,8 +1442,6 @@ namespace DebugLogV2{
 		Memory_HOOK_OBJECT_NEW(L,addr_to,lua_func,hook); 
 
 
-	
-
 
 
 		return 1;

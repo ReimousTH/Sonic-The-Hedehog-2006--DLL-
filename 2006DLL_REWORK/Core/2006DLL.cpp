@@ -1,13 +1,14 @@
 #include "2006DLL.h"
 #include <string>
 
-
+#include <Xbox.h>
 #include <Patch/Common/XEXALLOCATORS.H>
 #include <Patch/Common/XEXALLOCATORS_UNDEF.H>
 #include <Patch/FileSystemNew/FileSystemNew.h>
 #include <Patch/TailsGauge/TailsGauge.h>
 #include <Patch/OmegaGauge/OmegaGauge.h>
 #include <Patch/reticle/reticle.h>
+#include <Patch/ControllerRemap/ControllerRemap.h>
 
 
 
@@ -50,7 +51,8 @@ FPair functions[] = {
 	{"TagBattleExtension", TagBattleMain::GlobalInstall},
 	//{"FileSystemNew", FileSystemNew::GlobalInstall},
 	{"TailsGauge", TailsGauge::GlobalInstall},
-	{"OmegaHoverGauge",OmegaGauge::GlobalInstall}
+	{"OmegaHoverGauge",OmegaGauge::GlobalInstall},
+	{"ControllerRemap",ControllerRemap::GlobalInstall}
 };
 
 
@@ -569,6 +571,16 @@ void STH2006DLLMain()
 
 
 	FPS_CAP = lua_file.GetGlobalInt("FPS_CAP",-1);
+	int platform = lua_file.GetGlobalInt("Platform");
+	if (platform == 0){
+		HookNew::UseEmulatedAddress = 0;
+		HookV2::IsNotEmulatedHardWare =  true;
+	}
+	else if (platform == 1){
+		HookNew::UseEmulatedAddress = 1;
+		HookV2::IsNotEmulatedHardWare =  false;
+	}
+
 
 
 	DebugOptions::SetEnableDevStuff ( lua_file.GetGlobalBool("IsEnableDevStuff") );
@@ -600,7 +612,7 @@ void STH2006DLLMain()
 		WaitForSingleObject(overlap.hEvent,INFINITE);
 		CloseHandle(overlap.hEvent);
 	}
-	
+	//XShowSigninUI(1,0);
 	
 
 

@@ -39,9 +39,12 @@ private: //prevent r22, causing null ptr
 	static double scroll_acc_min;
 	static double scroll_acc;
 
+	public:
+	static std::map<std::string,size_t> breakpoint_disabled;
 
 
-public:
+
+
 	static bool& GetAlwaysRunModLoaderAtStartup();
 	static void SetAlwaysRunModLoaderAtStartup(bool value);
 

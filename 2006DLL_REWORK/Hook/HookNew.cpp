@@ -45,6 +45,7 @@ HookNew* HookNew::CreateHook(void* Target, void* TargetMap, void* Original,char 
 	hook->lua_function =fp13_number; 
 
 
+	AddMessage("hook : target: %x : original : %x",BufferPoint,Original);
 	// Check if the original function is already hooked
 	if (HookNew::SaveBuffer->find(Original) == HookNew::SaveBuffer->end()) {
 		HookNew::SaveBuffer->insert(std::make_pair(Original, std::vector<HookNew*>()));
@@ -54,6 +55,26 @@ HookNew* HookNew::CreateHook(void* Target, void* TargetMap, void* Original,char 
 		int OriginalPos = reinterpret_cast<int>(Original); // Pointer to original function
 
 		// Copy instructions from the original function
+
+		if (fp13){
+
+			while (true){
+
+				DWORD Instruction = *reinterpret_cast<int*>(OriginalPos);
+				DWORD Instruction_OP =  Instruction & 0xFC000000;
+
+				if (Instruction_OP == POWERPC_OPCODE_B){
+
+				}
+				
+
+
+				OriginalPos += 4; // Move to the next instruction
+				StartPos+=4;
+			}
+
+		}
+		else{
 		for (int i = 0; i < GenCopyInCount; ++i) {
 			DWORD Instruction = *reinterpret_cast<int*>(OriginalPos);
 
@@ -68,29 +89,48 @@ HookNew* HookNew::CreateHook(void* Target, void* TargetMap, void* Original,char 
 				}
 				int address_to = OriginalPos + BranchOffset;
 
-				// Prepare branch instructions
-				BranchBuffer[0] = POWERPC_LIS(register_choose, POWERPC_HI(address_to));
-				BranchBuffer[1] = POWERPC_ORI(register_choose, register_choose, POWERPC_LO(address_to));
-				BranchBuffer[2] = POWERPC_MTCTR(register_choose);
-				BranchBuffer[3] = 0x4E800420 | linked;
-		
-				memcpy((void*)(StartPos), BranchBuffer, sizeof(BranchBuffer)); // Copy data to hook address
-				StartPos += sizeof(BranchBuffer);
+				//instead-doing  __savegprlr_14 bl , we just add code of it 
+				if (address_to >= 0x826DE890 && address_to <= 0x826DE8E0){
+			
+					DWORD __savegprlr_pos = address_to - 0x826DE890;
+					for (int j = address_to;j<0x826DE8E0-4;j+=4){
+
+						memcpy((void*)(StartPos), (void*)(j), 4); // Copy data to hook address
+						StartPos += 4;
+						//AddMessage("pointer : %x : %x",Original,StartPos);
+					}
+				} //__savegprlr_14
+				else{
+
+					// Prepare branch instructions
+			
+					BranchBuffer[0] = POWERPC_LIS(register_choose, POWERPC_HI(address_to));
+					BranchBuffer[1] = POWERPC_ORI(register_choose, register_choose, POWERPC_LO(address_to));
+					BranchBuffer[2] = POWERPC_MTCTR(register_choose);
+					BranchBuffer[3] = 0x4E800420 | linked;
+
+					memcpy((void*)(StartPos), BranchBuffer, sizeof(BranchBuffer)); // Copy data to hook address
+					StartPos += sizeof(BranchBuffer);
+				}
+			
 			} else {
 				memcpy((void*)(StartPos), &Instruction, sizeof(Instruction)); // Copy data to hook address
 				StartPos += sizeof(Instruction);
 			}
 			OriginalPos += 4; // Move to the next instruction
 		}
+		}
 
-		// Finalize the branch to the target function
-		BranchBuffer[0] = POWERPC_LIS(register_choose, POWERPC_HI(reinterpret_cast<DWORD>(Original) + GenFuncSize));
-		BranchBuffer[1] = POWERPC_ORI(register_choose, register_choose, POWERPC_LO(reinterpret_cast<DWORD>(Original) + GenFuncSize));
-		BranchBuffer[2] = POWERPC_MTCTR(register_choose);
-		BranchBuffer[3] = 0x4E800420;
-
-		memcpy((void*)(StartPos), BranchBuffer, sizeof(BranchBuffer)); // Final copy for target
-		StartPos += sizeof(BranchBuffer);
+		if (!fp13){
+			// Finalize the branch to the target function
+			BranchBuffer[0] = POWERPC_LIS(register_choose, POWERPC_HI(reinterpret_cast<DWORD>(Original) + GenFuncSize));
+			BranchBuffer[1] = POWERPC_ORI(register_choose, register_choose, POWERPC_LO(reinterpret_cast<DWORD>(Original) + GenFuncSize));
+			BranchBuffer[2] = POWERPC_MTCTR(register_choose);
+			BranchBuffer[3] = 0x4E800420;
+			memcpy((void*)(StartPos), BranchBuffer, sizeof(BranchBuffer)); // Final copy for target
+			StartPos += sizeof(BranchBuffer);
+		}
+	
 
 		// Update saved buffer size
 		HookNew::SavedBufferSIZE += (StartPos - BufferPoint);
@@ -103,10 +143,11 @@ HookNew* HookNew::CreateHook(void* Target, void* TargetMap, void* Original,char 
 
 			//-----------------------------------IN WORK----------------------------------------(FP13)
 
+	
 			SAVE_ADDRESS_BUFFER_FP13[0] = POWERPC_LIS(register_choose, POWERPC_HI(reinterpret_cast<DWORD>(Original)));
 			SAVE_ADDRESS_BUFFER_FP13[1] = POWERPC_ORI(register_choose, register_choose, POWERPC_LO(reinterpret_cast<DWORD>(Original)));
-			SAVE_ADDRESS_BUFFER_FP13[2] = POWERPC_STW(register_choose,-0x10,1); //stw reg,-8(r1)
-			SAVE_ADDRESS_BUFFER_FP13[3] = POWERPC_LFS(13,-0x10,1); //lfs f13,-8(r1) 
+			SAVE_ADDRESS_BUFFER_FP13[2] = POWERPC_STW(register_choose,-8,1); //stw reg,-8(r1)
+			SAVE_ADDRESS_BUFFER_FP13[3] = POWERPC_LFS(13,-8,1); //lfs f13,-8(r1) 
 			memcpy((void*)(MoveOriginal),SAVE_ADDRESS_BUFFER_FP13,sizeof(SAVE_ADDRESS_BUFFER_FP13) );
 			MoveOriginal+= sizeof(SAVE_ADDRESS_BUFFER_FP13);
 			//-----------------------------------------------------------------------------------------

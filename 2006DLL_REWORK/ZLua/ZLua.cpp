@@ -114,6 +114,7 @@ unsigned int ZL_GetNumber(lua_State* L, int arg) {
 
 //just shell
 HOOKV3EX(0,void*,LuaHookReturnVoidZ,(void*,void*,void*,void*,void*,void*,void*,double,double,double,double,double,double),(r3z,r4z,r5z,r6z,r7z,r8z,r9z,fp1z,fp2z,fp3z,fp4z,fp5z,fp6z),void* r3z,void* r4z,void* r5z,void* r6z,void* r7z,void* r8z,void* r9z,double fp1z,double fp2z,double fp3z,double fp4z,double fp5z,double fp6z){
+	PushBreakPoint(__FILE__,__LINE__,"LuaHookReturnVoidZ");
 	return (void*)(0);
 }
 

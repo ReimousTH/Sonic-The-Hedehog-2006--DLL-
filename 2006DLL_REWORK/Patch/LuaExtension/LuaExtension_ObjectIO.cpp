@@ -1,6 +1,10 @@
 #include "LuaExtension_ObjectIO.h"
 #include "LuaExtension_Misc.h"
 
+#include <Sox/Scenery/World.h>
+#include <Sox/Scenery/SPAabbTree.h>
+#include <Sox/Scenery/SPWorld.h>
+
 
 namespace DebugLogV2{
 
@@ -320,6 +324,75 @@ namespace DebugLogV2{
 	//////////////////////////////////////////////////////////////////////////
 
 
+	extern "C" int ReloadScene(lua_State* L){
+
+
+
+		Sonicteam::GameImp* impl = Misc::GetGameIMP();
+		Sonicteam::Prop::Manager* mgr = impl->GamePropManager.get();
+
+
+
+
+		for (int i = 0;i<6;i++){
+			Sonicteam::Prop::Scene* _scene = impl->GamePropScene[i].get();
+			if (!_scene) continue;
+
+			Sonicteam::SoX::Scenery::SPWorld *  spworld =  _scene->PropSceneWorld.get();
+			std::vector<Sonicteam::SoX::Scenery::SPAabbNodeVector> _dummy_;
+			_dummy_.push_back(Sonicteam::SoX::Scenery::SPAabbNodeVector(0,0,0,0,0,0,0,0));
+			spworld->SceneryAabbTree.get()->SPAabbTreeInitialize(spworld,&_dummy_[0],1); //Reset Render Blocks (despawns all objects)
+			_scene->SceneObject.clear(); 
+			_scene->ScenePlacament.clear();
+			_scene->ScenePlacamentGroup.clear();
+			//_scene->ScenePropInstance.clear();
+			_scene->ScenePropData = 0;
+
+		}
+
+
+
+
+		Sonicteam::ActorManager* actor_manager = impl->GameActorManager.get();
+
+		for (int i = 0;i<actor_manager->LastActorIndex;i++){
+			Sonicteam::Actor* actor = (actor_manager->Actor[i]);
+			if (actor == NULL) continue;
+			const char* actor_t =  actor->GetObjectType();
+
+			bool is_forced_actor = strcmp(actor_t,"class Sonicteam::Player::Object") == 0 ||
+				strcmp(actor_t,"DependGame") == 0 ||
+				strcmp(actor_t,"Entities")  == 0 ||
+				strcmp(actor_t,"EnemyThread")  == 0 ||
+				strcmp(actor_t,"Players")  == 0 ||
+				strcmp(actor_t,"Cameras")  == 0 ||
+				strcmp(actor_t,"DependCameras")  == 0 ||
+				strcmp(actor_t,"SystemDependCameras")  == 0 ||
+				strcmp(actor_t,"GameRootTask")  == 0 ||
+				strcmp(actor_t,"Cameraman")  == 0;
+
+			if (!is_forced_actor){
+				AddMessage("DLL[CLEAR] : %s",actor_t);
+				actor->DestroyObject(1);
+			}	
+		}
+		//actor_manager->LastActorIndex = 0;
+		//actor_manager->LastActorID = 0;
+		//impl->GameActorManager.get()
+
+
+		for (int i = 0;i<6;i++){
+			//impl->GamePropScene[i].release(); //release pointer 
+			//impl->GameImpSceneryWorlds[i].release();
+			
+		}
+
+
+
+
+		return 0;
+	}
+
 
 	void GlobalInstall_ObjectIO(lua_State* LS)
 	{
@@ -327,6 +400,8 @@ namespace DebugLogV2{
 		lua_register06(LS,"GetSceneActorEx", GetSceneActorEx);
 		lua_register06(LS,"GetSceneActor", GetSceneActor);
 		lua_register06(LS,"GetActorALL", GetActorALL);
+
+		lua_register06(LS,"ReloadScene", ReloadScene);
 
 		luaL_newmetatable06(LS, "SceneActorMeta");
 		lua_pushstring06(LS,"__index"); lua_pushvalue(LS,-2); lua_settable06(LS,-3); // __index = PlayerMeta

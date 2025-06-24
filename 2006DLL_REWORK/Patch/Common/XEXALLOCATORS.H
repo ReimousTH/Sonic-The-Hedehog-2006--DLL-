@@ -2,13 +2,13 @@
 #ifndef XEXALLOCATORS
 #define XEXALLOCATORS
 
-
-
-
 #include <xtl.h>
 #undef realloc
 
+//#pragma optimize("", on) 
+
 extern void*& XapiProcessHeap;
+
 
 
 
@@ -96,6 +96,6 @@ void * __cdecl _aligned_offset_realloc(__in_opt void * _Memory, __in size_t _Siz
 void * __cdecl _aligned_offset_recalloc(__in_opt void * _Memory, __in size_t _Count, __in size_t _Size, __in size_t _Alignment, __in size_t _Offset);
 */
 
-
+//#pragma optimize("", off) 
 #endif
 

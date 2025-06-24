@@ -3,6 +3,8 @@
 
 #undef LocalReAlloc
 
+//#pragma optimize("g", on)
+
 extern void*& XapiProcessHeap = *(void**)0x82D57540; // Address to EXE's heap
 
 WINBASEAPI HLOCAL WINAPI LocalAlloc(IN UINT uFlags,IN SIZE_T uBytes)
@@ -56,3 +58,4 @@ void * __cdecl realloc(void* ptr, size_t size)
 	return 0;
 
 }
+//#pragma optimize("", off) 

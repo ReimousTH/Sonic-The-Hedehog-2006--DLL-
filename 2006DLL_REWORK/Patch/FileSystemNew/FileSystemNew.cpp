@@ -745,6 +745,8 @@ class ModScene:public IScene{
 			}
 		}
 		mrg->LoacArcThreadFinished = true;
+
+		return true;
 	}
 
 
@@ -757,6 +759,10 @@ class ModScene:public IScene{
 
 
 		ATG::GAMEPAD* gc =  ATG::Input::GetMergedInput();
+
+		if (gc->wLastButtons != 0 ) {
+			//PushBreakPoint(__FILE__,__LINE__,"%d",gc->wLastButtons);
+		}
 
 
 		if ((gc->wLastButtons & XINPUT_GAMEPAD_DPAD_DOWN) != 0){

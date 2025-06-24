@@ -40,6 +40,7 @@
 #define POWERPC_OPCODE_ADDIS     POWERPC_OPCODE( 15 )
 #define POWERPC_OPCODE_BC        POWERPC_OPCODE( 16 )
 #define POWERPC_OPCODE_B         POWERPC_OPCODE( 18 )
+#define POWERPC_OPCODE_BLR         POWERPC_OPCODE( 18 ) | 1
 #define POWERPC_OPCODE_BCCTR     POWERPC_OPCODE( 19 )
 #define POWERPC_OPCODE_ORI       POWERPC_OPCODE( 24 )
 #define POWERPC_OPCODE_EXTENDED  POWERPC_OPCODE( 31 ) // Use extended opcodes.
@@ -51,6 +52,13 @@
 #define POWERPC_OPCODE_LD        POWERPC_OPCODE( 58 )
 
 #define POWERPC_OPCODE_STWU        POWERPC_OPCODE( 37 )
+
+
+#define POWERPC_OPCODE_MFLR  ((31 << 26) | (8 << 16) | (339 << 1)) //7C0802A6
+#define POWERPC_OPCODE_MTLR  ((31 << 26) | (8 << 16) | (467 << 1)) //7C0803A6
+
+
+
 
 #define POWERPC_OPCODE_STD       POWERPC_OPCODE( 62 )
 #define POWERPC_OPCODE_MASK      POWERPC_OPCODE( 63 )
@@ -81,6 +89,11 @@
 #define POWERPC_LFS(rS, DS, rA)      (UINT32)( POWERPC_OPCODE_LFS | ( rS << POWERPC_BIT32( 10 ) ) | ( rA << POWERPC_BIT32( 15 ) ) | ( (INT16)DS & 0xFFFF ) )
 
 
+#define POWERPC_MFLR(rD)  ((UINT32)(POWERPC_OPCODE_MFLR | ((rD) << POWERPC_BIT32(10))))
+#define POWERPC_MTLR(rD)  ((UINT32)(POWERPC_OPCODE_MTLR | ((rD) << POWERPC_BIT32(10))))
+
+
+#define POWERPC_BLR() POWERPC_OPCODE_BLR
 #define POWERPC_LI(rD, SIMM)        POWERPC_ADDI( rD, 0, SIMM )  // Mnemonic for addi %rD, 0, SIMM
 #define POWERPC_MTSPR(SPR, rS)      (UINT32)( POWERPC_OPCODE_EXTENDED | ( rS << POWERPC_BIT32( 10 ) ) | ( POWERPC_SPR( SPR ) << POWERPC_BIT32( 20 ) ) | POWERPC_EXOPCODE_MTSPR )
 #define POWERPC_MTCTR(rS)           POWERPC_MTSPR( 9, rS ) // Mnemonic for mtspr 9, rS
@@ -121,6 +134,7 @@ extern "C" {
 
 
 
+#define HOOK_BUFFER_SIZE 0x3FFFC
 
 class HookNew {
 public:
@@ -171,11 +185,40 @@ public:
 
 extern "C" void CallLuaFunc();
 
+/*
+extern "C" void __declspec(naked) __savegprlr(){
+	__asm{
+		std       r14, -0x98(r1)
+		std       r15, -0x90(r1)
+		std       r16, -0x88(r1)
+		std       r17, -0x80(r1)
+		std       r18, -0x78(r1)
+		std       r19, -0x70(r1)
+		std       r20, -0x68(r1)
+		std       r21, -0x60(r1)
+		std       r22, -0x58(r1)
+		std       r23, -0x50(r1)
+		std       r24, -0x48(r1)
+		std       r25, -0x40(r1)
+		std       r26, -0x38(r1)
+		std       r27, -0x30(r1)
+		std       r28, -0x28(r1)
+		std       r29, -0x20(r1)
+		std       r30, -0x18(r1)
+		std       r31, -0x10(r1)
+		stw       r12, -8(r1)
+		blr
+	}
+};
+*/
 
 #define HOOKV3EXMAP_SHELL(addressTo, return_type, HookFuncName, call_args,args_name,lua_arg_call,...)
 
 
 #define HOOKV3EXMAP_LUA \
+	DWORD r3x,r4x,r5x,r6x,r7x,r8x,r9x,r10x; \
+	double fp1x;\
+	double fp2x;\
 	__asm{mr r3,r3x};\
 	__asm{mr r4,r4x};\
 	__asm{mr r5,r5x};\
@@ -186,11 +229,32 @@ extern "C" void CallLuaFunc();
 	__asm{mr r10,r10x};\
 	__asm{fmr fp1,fp1x};\
 	__asm{fmr fp2,fp2x};\
-	__asm{bl CallLuaFunc};\
+	//__asm{bl CallLuaFunc};\
+
+#define LockR22Register \
+	volatile int r22_dummy; \
+	__asm{ mr r22_dummy,r22 };\
+	__asm{ mr r22,r22_dummy};\
+
+#define FP13RetInit \
+	float f13; \
+
+#define FP13RetAddr(addressTo2,addressTo) \
+	__asm { fmr f13, fp13 }; \
+	if (addressTo == 0) addressTo2 = *(void**)&f13; \
+
+
+
+
+	
 
 #define HOOKV3EXMAP(addressTo, return_type, HookFuncName, call_args,args_name,...) \
 	return_type HookFuncName##MAP(__VA_ARGS__) { \
+		FP13RetInit;\
+		LockR22Register;\
+		bool is_lua = addressTo == 0; \
 		void* addressTo2 = (void*)addressTo;\
+		FP13RetAddr(addressTo2,addressTo); \
 		return_type return_value = (return_type)0; \
 		if (HookNew::SaveBuffer && HookNew::SaveBuffer->find((void*)addressTo2) != HookNew::SaveBuffer->end()){\
 		\
@@ -200,6 +264,9 @@ extern "C" void CallLuaFunc();
 				block |= (*it)->Block;\
 				if ((*it)->lua_function != 0 && (*it)->L != 0)\
 				{\
+					float fv = *(float*)&(*it);\
+					__asm {fmr fp13,fv}; \
+					HOOKV3EXMAP_LUA\
 				}\
 				else{\
 					void* tar = (*it)->TargetFunc; \
