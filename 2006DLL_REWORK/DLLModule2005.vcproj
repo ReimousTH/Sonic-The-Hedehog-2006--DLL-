@@ -635,6 +635,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_KhronoTime.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_KhronoTime.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Patch\LuaExtension\LuaExtension_LoadReAttachArc.cpp"
 					>
 				</File>
@@ -688,6 +696,14 @@
 				</File>
 				<File
 					RelativePath=".\Patch\LuaExtension\LuaExtension_OpenState.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_Pause.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Patch\LuaExtension\LuaExtension_Pause.h"
 					>
 				</File>
 				<File

@@ -1941,19 +1941,19 @@ int __fastcall Character_AmigoSwitch(int result){
 
 }
 
-void __fastcall Listener_Common_Input(int _this, Sonicteam::Player::Input::IListenerInputStruc01* PtrStructThatHasCameraObjAndKhronoController, double a3){
+void __fastcall Listener_Common_Input(int _this, Sonicteam::SoX::Input::Manager* PtrStructThatHasCameraObjAndKhronoController, double a3){
 
 	BranchTo(0x82222428 ,int,_this,PtrStructThatHasCameraObjAndKhronoController,a3);
 
 	if (PtrStructThatHasCameraObjAndKhronoController){
 
-		if ((PtrStructThatHasCameraObjAndKhronoController->wLastButtons & SO_GAMEPAD_RAW_BUTTON_DPAD_UP) != 0) {
+		if ((PtrStructThatHasCameraObjAndKhronoController->Gamepad.wLastButtons & SO_GAMEPAD_RAW_BUTTON_DPAD_UP) != 0) {
 			 *(_DWORD *)(_this + 0x48) |= 0x400000u;// 
 		}
-		if ((PtrStructThatHasCameraObjAndKhronoController->wLastButtons & SO_GAMEPAD_RAW_BUTTON_DPAD_DOWN) != 0){
+		if ((PtrStructThatHasCameraObjAndKhronoController->Gamepad.wLastButtons & SO_GAMEPAD_RAW_BUTTON_DPAD_DOWN) != 0){
 			*(_DWORD *)(_this + 0x48) |= 0x800000u;// 
 		}
-		if ((PtrStructThatHasCameraObjAndKhronoController->wLastButtons & SO_GAMEPAD_RAW_BUTTON_B) != 0){
+		if ((PtrStructThatHasCameraObjAndKhronoController->Gamepad.wLastButtons & SO_GAMEPAD_RAW_BUTTON_B) != 0){
 			*(_DWORD *)(_this + 0x48) |= 0x80; // 
 		}
 

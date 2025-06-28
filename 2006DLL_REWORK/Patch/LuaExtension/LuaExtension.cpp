@@ -1558,14 +1558,11 @@ namespace DebugLogV2{
 		UINT32 PlayerIndex = (UINT32)lua_tonumber(L,1);
 		Sonicteam::DocMarathonImp* impl = 	*(Sonicteam::DocMarathonImp**)(*(UINT32*)0x82D3B348 + 0x180);
 		PlayerIndex = impl->GetRealControllerID(PlayerIndex);
-		Sonicteam::Player::Input::IListenerInputStruc01* Inp2 = (Sonicteam::Player::Input::IListenerInputStruc01*)impl->GetPlayerInput(PlayerIndex);
+		Sonicteam::SoX::Input::Manager* Inp2 = (Sonicteam::SoX::Input::Manager*)impl->GetPlayerInput(PlayerIndex);
 
-		Sonicteam::Player::Input::IListenerInputStruc01 Inp;
+		Sonicteam::SoX::Input::Manager* Inp = Inp2;
 
 
-		if (Inp2){
-			memcpy(&Inp,Inp2,sizeof(Sonicteam::Player::Input::IListenerInputStruc01));
-		}
 
 
 		BranchTo(0x825D5C30,int,L); //lua_newtable
@@ -1575,26 +1572,26 @@ namespace DebugLogV2{
 
 		BranchTo(0x825D5918,int,L,"Buttons");
 		//BranchTo(0x825D5890,int,L,Inp.wLastButtons);
-		lua_pushnumber(L, Inp.wLastButtons);
+		lua_pushnumber(L, Inp->Gamepad.wLastButtons);
 		BranchTo(0x825D5D98,int,L,-3);
 
 
 
 		BranchTo(0x825D5918,int,L,"LStickX");
-		BranchTo(0x825D5890,int,L,Inp.fX1);
+		BranchTo(0x825D5890,int,L,Inp->Gamepad.fX1);
 		BranchTo(0x825D5D98,int,L,-3);
 
 
 		BranchTo(0x825D5918,int,L,"LStickY");
-		BranchTo(0x825D5890,int,L,Inp.fY1);
+		BranchTo(0x825D5890,int,L,Inp->Gamepad.fY1);
 		BranchTo(0x825D5D98,int,L,-3);
 
 		BranchTo(0x825D5918,int,L,"RStickX");
-		BranchTo(0x825D5890,int,L,Inp.fX2);
+		BranchTo(0x825D5890,int,L,Inp->Gamepad.fX2);
 		BranchTo(0x825D5D98,int,L,-3);
 
 		BranchTo(0x825D5918,int,L,"RStickY");
-		BranchTo(0x825D5890,int,L,Inp.fY2);
+		BranchTo(0x825D5890,int,L,Inp->Gamepad.fY2);
 		BranchTo(0x825D5D98,int,L,-3);
 
 		

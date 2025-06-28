@@ -4,6 +4,7 @@
 #include <System/Peripheral/ManagerImpXenon.h>
 #include <ZLua/ZLua.h>
 
+#include <cmath> // for std::abs
 
 #define XENON_GAMEPAD_LS_RS				-3
 #define XENON_GAMEPAD_LS_X_PLUS			XENON_GAMEPAD_LS_RS-1
@@ -34,6 +35,7 @@ namespace ControllerRemap{
 		std::map<size_t,size_t> Buttons;
 		size_t XINPUT_LEFT_TRIGGER;
 		size_t XINPUT_RIGHT_TRIGGER;
+		size_t XINPUT_GAMEPAD_TRIGGER_THRESHOLD_L;
 		CRTStick LS;
 		CRTStick RS;
 	};
@@ -65,58 +67,62 @@ namespace ControllerRemap{
 	}
 
 	// Maps stick movements to other stick axes
-	void StickToStick(short* sThumbs_out[4], const short sThumbs_raw[4], 
-		const CRTStick& LS, const CRTStick& RS) 
-	{
-		// Initialize output axes to zero
-		short mappedValues[4] = {0, 0, 0, 0};
-		bool mapped[4] = {false, false, false, false}; // Track mapped axes
-
-		// Axis indices: 0=LX, 1=LY, 2=RX, 3=RY
-		const int LX = 0, LY = 1, RX = 2, RY = 3;
-
-		// Process each input axis
-		for (int axis = 0; axis < 4; axis++) {
-			const short rawValue = sThumbs_raw[axis];
-			int ax = axis / 2;
-			int X_Y_INDEX = axis % 2;
-			CRTStick CStick = ax == 0 ? LS : RS;
-			int* axis_plus_minus = (int*)&CStick.XPLUS + (X_Y_INDEX * 2);
-			int out_axis_index = axis_plus_minus[0];
-			if (rawValue < 0) out_axis_index = axis_plus_minus[1];
 	
 
-			//LSX
-			//=-4 ,  out_axis_index + XENON_GAMEPAD_LS_RS -1  = -1, then add -  = 0
-			//=-5 ,  out_axis_index + XENON_GAMEPAD_LS_RS -1  = -2, then add -  = 1
+	#pragma optimize( "", off )
+	extern "C" void StickToStick(short* sThumbs_out[4], const short sThumbs_raw[4], 
+		const CRTStick& LS, const CRTStick& RS) 
+	{
+		for (int axis = 0; axis < 4; axis++) {
+			short rawValue = sThumbs_raw[axis];
+			if (rawValue == 0) continue;  // Skip zero values
 
-			//LSY
-			//=-6 ,  out_axis_index + XENON_GAMEPAD_LS_RS -1  = -3, then add -  = 2
-			//=-7 ,  out_axis_index + XENON_GAMEPAD_LS_RS  = -4, then add -  = 3
+			int ax = axis / 2;
+			int axis_idx = axis % 2;
+			CRTStick CStick = (ax == 0) ? LS : RS;
 
-			//RSX
-			//=-7 ,  out_axis_index + XENON_GAMEPAD_LS_RS - 1  = -5, then add -  = 4
-			//=-8 ,  out_axis_index + XENON_GAMEPAD_LS_RS -1  = -6, then add -  = 5
-
-
-			//RSY
-			//=-9 ,  out_axis_index + XENON_GAMEPAD_LS_RS -1  = -7, then add -  = 6
-			//=-10 ,  out_axis_index + XENON_GAMEPAD_LS_RS -1  = -8, then add -  = 7
-
-			out_axis_index =  (-(out_axis_index - XENON_GAMEPAD_LS_RS - 1) / 2) -1;
-
-			if (rawValue > 0){
-				*sThumbs_out[out_axis_index] = rawValue > 0 ? rawValue : 0;
+			// Get target mapping
+			int target;
+			if (axis_idx == 0) {  // X-axis
+				target = rawValue >= 0 ? CStick.XPLUS : CStick.XMINUS;
+			} else {  // Y-axis
+				target = rawValue >= 0 ? CStick.YPLUS : CStick.YMINUS;
 			}
-			else if (rawValue < 0){
-				*sThumbs_out[out_axis_index] = rawValue < 0 ? rawValue : 0;
+
+			// Compute output index
+			int out_idx = (-(target - XENON_GAMEPAD_LS_RS - 1) / 2) - 1;
+
+			// Compute sign using modulo
+			int sign_flag = (-(target - XENON_GAMEPAD_LS_RS - 1) % 2);
+
+
+			if (rawValue == SHRT_MIN) {
+				rawValue = SHRT_MAX; 
+			} else {
+				rawValue = static_cast<short>(std::abs(rawValue)); // Safe if not SHRT_MIN
 			}
-			AddMessage("axis %d, out_axis_index %d",axis,out_axis_index);
 
 
 
+		    short finalValue =  rawValue;
+			if (sign_flag == 1){
+				finalValue = -finalValue;
+			}
+	
+
+		
+			// Apply inversion using abs() as requested
+	
+	
+
+
+
+			*sThumbs_out[out_idx] = finalValue;
+			//AddMessage("Axis %d: raw %d -> idx %d val %d, val2 %d (sign %d)",
+			//	axis, rawValue, out_idx, finalValue,finalValue, sign_flag);
 		}
 	}
+	
 	
 	void StickToButton(int& wbuttons, short& sThumb, short rawValue, 
 		unsigned short deadzone, unsigned short max_radius,
@@ -287,17 +293,17 @@ namespace ControllerRemap{
 					
 					//LEFT_TRIGGER (REMAP TO OTHER TRIGGER IF)
 					if (table->XINPUT_LEFT_TRIGGER == 0x4000u) {
-						if (_buffer_state.Gamepad.bLeftTrigger > 0x1Eu) {
+						if (_buffer_state.Gamepad.bLeftTrigger > table->XINPUT_GAMEPAD_TRIGGER_THRESHOLD_L) {
 							wbuttons |= 0x4000u;
 						}
 					} 
 					else if (table->XINPUT_LEFT_TRIGGER == 0x8000u) {
-						if (_buffer_state.Gamepad.bRightTrigger > 0x1Eu) {
+						if (_buffer_state.Gamepad.bRightTrigger > table->XINPUT_GAMEPAD_TRIGGER_THRESHOLD_L) {
 							wbuttons |= 0x4000u;
 						}
 					}
 					else{
-						if (_buffer_state.Gamepad.bLeftTrigger > 0x1Eu) {
+						if (_buffer_state.Gamepad.bLeftTrigger > table->XINPUT_GAMEPAD_TRIGGER_THRESHOLD_L) {
 							wbuttons |= table->XINPUT_LEFT_TRIGGER;
 						}
 					}
@@ -305,17 +311,17 @@ namespace ControllerRemap{
 
 					//RIGHT_TRIGGER (REMAP TO OTHER TRIGGER IF)
 					if (table->XINPUT_RIGHT_TRIGGER == 0x8000u) {
-						if (_buffer_state.Gamepad.bRightTrigger > 0x1Eu) {
+						if (_buffer_state.Gamepad.bRightTrigger > table->XINPUT_GAMEPAD_TRIGGER_THRESHOLD_L) {
 							wbuttons |= 0x8000u;
 						}
 					} 
 					else if (table->XINPUT_RIGHT_TRIGGER == 0x4000u) {
-						if (_buffer_state.Gamepad.bLeftTrigger > 0x1Eu) {
+						if (_buffer_state.Gamepad.bLeftTrigger > table->XINPUT_GAMEPAD_TRIGGER_THRESHOLD_L) {
 							wbuttons |= 0x8000u;
 						}
 					}
 					else{
-						if (_buffer_state.Gamepad.bRightTrigger > 0x1Eu) {
+						if (_buffer_state.Gamepad.bRightTrigger > table->XINPUT_GAMEPAD_TRIGGER_THRESHOLD_L) {
 							wbuttons |= table->XINPUT_RIGHT_TRIGGER;
 						}
 					}
@@ -323,16 +329,7 @@ namespace ControllerRemap{
 
 
 	
-					/*
-
-					StickToButton(wbuttons,sThumbLX,_buffer_state.Gamepad.sThumbLX,XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE,0x5E0E,table->LS.XPLUS,table->LS.XMINUS); //LSX
-					StickToButton(wbuttons,sThumbLY,_buffer_state.Gamepad.sThumbLY,XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE,0x5E0E,table->LS.YPLUS,table->LS.YMINUS); //LSY
-			
-					StickToButton(wbuttons,sThumbRX,_buffer_state.Gamepad.sThumbRX,XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE,0x5E0E,table->RS.XPLUS,table->RS.XMINUS); //RSX
-					StickToButton(wbuttons,sThumbRY,_buffer_state.Gamepad.sThumbRY,XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE,0x5E0E,table->RS.YPLUS,table->RS.YMINUS); //RSY
-
-
-			*/
+				
 
 					short* sThumbs_out[] = {&sThumbLX, &sThumbLY, &sThumbRX, &sThumbRY};
 					short sThumbs_raw[] = {
@@ -345,6 +342,15 @@ namespace ControllerRemap{
 
 					// 1. First apply stick-to-stick mappings
 					StickToStick(sThumbs_out, sThumbs_raw, table->LS, table->RS);
+
+
+					/*
+					StickToButton(wbuttons,sThumbLX,sThumbLX,XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE,0x5E0E,table->LS.XPLUS,table->LS.XMINUS); //LSX
+					StickToButton(wbuttons,sThumbLY,sThumbLY,XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE,0x5E0E,table->LS.YPLUS,table->LS.YMINUS); //LSY
+			
+					StickToButton(wbuttons,sThumbRX,sThumbRY,XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE,0x5E0E,table->RS.XPLUS,table->RS.XMINUS); //RSX
+					StickToButton(wbuttons,sThumbRY,sThumbRY,XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE,0x5E0E,table->RS.YPLUS,table->RS.YMINUS); //RSY
+					*/
 
 	
 			
@@ -476,6 +482,14 @@ namespace ControllerRemap{
 			lua_gettable(L, -2);
 			_map.XINPUT_RIGHT_TRIGGER = lua_tonumber(L, -1);
 			lua_pop(L, 1);
+
+
+			lua_pushstring(L, "XINPUT_GAMEPAD_TRIGGER_THRESHOLD");
+			lua_gettable(L, -2);
+			_map.XINPUT_GAMEPAD_TRIGGER_THRESHOLD_L = lua_tonumber(L, -1);
+			lua_pop(L, 1);
+
+
 
 			lua_pop(L, 1);
 			_players_map.push_back(_map);

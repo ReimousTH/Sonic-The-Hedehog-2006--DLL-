@@ -10,8 +10,9 @@
 #include <Patch/reticle/reticle.h>
 #include <Patch/ControllerRemap/ControllerRemap.h>
 
+#include <Sox/MessageReceiver.h>
 
-
+#include <CsdManager.h>
 #include <Sox/Perfomance.h>
 #include <Sox/StepableThread.h>
 #include <Sox/Engine/Task.h>
@@ -27,11 +28,14 @@
 #include <Sox/FileLoaderARC.h>
 #include <Sox/FileSystemARC.h>
 #include <Sox/ApplicationXenon.h>
+#include <SceneTimeLight.h>
 
 #include <Heap.h>
 #include <SpanverseHeap.h>
 #include <Player/IPostureControl.h>
 #include <boost/function.hpp>
+
+#include <Sox/Physics/Havok/BodyHavok.h>
 
 struct FPair{
 	const char* Name;
@@ -423,6 +427,38 @@ HOOKV3(0x8221ECD0,void*,sub_8221ECD0,(int,int,int),(a1,a2,a3),int a1, int a2,int
 };
 
 
+HOOKV3(0x82287C10,int,sub_82287C10,(int,Sonicteam::SoX::MessageTemplate<0x20>*),(a1,msg),int a1,Sonicteam::SoX::MessageTemplate<0x20>* msg){
+
+
+	int t = a1-0x20;
+	int RagdollHavok = *(int*)(t + 0x80);
+	std::map<std::string,size_t>* RagdollHavokMap = (std::map<std::string,size_t>*)(RagdollHavok + 0x8);
+
+	
+	Sonicteam::SoX::Physics::Havok::BodyHavok* bodyhavok =  (Sonicteam::SoX::Physics::Havok::BodyHavok*)RagdollHavokMap->begin()->second;
+	size_t hkrigidbody =  bodyhavok->EntityInfo.hkrigidbody;
+	size_t hkobject =  *(size_t*)(hkrigidbody+ 0x58);
+
+
+
+
+	//all there on touch
+	//69636
+	//65559
+	//69653
+	//77838
+
+	//69634 (on stand)
+	//69635 (on leave stand)
+
+	//69711 (on silver grab) 0x1104F
+	//65547 (on silver grab limit)
+	//AddMessage("Sonicteam::ObjectPhysicsSingle %x,RagdollHavok %x ,bodyhavok: %x ,hkrigbody : %x,hkobject: %x Message ID : %d",t,RagdollHavok,bodyhavok,hkrigidbody,hkobject,msg->GetValueAt<int>(0));
+
+	return 0;
+
+}
+
 int __fastcall sub_8221EAF0(int a1, char a2)
 {
 
@@ -523,12 +559,14 @@ void STH2006DLLMain()
 	SSINGLETON(Sonicteam::SoX::FileLoaderARC)::getInstance((void**)0x82D3C184,(void*)0x8262A3E8); //FileLoaderARC
 	SSINGLETON(Sonicteam::SoX::ArcHandleMgr)::getInstance((void**)0x82D36710,(void*)0x82163D20); //
 	SSINGLETON(Sonicteam::SoX::ResourceManager)::getInstance((void**)0x82D3B264,(void*)0x82581F00); //ResourceManager
-
-
 	SSINGLETON(Sonicteam::SoX::PerformanceFrequency)::getInstance((void**)0x82D3B210,(void*)0x82581C88);
-
 	SSINGLETON(Sonicteam::SoX::FileSystemXenon)::getInstance((void*)0x82D37088); 
 	SSINGLETON(Sonicteam::SpanverseHeap)::getInstance((void*)0x82D3C620); 
+	SSINGLETON(Sonicteam::SceneTimeLight)::getInstance((void**)0x82D36D04,(void*)0x8226FE38); 
+
+
+	SSINGLETON(Sonicteam::CsdManager)::getInstance((void**)0x82D3BC58,(void*)0x825E9530); 
+
 	HookNew::SaveBuffer = new std::map<void*, std::vector<HookNew*>>();
 	
 
@@ -541,6 +579,7 @@ void STH2006DLLMain()
 
 
 
+	INSTALL_HOOKV3EX(sub_82287C10,-1,false,11);
 	
 
 //	INSTALL_HOOKV3EX(sub_0x82279CA8,-1,false,11);

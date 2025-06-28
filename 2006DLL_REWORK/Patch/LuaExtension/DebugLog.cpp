@@ -73,9 +73,11 @@ namespace DebugLogV2{
 		GlobalInstall__LoadReAttachArc(LS);
 		IO_GlobalInstall(LS);
 		CSD_GlobalInstall(LS);
-
 		GlobalInstall_ObjectIO(LS);
-	
+
+
+		KhronoTime_GlobalInstall(LS);
+
 		return sub_825DB498H(LS);
 	}
 

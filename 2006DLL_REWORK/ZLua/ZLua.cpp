@@ -153,6 +153,15 @@ ZLua::ZLua(const char* a1){
 void ZLua::UseBaseLibsEx(lua_State* L){
 	
 
+
+
+	lua_baselibopen(L);
+	luaopen_base(L);
+	luaopen_debug(L);
+	luaopen_string(L);
+	luaopen_loadlib(L);
+	luaopen_io(L);
+
 	
 	lua_register(L,"WriteVirtualBytes",WriteVirtualBytes);
 	lua_register(L,"WriteVirtualBytesRange",WriteVirtualBytesRange);
@@ -160,9 +169,6 @@ void ZLua::UseBaseLibsEx(lua_State* L){
 	lua_register(L,"InitHOOK",InitHOOK);
 
 
-	luaopen_base(L);
-	luaopen_debug(L);
-	luaopen_string(L);
 
 
 	DebugLogV2::MessageUtilGlobalInstall(L);

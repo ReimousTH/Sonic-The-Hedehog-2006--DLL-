@@ -3,14 +3,14 @@
 namespace PostureInverseStick{
 
 
-	void __fastcall Listener_Common_Input(int _this, Sonicteam::Player::Input::IListenerInputStruc01* PtrStructThatHasCameraObjAndKhronoController, double a3){
+	void __fastcall Listener_Common_Input(int _this, Sonicteam::SoX::Input::Manager* PtrStructThatHasCameraObjAndKhronoController, double a3){
 
 
-		short* t =  (short*)&PtrStructThatHasCameraObjAndKhronoController->fX1Y1Unk;
+		short* t =  (short*)&PtrStructThatHasCameraObjAndKhronoController->Gamepad.sThumbLX;
 		t[0] = -t[0];
 		t[1] = -t[1];
 
-		PtrStructThatHasCameraObjAndKhronoController->fX1 = -PtrStructThatHasCameraObjAndKhronoController->fX1;
+		PtrStructThatHasCameraObjAndKhronoController->Gamepad.fX1 = -PtrStructThatHasCameraObjAndKhronoController->Gamepad.fX1;
 	//	PtrStructThatHasCameraObjAndKhronoController->fY1 = -PtrStructThatHasCameraObjAndKhronoController->fY1;
 		BranchTo(0x82222428,int,_this,PtrStructThatHasCameraObjAndKhronoController,a3);
 	}
@@ -124,7 +124,7 @@ if (SelectedIndex >= 5){
 }
 
 
-Sonicteam::Player::Input::IListenerInputStruc01* inp_data = (Sonicteam::Player::Input::IListenerInputStruc01*)a1->GetCurrentDoc()->GetPlayerInput(a1->GetCurrentDoc()->GetRealControllerID(0));
+Sonicteam::SoX::Input::Manager* inp_data = (Sonicteam::SoX::Input::Manager*)a1->GetCurrentDoc()->GetPlayerInput(a1->GetCurrentDoc()->GetRealControllerID(0));
 
 switch (a1->MMCurrentCase) {
     case 0x9: {

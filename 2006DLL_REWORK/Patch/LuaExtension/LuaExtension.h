@@ -37,6 +37,7 @@ extern "C" {
 #include "LuaExtension_CSD.h"
 #include "LuaExtension_IO.h"
 #include "LuaExtension_ObjectIO.h"
+#include "LuaExtension_KhronoTime.h"
 
 #include "LuaSystem.h"
 

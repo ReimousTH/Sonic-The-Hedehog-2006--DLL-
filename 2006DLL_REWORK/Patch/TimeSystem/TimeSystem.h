@@ -4,10 +4,36 @@
 #include <LuaSystemManager.h>
 #include <LuaSystem.h>
 
+#include <string>
+#include <SceneTimeLight.h>
+
 
 
 
 namespace TimeSystem{
+
+
+	struct SceneTimeLightTableEX:public Sonicteam::SceneTimeLightTable{
+		Sonicteam::SSLVECTOR LightMaxInfo0;
+		Sonicteam::SSLVECTOR LightMaxInfo1;
+	};
+
+
+	class SceneTimeLightEX{
+	public:
+		SceneTimeLightEX(){
+
+		}
+		~SceneTimeLightEX(){
+
+		}
+
+		std::vector<SceneTimeLightTableEX> TLTable; // 0
+		std::string TLFile; // wvo_table.lua //0x10
+
+	};
+
+
 
 	struct LTI_Vector4{
 		float x;

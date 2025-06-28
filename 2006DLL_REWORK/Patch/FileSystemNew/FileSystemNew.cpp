@@ -1522,7 +1522,7 @@ public:
 
 	void PrecisionFrameCap_Xenon(LARGE_INTEGER StartFrame,int targetFPS) {
 
-		if (targetFPS == -1) return;
+		if (targetFPS == -1 || targetFPS == -2) return;
 		LARGE_INTEGER frequency, currentTime;
 		QueryPerformanceFrequency(&frequency);  // ticks per second
 		QueryPerformanceCounter(&currentTime);  // current ticks
@@ -1556,7 +1556,7 @@ public:
 
 
 		_D3DDevice->SetShaderGPRAllocation(0,0,0);
-		_D3DDevice->SynchronizeToPresentationInterval(); //uncap FPS may cause issue on console (uncync from 60 )
+		if (FPS_CAP != -2) _D3DDevice->SynchronizeToPresentationInterval(); //uncap FPS may cause issue on console (uncync from 60 )
 		_D3DDevice->Resolve(0,0,FrontBufferTexture,0,0,0,0,0.0,0,0);
 		_D3DDevice->Swap(FrontBufferTexture,0);
 
@@ -1677,7 +1677,7 @@ public:
 			FIRST_SCALE.QuadPart = unk0x70.QuadPart;
 			double delta2 = ((double)unk0x70.QuadPart * 0.000001);
 
-			if (FPS_CAP != -1){
+			if (FPS_CAP != -1 && FPS_CAP != -2){
 
 				float* flt_82000B88 = (float*)0x92000B88;
 				float* flt_8200CEAC = (float*)0x9200CEAC;
@@ -1862,7 +1862,7 @@ void FileSystemNew::GlobalInstall()
 {
 
 
-	if (FPS_CAP != -1) {
+	if (FPS_CAP != -1 || FPS_CAP == -2) {
 
 		DWORD interval = D3DPRESENT_INTERVAL_ONE;
 
@@ -1879,10 +1879,13 @@ void FileSystemNew::GlobalInstall()
 			interval = D3DPRESENT_INTERVAL_THREE;
 		}
 
+	
+
 		
 		AddMessage("[DLL] monitorRefreshRate : %d, inverval : %d ",monitorRefreshRate,interval);
 		WRITE_DWORD(0x825B1C84, 0x38800000 | interval);
 	}
+
 
 	
 

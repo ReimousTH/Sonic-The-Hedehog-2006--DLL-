@@ -137,12 +137,12 @@ PLAYERS_DATA* GetPrimaryPlayer(){
 }
 
 
-void ProcessDButton(PLAYERS_DATA* plr,Sonicteam::Player::Input::IListenerInputStruc01* inp_data,int OriginButton,int out){
+void ProcessDButton(PLAYERS_DATA* plr,Sonicteam::SoX::Input::Manager* inp_data,int OriginButton,int out){
 
 	//remove
 
 	//HOLDING BUTTON
-	if ((inp_data->wLastButtons & OriginButton) != 0){
+	if ((inp_data->Gamepad.wLastButtons & OriginButton) != 0){
 			plr->input_data ^= out; 
 	}
 
@@ -153,10 +153,10 @@ void ProcessDButton(PLAYERS_DATA* plr,Sonicteam::Player::Input::IListenerInputSt
 }
 
 
-void ProcessButton(PLAYERS_DATA* plr, Sonicteam::Player::Input::IListenerInputStruc01* inp_data, int OriginButton, int StartFrameID, int HOLDFrameID, int ReleaseFrameID) {
+void ProcessButton(PLAYERS_DATA* plr, Sonicteam::SoX::Input::Manager* inp_data, int OriginButton, int StartFrameID, int HOLDFrameID, int ReleaseFrameID) {
 
 	// if BUTTON IS HELD
-	if ((inp_data->wLastButtons & OriginButton) != 0) {
+	if ((inp_data->Gamepad.wLastButtons & OriginButton) != 0) {
 		// Check if the button was previously released
 		if ((plr->input_data & (StartFrameID | HOLDFrameID) ) != 0) {
 			plr->input_data |= HOLDFrameID; // A_HOLD_FRAME;
@@ -167,12 +167,12 @@ void ProcessButton(PLAYERS_DATA* plr, Sonicteam::Player::Input::IListenerInputSt
 		}
 	}
 	// Check if the button was released
-	else if ((inp_data->wLastButtons & OriginButton) == 0 && (plr->input_data & (HOLDFrameID | StartFrameID)) != 0) {
+	else if ((inp_data->Gamepad.wLastButtons & OriginButton) == 0 && (plr->input_data & (HOLDFrameID | StartFrameID)) != 0) {
 		plr->input_data &= ~(HOLDFrameID | StartFrameID);
 		plr->input_data |= ReleaseFrameID; // CONFIRM_BUTTON
 	}
 	// Check if the button was previously held
-	else if ((inp_data->wLastButtons & OriginButton) == 0) {
+	else if ((inp_data->Gamepad.wLastButtons & OriginButton) == 0) {
 		plr->input_data &= ~(StartFrameID | HOLDFrameID | ReleaseFrameID);
 	}
 }
@@ -185,7 +185,7 @@ void ProcessFourInputs(Sonicteam::MainMenuTask *a1,float delta){
 
 			
 
-			Sonicteam::Player::Input::IListenerInputStruc01* inp_data = (Sonicteam::Player::Input::IListenerInputStruc01*)a1->GetCurrentDoc()->GetPlayerInput(a1->GetCurrentDoc()->GetRealControllerID(i));
+			Sonicteam::SoX::Input::Manager* inp_data = (Sonicteam::SoX::Input::Manager*)a1->GetCurrentDoc()->GetPlayerInput(a1->GetCurrentDoc()->GetRealControllerID(i));
 			std::stringstream ss;
 
 			//plr->CurrentController = a1->GetCurrentDoc()->GetPlayerInput(a1->GetCurrentDoc()->GetRealControllerID(i));
@@ -199,7 +199,7 @@ void ProcessFourInputs(Sonicteam::MainMenuTask *a1,float delta){
 		//	ProcessButton(plr,inp_data,SO_GAMEPAD_RAW_BUTTON_DPAD_LEFT,0x4,0x100000,0x200000);	
 		//	ProcessButton(plr,inp_data,SO_GAMEPAD_RAW_BUTTON_DPAD_RIGHT,0x8,0x400000,0x800000);	
 
-			if (inp_data->wLastButtons != 0){
+			if (inp_data->Gamepad.wLastButtons != 0){
 
 				std::stringstream sss;
 				//sss << std::hex << inp_data->wLastButtons;
@@ -216,19 +216,19 @@ void ProcessFourInputs(Sonicteam::MainMenuTask *a1,float delta){
 				//	DebugLogV2::PrintNextFixed(ss.str());
 			}
 
-			if ( (inp_data->wLastButtons & (SO_GAMEPAD_RAW_BUTTON_DPAD_LEFT | SO_GAMEPAD_RAW_BUTTON_DPAD_RIGHT)) != 0){
-				inp_data->fX1 = (inp_data->wLastButtons & SO_GAMEPAD_RAW_BUTTON_DPAD_LEFT) != 0 ? -1.0 : 1.0;
+			if ( (inp_data->Gamepad.wLastButtons & (SO_GAMEPAD_RAW_BUTTON_DPAD_LEFT | SO_GAMEPAD_RAW_BUTTON_DPAD_RIGHT)) != 0){
+				inp_data->Gamepad.fX1 = (inp_data->Gamepad.wLastButtons & SO_GAMEPAD_RAW_BUTTON_DPAD_LEFT) != 0 ? -1.0 : 1.0;
 			}
-			if ( (inp_data->wLastButtons & (SO_GAMEPAD_RAW_BUTTON_DPAD_DOWN | SO_GAMEPAD_RAW_BUTTON_DPAD_UP)) != 0){
-				inp_data->fY1 = (inp_data->wLastButtons & SO_GAMEPAD_RAW_BUTTON_DPAD_UP) != 0 ? -1.0 : 1.0;
+			if ( (inp_data->Gamepad.wLastButtons & (SO_GAMEPAD_RAW_BUTTON_DPAD_DOWN | SO_GAMEPAD_RAW_BUTTON_DPAD_UP)) != 0){
+				inp_data->Gamepad.fY1 = (inp_data->Gamepad.wLastButtons & SO_GAMEPAD_RAW_BUTTON_DPAD_UP) != 0 ? -1.0 : 1.0;
 			}
 
 
 			//StickOnly
-			if (abs(inp_data->fX1) > 0.1){
+			if (abs(inp_data->Gamepad.fX1) > 0.1){
 				plr->hold_time += delta;
 				if (plr->hold_time <= delta){
-					if (inp_data->fX1 < 0.0){
+					if (inp_data->Gamepad.fX1 < 0.0){
 						plr->input_data |= 4;
 					}
 					else{
@@ -253,10 +253,10 @@ void ProcessFourInputs(Sonicteam::MainMenuTask *a1,float delta){
 
 
 			//StickOnly
-			if (abs(inp_data->fY1) > 0.1){
+			if (abs(inp_data->Gamepad.fY1) > 0.1){
 				plr->hold_time_Y += delta;
 				if (plr->hold_time_Y <= delta){
-					if (inp_data->fY1 < 0.0){
+					if (inp_data->Gamepad.fY1 < 0.0){
 						plr->input_data |= 1;
 					}
 					else{
