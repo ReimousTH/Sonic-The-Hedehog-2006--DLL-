@@ -11,6 +11,7 @@
 #include <queue>
  
 
+
 struct DMSG_UI;
 struct DMSG;
 
@@ -29,6 +30,9 @@ private: //prevent r22, causing null ptr
 	static bool showlog;
 	static bool showuimsg;
 	static bool BreakPoint;
+	static bool YKhronoTimeACC;
+	
+
 
 
 	//extra
@@ -41,6 +45,9 @@ private: //prevent r22, causing null ptr
 
 	public:
 	static std::map<std::string,size_t> breakpoint_disabled;
+
+	static CRITICAL_SECTION g_MessageCriticalSection;
+	static bool USEMUTEX;
 
 
 
@@ -83,6 +90,16 @@ private: //prevent r22, causing null ptr
 
 	static double& Getscroll_acc();
 	static void Setscroll_acc(double value);
+
+
+
+	static bool& GetYKhronoTimeACC();
+	static void SetYKhronoTimeACC(bool value);
+
+
+	static void Initilize();
+
+
 
 
 
@@ -193,6 +210,27 @@ public:
 	}
 	void SetMSG(std::wstring& msg){
 		this->_m = msg;
+
+	}
+	void SetMSG(const char* fmt_str,...){
+
+		va_list args;
+		va_start(args, fmt_str);
+		int size = vsnprintf(NULL, 0, fmt_str, args);
+		va_end(args);
+
+		if (size <= 0) return;
+
+
+		char* buffer = new char[size + 1];
+
+
+		va_start(args, fmt_str); 
+		vsnprintf(buffer, size + 1, fmt_str, args);
+		va_end(args);
+
+
+
 
 	}
 

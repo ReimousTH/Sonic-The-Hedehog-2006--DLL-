@@ -30,7 +30,7 @@ namespace DebugLogV2{
 		Sonicteam::SoX::ResourceManager* ResourceManager = (Sonicteam::SoX::ResourceManager*)0x82D3B224;
 
 		Sonicteam::SoX::IResourceMgr* ArcMgr = (Sonicteam::SoX::IResourceMgr*)(0x82D366D4);
-		Sonicteam::SoX::IResource* ArcHandle =  ArcMgr->GetMgrResource(Sonicteam::SoX::IResourceMgrParam(param_1,param_2));
+		Sonicteam::SoX::IResource* ArcHandle =  ArcMgr->GetMgrResource(&Sonicteam::SoX::IResourceMgrParam(param_1,param_2));
 		ArcHandle->ResourceStr3 = std::string(File_Name);
 		ArcHandle->ResourceLoad(0,0);
 		ArcHandle->AddReference();

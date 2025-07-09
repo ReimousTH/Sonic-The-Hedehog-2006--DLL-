@@ -19,6 +19,7 @@ namespace Misc {
 	Sonicteam::GameImp* GetGameIMP();
 	extern "C" size_t GetNumber(lua_State* L,int argument);
 	extern "C" XMVECTOR GetVector(lua_State*L, int argument);
+	extern "C" int MemoryMetaNew(lua_State*L, void* arg);
 
 }
 

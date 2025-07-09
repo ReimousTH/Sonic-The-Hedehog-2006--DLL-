@@ -21,6 +21,16 @@ extern "C" XMVECTOR Misc::GetVector(lua_State*L, int argument){
 }
 
 
+extern "C" int MemoryMetaNew(lua_State*L, void* arg)
+{
+	lua_getglobal(L,"Memory");
+	lua_pushlightuserdata(L,arg);
+	lua_pcall06(L,1,1,0);
+
+	return 1;
+
+}
+
 Sonicteam::GameImp* Misc::GetGameIMP()
 {
 	Sonicteam::DocMarathonImp* impl = 	*(Sonicteam::DocMarathonImp**)(*(UINT32*)0x82D3B348 + 0x180);

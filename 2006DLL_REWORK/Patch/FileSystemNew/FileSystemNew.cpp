@@ -536,6 +536,13 @@ public:
 
 
 
+		_btn_map[1][3] = new Button("YKhronoTimeACC",600,100,D3DCOLOR_ARGB(255,255,0,0),&DebugOptions::GetYKhronoTimeACC());
+
+	
+
+
+
+
 		for (size_t r = 0; r < _btn_map_size; ++r) {
 			for (size_t c = 0; c < _btn_map_size; ++c) {
 				if (_btn_map[r][c]) _btn_map[r][c]->FocusOFF();

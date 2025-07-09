@@ -40,6 +40,8 @@ namespace TimeSystem{
 		float y;
 		float z;
 		float a;
+
+	
 	};
 	struct LTI_Vector3{
 		float x;

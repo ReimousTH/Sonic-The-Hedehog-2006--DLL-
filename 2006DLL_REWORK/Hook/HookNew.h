@@ -14,7 +14,7 @@
 
 
 
-#include <stdint.h>
+//#include <stdint.h>
 #include <vector>
 #include <map>
 
@@ -249,12 +249,9 @@ extern "C" void __declspec(naked) __savegprlr(){
 	
 
 #define HOOKV3EXMAP(addressTo, return_type, HookFuncName, call_args,args_name,...) \
-	return_type HookFuncName##MAP(__VA_ARGS__) { \
-		FP13RetInit;\
+	return_type __fastcall HookFuncName##MAP(__VA_ARGS__) { \
 		LockR22Register;\
-		bool is_lua = addressTo == 0; \
 		void* addressTo2 = (void*)addressTo;\
-		FP13RetAddr(addressTo2,addressTo); \
 		return_type return_value = (return_type)0; \
 		if (HookNew::SaveBuffer && HookNew::SaveBuffer->find((void*)addressTo2) != HookNew::SaveBuffer->end()){\
 		\
@@ -264,9 +261,6 @@ extern "C" void __declspec(naked) __savegprlr(){
 				block |= (*it)->Block;\
 				if ((*it)->lua_function != 0 && (*it)->L != 0)\
 				{\
-					float fv = *(float*)&(*it);\
-					__asm {fmr fp13,fv}; \
-					HOOKV3EXMAP_LUA\
 				}\
 				else{\
 					void* tar = (*it)->TargetFunc; \
@@ -303,7 +297,7 @@ extern "C" void __declspec(naked) __savegprlr(){
 #define HOOKV3EX(addressTo, return_type, HookFuncName, call_args,args_name,...) \
 	void* HookFuncName##addressto = (void*)addressTo; \
 	HOOKV3EXMAP(addressTo,return_type,HookFuncName,call_args,args_name,__VA_ARGS__); \
-	return_type HookFuncName(__VA_ARGS__) \
+	return_type __fastcall HookFuncName(__VA_ARGS__) \
 
 
 #define HOOKV3EX_EXTERN_C(addressTo, return_type, HookFuncName, call_args,args_name,...) \

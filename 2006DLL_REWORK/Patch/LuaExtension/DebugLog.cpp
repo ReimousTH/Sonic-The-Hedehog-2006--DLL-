@@ -25,6 +25,15 @@ namespace DebugLogV2{
 
 
 
+	// Function to get a metatable by its name
+	static int lua_cgetmetatable(lua_State* L) {
+		const char* name = luaL_checkstring(L, 1); // Get the metatable name (e.g., "SceneIParamMeta")
+		luaL_getmetatable(L, name);
+		return 1; // Success: metatable is on the stack
+
+	}
+
+
 
 	HOOK(int,__cdecl ,sub_825DB498,0x825DB498,lua_State* LS){
 		
@@ -38,6 +47,8 @@ namespace DebugLogV2{
 		BranchTo(0x82639830,int,LS); //open script
 		
 
+
+		lua_register06(LS,"cgetmetatable",lua_cgetmetatable);
 		luaopen_debug(LS);
 		luaopen_string(LS);
 	

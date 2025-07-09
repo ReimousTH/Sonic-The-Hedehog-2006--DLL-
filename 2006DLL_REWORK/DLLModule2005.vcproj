@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="DLLModule"
 	ProjectGUID="{652C7D60-BC02-4E09-96DD-930012345678}"
 	RootNamespace="DLLModule"
@@ -373,7 +373,7 @@
 			<Tool
 				Name="VCX360LinkerTool"
 				AdditionalOptions="/ignore:4089 /dll /entry:&quot;_DllMainCRTStartup&quot; /include:&quot;XboxKrnlBuildNumber&quot;&#x0D;&#x0A;/FORCE:MULTIPLE&#x0A;"
-				AdditionalDependencies="d3d9.lib d3dx9.lib xgraphics.lib xapilib.lib xaudio.lib x3daudio.lib xboxkrnl.lib xbdm.lib libcmt.lib xnet.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib xgraphics.lib xaudio.lib x3daudio.lib xboxkrnl.lib xbdm.lib libcmt.lib xnet.lib xapilib.lib"
 				OutputFile="$(OutDir)/$(ProjectName).dll"
 				AdditionalLibraryDirectories="&quot;..\Havok\lib\win32_net_9-0\release_multithreaded&quot;"
 				IgnoreAllDefaultLibraries="false"
@@ -382,8 +382,8 @@
 				GenerateDebugInformation="true"
 				StackReserveSize="262144"
 				StackCommitSize="262144"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
+				OptimizeReferences="1"
+				EnableCOMDATFolding="1"
 				SetChecksum="true"
 			/>
 			<Tool

@@ -29,6 +29,7 @@
 #include <Sox/FileSystemARC.h>
 #include <Sox/ApplicationXenon.h>
 #include <SceneTimeLight.h>
+#include <Sox/IResourceMgr.h>
 
 #include <Heap.h>
 #include <SpanverseHeap.h>
@@ -36,6 +37,14 @@
 #include <boost/function.hpp>
 
 #include <Sox/Physics/Havok/BodyHavok.h>
+
+#include <LuaSystem.h>
+
+#include <string>
+#include <Sox/IResource.h>
+
+#include <map>
+
 
 struct FPair{
 	const char* Name;
@@ -278,43 +287,7 @@ HOOKV3(0x821F1E30,void*,PostureCommon,(Sonicteam::Player::IPostureControl*,doubl
 
 
 
-HOOKV3(0x82582648,REF_TYPE(Sonicteam::SoX::IResource),sub_82582380,(REF_TYPE(Sonicteam::SoX::IResource)&,Sonicteam::SoX::IResourceMgr*,std::string&,char*,int,int),
-	   (ret,mgr,str,out,flag1,flag2),
-	   REF_TYPE(Sonicteam::SoX::IResource)& ret,Sonicteam::SoX::IResourceMgr* mgr, std::string& str,char* out,int flag1,int flag2){
-		   
-		   if (*(int*)0x82D3B264 = 0){
-				*(int*)0x82D3B264 = BranchTo(0x82581F00,int);
-		   }
 
-		   Sonicteam::SoX::ResourceManager* rmgr =  &SSINGLETON(Sonicteam::SoX::ResourceManager)::getInstance();
-
-		   //create
-		   if (mgr->MgrType == 0 && rmgr->ManagerResouceMgr.size() == 0){
-			   Sonicteam::SoX::HoldMGR holdmgr;
-			   holdmgr.Unk0 = 0;
-			   holdmgr.Unk4 = 0;
-			   holdmgr.Mgr = mgr;
-			   holdmgr.Flag01 = 1;
-			   holdmgr.Flag02 = 0;
-			   rmgr->ManagerResouceMgr[rmgr->ManagerResouceMgr.size()] = holdmgr;
-
-		   }
-		   else if ( rmgr->ManagerResouceMgr.find(mgr->MgrType) == rmgr->ManagerResouceMgr.end()){
-			   Sonicteam::SoX::HoldMGR holdmgr;
-			   holdmgr.Unk0 = 0;
-			   holdmgr.Unk4 = 0;
-			   holdmgr.Mgr = mgr;
-			   holdmgr.Flag01 = 1;
-			   holdmgr.Flag02 = 0;
-			   rmgr->ManagerResouceMgr[rmgr->ManagerResouceMgr.size()] = holdmgr;
-		   }
-
-
-
-
-
-	   return ret;
-}
 
 
 
@@ -467,6 +440,102 @@ int __fastcall sub_8221EAF0(int a1, char a2)
 }
 
 
+HOOKV3(0x825ED0C8,int,sub_825ED0C8,(int),(a1),int a1){
+
+	char t = *(char*)(a1 + 0x60 + 0x24);
+
+	if (t){
+			PushBreakPoint(__FILE__,__LINE__,"sub_825ED0C8 : %x",a1);
+	}
+
+
+
+	return a1;
+	
+}
+
+HOOKV3(0x82582648,REF_TYPE(Sonicteam::SoX::IResource),sub_82582648,(Sonicteam::SoX::IResourceMgr*,std::string&,std::string&,Sonicteam::SoX::IResourceMgrParam*,bool),(mgr,file1,file2,params,check),Sonicteam::SoX::IResourceMgr* mgr, std::string& file1, std::string& file2,Sonicteam::SoX::IResourceMgrParam* params,bool check){
+
+
+	AddMessage("%s : ", file1.c_str());
+	return Sonicteam::SoX::ResourceManager::LoadResourceFromArc(mgr,file1,file2,params,check);;
+
+}
+
+
+HOOKV3(0x82582380,REF_TYPE(Sonicteam::SoX::IResource),sub_82582380,(Sonicteam::SoX::IResourceMgr*,std::string&,bool*,Sonicteam::SoX::IResourceMgrParam*),(mgr,file1,check,params),Sonicteam::SoX::IResourceMgr* mgr, std::string& file1,bool* check,Sonicteam::SoX::IResourceMgrParam* params){
+
+
+	AddMessage("0x82582380 mgr : %x (%s) %s : ", mgr,typeid(*mgr).name(),file1.c_str());
+	//return 0;
+	return Sonicteam::SoX::ResourceManager::LoadResource(mgr,file1,check,params);;
+
+}
+
+
+
+HOOKV3(0x82581F78 ,unsigned int*,sub_82581F78,(Sonicteam::SoX::IResourceMgr*),(mgr),Sonicteam::SoX::IResourceMgr* mgr){
+
+
+	AddMessage("sub_82581F78 mgr : %x (%s) : ", mgr,typeid(*mgr).name());
+	return Sonicteam::SoX::ResourceManager::InitializeManagerIndex(mgr);
+
+}
+
+
+//works 100 %
+HOOKV3(0x825BDAC0 ,void*,sub_825BDAC0,(Sonicteam::SoX::ResourceManager*,unsigned int*,std::string&),(res,index,str),Sonicteam::SoX::ResourceManager* res, unsigned int* index,std::string& str){
+
+
+	AddMessage("sub_825BDAC0 index : %d : %s ",*index,str.c_str());
+	res->RemoveResource(index,str);
+	return 0;
+
+}
+
+
+HOOKV3(0x825BE0C0 ,void*,sub_825BE0C0,(void*,Sonicteam::SoX::ResourceManager*,unsigned int*,std::string),(ou,res,index,str),void* ou,Sonicteam::SoX::ResourceManager* res,unsigned int* index,std::string str){
+
+	//PushBreakPoint(__FILE__,__LINE__,"sub_825BE0C0 : %s",str.c_str());
+	AddMessage("sub_825BE0C0 : %s",str.c_str());
+	//*((std::map<std::string, Sonicteam::SoX::IResource*>::iterator*)ou) = 	 res->FindResource(index,str);
+	return ou;
+
+}
+
+
+
+
+
+
+
+
+ extern "C" void __fastcall sub_825963F0(int a1, double a2)
+{
+
+	LockR22Register;
+	
+
+
+	if ( *(_DWORD *)(a1 + 0x14) )
+	{
+		if ( a2 != 0.0 )
+			*(float *)(a1 + 0x18) = ((double (__fastcall *)(int, double, double))*(_DWORD *)(*(_DWORD *)a1 + 0x28))(// 82599170
+			a1,
+			*(float *)(a1 + 0x18),
+			a2);
+	}
+
+	if ( a2 != 0.0  ) {  // Add thread check here
+		//PushBreakPoint(__FILE__,__LINE__,"TEST");
+		AddMessage("sub_825963F0(1) %d : %f : %f", GetCurrentThreadId(),*(float *)(a1 + 0x18),a2);
+
+	}
+
+}
+
+
+
 
 
 void STH2006DLLMain()
@@ -563,9 +632,10 @@ void STH2006DLLMain()
 	SSINGLETON(Sonicteam::SoX::FileSystemXenon)::getInstance((void*)0x82D37088); 
 	SSINGLETON(Sonicteam::SpanverseHeap)::getInstance((void*)0x82D3C620); 
 	SSINGLETON(Sonicteam::SceneTimeLight)::getInstance((void**)0x82D36D04,(void*)0x8226FE38); 
-
-
 	SSINGLETON(Sonicteam::CsdManager)::getInstance((void**)0x82D3BC58,(void*)0x825E9530); 
+
+	SSINGLETON(Sonicteam::LuaSystemManager)::getInstance((void**)0x82D35EDC,(void*)0x82162DF8); 
+
 
 	HookNew::SaveBuffer = new std::map<void*, std::vector<HookNew*>>();
 	
@@ -579,7 +649,19 @@ void STH2006DLLMain()
 
 
 
-	INSTALL_HOOKV3EX(sub_82287C10,-1,false,11);
+	//INSTALL_HOOKV3EX(sub_82287C10,-1,false,11);
+	//INSTALL_HOOKV3EX(sub_825ED0C8,-1,false,11);
+	//INSTALL_HOOKV3EX(sub_82582648,1,true,9);
+	
+	//INSTALL_HOOKV3EX(sub_82582380,-1,true,11);
+	
+	//INSTALL_HOOKV3EX(sub_82581F78,-1,true,11); works
+	//INSTALL_HOOKV3EX(sub_825BDAC0,-1,true,11); //works 1:1
+	
+
+//	INSTALL_HOOKV3EX(sub_825BE0C0,-1,true,11);
+
+
 	
 
 //	INSTALL_HOOKV3EX(sub_0x82279CA8,-1,false,11);
@@ -596,6 +678,8 @@ void STH2006DLLMain()
 
 
 //	WRITE_DWORD(0x8200BB08,sub_8221EAF0);
+
+	//WRITE_DWORD(0x82046DD4,sub_825963F0);
 
 
 
@@ -625,6 +709,14 @@ void STH2006DLLMain()
 	DebugOptions::SetEnableDevStuff ( lua_file.GetGlobalBool("IsEnableDevStuff") );
 	DebugOptions::SetAlwaysRunModLoaderAtStartup ( lua_file.GetGlobalBool("IsForceModLoaderStartup") );
 
+	DebugOptions::SetDebugLogV4HUD ( lua_file.GetGlobalBool("DebugLogV4HUD") );
+	DebugOptions::SetHideXNCP(lua_file.GetGlobalBool("HideXNCP") );
+	DebugOptions::Setshowlog( lua_file.GetGlobalBool("showlog") );
+	DebugOptions::Setshowuimsg ( lua_file.GetGlobalBool("showuimsg") );
+	DebugOptions::SetBreakPoint ( lua_file.GetGlobalBool("BreakPoint") );
+	DebugOptions::SetYKhronoTimeACC ( lua_file.GetGlobalBool("YKhronoTimeACC") );
+
+	DebugOptions::Initilize(); //mutex_for
 
 
 	FileSystemNew::GlobalInstall();

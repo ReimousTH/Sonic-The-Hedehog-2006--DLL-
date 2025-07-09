@@ -94,7 +94,6 @@ namespace DebugLogV2{
 	}
 	extern "C" int IO__MALLOC(lua_State* L){
 		lua_pushlightuserdata(L,malloc(IO_GetNumber(L,1)));
-
 		return 1;
 	}
 
